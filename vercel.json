@@ -1,9 +1,42 @@
 {
   "version": 2,
-  "cleanUrls": true,
+  "headers": [
+    {
+      "source": "/studio",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
+    },
+    {
+      "source": "/studio/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ],
   "redirects": [
     {
       "source": "/start",
+      "destination": "/studio",
+      "permanent": false
+    },
+    {
+      "source": "/start.html",
       "destination": "/studio",
       "permanent": false
     },
@@ -25,7 +58,11 @@
     },
     {
       "source": "/studio",
-      "destination": "/guest-studio.html"
+      "destination": "/studio/index.html"
+    },
+    {
+      "source": "/studio/",
+      "destination": "/studio/index.html"
     },
     {
       "source": "/:path*",
