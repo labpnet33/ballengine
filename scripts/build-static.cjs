@@ -2,42 +2,36 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const root = path.resolve(__dirname, '..');
-const source = path.join(root, 'extra', 'wget', 'ballengine.app');
-const out = path.join(root, 'dist');
-const homeFile = path.join(source, 'index.html');
-const guestFile = path.join(root, 'guest-studio.html');
+const repo = path.resolve(__dirname, '..');
+const website = path.join(repo, 'extra', 'wget', 'ballengine.app');
+const homePath = path.join(website, 'index.html');
+const studioPath = path.join(repo, 'guest-studio.html');
+for (const p of [homePath, studioPath]) if (!fs.existsSync(p)) throw new Error('Missing input: ' + p);
 
-for (const p of [homeFile, guestFile]) {
-  if (!fs.existsSync(p)) throw new Error('Required source file missing: ' + p);
-}
-fs.rmSync(out, { recursive: true, force: true });
-fs.cpSync(source, out, { recursive: true });
-let homepage = fs.readFileSync(homeFile, 'utf8');
-
-// The original browser bundle contains the captured site's sign-in gate.
-// Keep the pre-rendered landing page intact; serve a separate original guest editor.
-homepage = homepage.replace(/<script\b(?=[^>]*\btype=["']module["'])(?=[^>]*\bsrc=["'][^"']*assets\/index-[^"']+\.js["'])[^>]*><\/script>/gi, '');
+// Vercel project Root Directory is extra/wget/ballengine.app.
+// Prepare a publishable site IN that directory instead of creating a separate dist.
+let homepage = fs.readFileSync(homePath, 'utf8');
+const originalBundle = /<script\b(?=[^>]*\btype=["']module["'])(?=[^>]*\bsrc=["'][^"']*assets\/index-[^"']+\.js["'])[^>]*><\/script>/gi;
+const count = (homepage.match(originalBundle) || []).length;
+homepage = homepage.replace(originalBundle, '');
 homepage = homepage.replace(/<link\b[^>]*rel=["']modulepreload["'][^>]*>/gi, '');
 homepage = homepage.replace(/href=["']start\.html["']/gi, 'href="/studio"');
 homepage = homepage.replace(/<a\b[^>]*href=["'](?:login|signup)(?:\.html)?["'][^>]*>[\s\S]*?<\/a>/gi, '');
-homepage = homepage.replace(/<a\b[^>]*href=["'](?:\/)?start["'][^>]*>/gi, '<a href="/studio">');
-fs.writeFileSync(path.join(out, 'index.html'), homepage);
+fs.writeFileSync(homePath, homepage);
 
-const guest = fs.readFileSync(guestFile, 'utf8');
-fs.mkdirSync(path.join(out, 'studio'), { recursive: true });
-fs.writeFileSync(path.join(out, 'studio', 'index.html'), guest);
-fs.writeFileSync(path.join(out, 'studio.html'), guest);
-fs.writeFileSync(path.join(out, 'guest-studio.html'), guest);
+const guest = fs.readFileSync(studioPath, 'utf8');
+fs.mkdirSync(path.join(website, 'studio'), { recursive: true });
+fs.writeFileSync(path.join(website, 'studio.html'), guest);
+fs.writeFileSync(path.join(website, 'studio', 'index.html'), guest);
 
-// Stop a captured service worker from restoring stale auth-required navigation.
-fs.writeFileSync(path.join(out, 'sw.js'),
+// Clear service workers left by the captured upstream site.
+fs.writeFileSync(path.join(website, 'sw.js'),
   'self.addEventListener("install",()=>self.skipWaiting());\n'+
-  'self.addEventListener("activate",e=>e.waitUntil((async()=>{for(const k of await caches.keys()) await caches.delete(k); await self.registration.unregister(); await self.clients.claim()})()));\n'
+  'self.addEventListener("activate",e=>e.waitUntil((async()=>{for(const k of await caches.keys())await caches.delete(k);await self.registration.unregister();await self.clients.claim()})()));\n'
 );
 const required = ['index.html', 'studio.html', 'studio/index.html', 'assets/index-DoMKM56W.css'];
-for (const item of required) if (!fs.existsSync(path.join(out, item))) throw new Error('Missing published asset: ' + item);
-console.log('Static output built at dist/ with homepage, standalone studio and captured assets.');
-console.log('Homepage bytes: ' + fs.statSync(path.join(out, 'index.html')).size);
-console.log('Guest studio bytes: ' + fs.statSync(path.join(out, 'studio.html')).size);
-console.log('Published top-level files: ' + fs.readdirSync(out).length);
+for(const item of required) if(!fs.existsSync(path.join(website, item))) throw new Error('Missing public file: ' + item);
+console.log('Guest preview files prepared in configured Vercel Root Directory.');
+console.log('Removed captured SPA entry bundles:', count);
+console.log('Published HTML bytes:', fs.statSync(homePath).size, fs.statSync(path.join(website,'studio.html')).size);
+console.log('Published directory entries:', fs.readdirSync(website).length);
