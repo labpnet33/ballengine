@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/start",
+      "destination": "/studio",
+      "permanent": false
+    },
+    {
+      "source": "/login",
+      "destination": "/studio",
+      "permanent": false
+    },
+    {
+      "source": "/signup",
+      "destination": "/studio",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/extra/wget/ballengine.app/index.html"
+    },
+    {
+      "source": "/studio",
+      "destination": "/extra/wget/ballengine.app/studio.html"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/extra/wget/ballengine.app/:path*"
+    }
+  ]
+}
