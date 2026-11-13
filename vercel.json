@@ -1,34 +1,10 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "headers": [
-    {
-      "source": "/studio",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
-        }
-      ]
-    },
-    {
-      "source": "/studio/:path*",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
-        }
-      ]
-    },
-    {
-      "source": "/sw.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    }
-  ],
+  "framework": null,
+  "buildCommand": "node scripts/build-static.cjs",
+  "outputDirectory": "dist",
+  "cleanUrls": false,
   "redirects": [
     {
       "source": "/start",
@@ -41,32 +17,63 @@
       "permanent": false
     },
     {
+      "source": "/signup",
+      "destination": "/studio",
+      "permanent": false
+    },
+    {
+      "source": "/signup.html",
+      "destination": "/studio",
+      "permanent": false
+    },
+    {
       "source": "/login",
       "destination": "/studio",
       "permanent": false
     },
     {
-      "source": "/signup",
+      "source": "/login.html",
       "destination": "/studio",
       "permanent": false
     }
   ],
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/extra/wget/ballengine.app/index.html"
-    },
-    {
       "source": "/studio",
-      "destination": "/studio/index.html"
+      "destination": "/studio.html"
     },
     {
       "source": "/studio/",
-      "destination": "/studio/index.html"
+      "destination": "/studio.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/studio",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
     },
     {
-      "source": "/:path*",
-      "destination": "/extra/wget/ballengine.app/:path*"
+      "source": "/studio.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
     }
   ]
 }
