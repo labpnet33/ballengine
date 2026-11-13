@@ -29,6 +29,21 @@ fs.writeFileSync(path.join(website, 'sw.js'),
   'self.addEventListener("install",()=>self.skipWaiting());\n'+
   'self.addEventListener("activate",e=>e.waitUntil((async()=>{for(const k of await caches.keys())await caches.delete(k);await self.registration.unregister();await self.clients.claim()})()));\n'
 );
+
+// All former auth entrypoints must resolve to the guest studio, including direct visits.
+const guestRedirect = '<!doctype html><html><head><meta charset="utf-8">'+
+  '<meta name="viewport" content="width=device-width,initial-scale=1">'+
+  '<meta http-equiv="refresh" content="0; url=/studio">'+
+  '<title>Opening Guest Studio</title></head><body style="background:#09090b;color:#fafafa;font-family:system-ui;padding:24px">'+
+  '<p>Opening the guest studio… <a style="color:#22d3ee" href="/studio">Continue to studio</a></p>'+
+  '<script>window.location.replace("/studio");<\/script></body></html>';
+for (const entry of ['signup', 'login', 'start']) {
+  const directory = path.join(website, entry);
+  fs.mkdirSync(directory, { recursive:true });
+  fs.writeFileSync(path.join(directory, 'index.html'), guestRedirect);
+  fs.writeFileSync(path.join(website, entry + '.html'), guestRedirect);
+}
+
 const required = ['index.html', 'studio.html', 'studio/index.html', 'assets/index-DoMKM56W.css'];
 for(const item of required) if(!fs.existsSync(path.join(website, item))) throw new Error('Missing public file: ' + item);
 console.log('Guest preview files prepared in configured Vercel Root Directory.');
