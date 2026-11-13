@@ -1,0 +1,48 @@
+name: Captured-site preview smoke test
+
+on:
+  push:
+    branches:
+      - dev/rebuild-from-capture
+    paths:
+      - scripts/serve-capture.mjs
+      - .github/workflows/capture-preview.yml
+      - extra/wget/ballengine.app/**
+  pull_request:
+    paths:
+      - scripts/serve-capture.mjs
+      - .github/workflows/capture-preview.yml
+
+permissions:
+  contents: read
+
+jobs:
+  check-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Check script syntax
+        run: node --check scripts/serve-capture.mjs
+      - name: Serve captured site and test routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/serve-capture.mjs 4173 > /tmp/capture-preview.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/ -o /tmp/index-preview.html; then break; fi
+            sleep 1
+          done
+          test -s /tmp/index-preview.html
+          curl --fail --silent http://127.0.0.1:4173/studio -o /tmp/studio-preview.html
+          test -s /tmp/studio-preview.html
+          curl --fail --silent http://127.0.0.1:4173/assets/index-DoMKM56W.css -o /tmp/preview-style.css
+          test -s /tmp/preview-style.css
+          test "$(curl --silent -o /tmp/api-preview.json -w '%{http_code}' http://127.0.0.1:4173/api/does-not-exist)" = "501"
+          test "$(curl --silent -o /dev/null -w '%{http_code}' http://127.0.0.1:4173/assets/not-found.js)" = "404"
+          echo "Captured-site static smoke tests passed."
