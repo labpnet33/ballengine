@@ -25,7 +25,7 @@
     },
     {
       "source": "/studio",
-      "destination": "/extra/wget/ballengine.app/studio.html"
+      "destination": "/guest-studio.html"
     },
     {
       "source": "/:path*",
