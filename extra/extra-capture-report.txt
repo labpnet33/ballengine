@@ -1,0 +1,14 @@
+Webcloner optional public capture
+URL: https://ballengine.app/
+Output: /home/ubuntu/webcloner/captures/all-ballengine.app-20261113T143310Z/extra
+Engines: both
+Depth: 4; Browsertrix page limit: 80
+Per-engine quota: 1200 MB; time: 30 minutes
+
+Wget: exit 8; logs: wget-run.log (some HTTP errors are expected)
+Browsertrix: skipped (Docker unavailable)
+
+Wget creates an offline page and public-asset mirror.
+Browsertrix creates WARC/WACZ archives for replay and inspection.
+These do not contain private code, protected functionality or databases.
+Do not publish copyrighted assets without permission.

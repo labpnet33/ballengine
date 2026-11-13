@@ -1,0 +1,7 @@
+[
+  {
+    "kind": "page",
+    "url": "https://ballengine.app/",
+    "reason": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  }
+]

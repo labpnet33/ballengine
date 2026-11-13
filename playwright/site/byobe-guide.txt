@@ -1,0 +1,107 @@
+# Add the BallEngine player to this website
+
+You are adding BallEngine (https://ballengine.app), a physics ball simulation player, to the user's
+website. It is ONE iframe that BallEngine hosts. Do not install any package, do not copy any
+BallEngine code, do not add a build step. Keep the user's existing design: the player runs in its
+own frame and the page's CSS cannot affect it.
+
+## Facts
+- Public key: be_pk_YOUR_KEY
+  Safe to put in page source. It only works on: the websites registered for your key
+- Modes: RHYTHMIC, ESCAPE, DRAWER, SPAWNER, GHOST_ESCAPE, SPIRAL_BREAKER, GLASS_TOWER, FLAG_BATTLE, WEAPON_BALL_BATTLE, MERGE_EVOLUTION, GLASS_RUSH, WAVE_GRID, MARBLE_RUN_3D, BALL_CRUSH, SOFT_BODY, CUT_COUNT, MAGNETIC, GRID_MERGE
+- Randomize makes a new simulation; Download video records an MP4 on the visitor's own device
+  (no server, no credits). Each finished download counts against the site's monthly videos.
+- The player is vertical 9:16. Never give it a fixed height that breaks that ratio.
+
+## First, ask the user ONE question, then build only what they choose
+"How much do you want to build?
+ 1. Quick test: the player with its built-in Randomize and Download buttons (about 2 minutes)
+ 2. My own controls: your own Randomize, Download video and mode picker buttons in your design
+ 3. Full: level 2 plus progress bar, monthly videos left, keeping the video on your server, and a
+    per-user limit"
+If the user already said what they want, skip the question. If unsure, build level 1: it already
+makes great-looking videos, because Randomize does the design work.
+
+## Level 1: the player (everyone starts here)
+Place this where the player should appear, with the mode the user wants:
+
+<iframe
+  id="ballengine-player"
+  src="https://ballengine.app/embed?key=be_pk_YOUR_KEY&mode=FLAG_BATTLE&duration=15"
+  style="width: 100%; max-width: 420px; aspect-ratio: 9 / 16; border: 0; display: block"
+  allow="autoplay; fullscreen"
+  title="BallEngine simulation"
+></iframe>
+
+It already has a Randomize button and a Download video button at the bottom. Done for level 1.
+URL options: mode (key like FLAG_BATTLE or page name like flag-battle), duration (5 to 60 seconds,
+default 15), visitor (optional id of the signed-in user, for a per-user limit).
+Look settings, the SAME names the cloud render API takes, so the site and its rendered videos match:
+theme (cyberpunk_neon, dark_minimal, retro_synthwave, matrix_code, gold_luxury, fire_and_ice,
+pastel_dream, deep_space), palette (comma-separated hex colours), title_text, watermark_text,
+speed (0.5 to 3), ball_count, gravity (0 to 5), sound_effect, config_overrides (URL-encoded JSON).
+They stay on through every Randomize. Only add them if the user wants a fixed look.
+React: same tag, style as an object. SSR frameworks: render it client-side if needed.
+
+## Level 2: the site's own buttons (build in this order)
+The page talks to the player with postMessage. Always check the origin.
+
+const BE = 'https://ballengine.app';
+const player = document.getElementById('ballengine-player');
+const send = (msg) => player.contentWindow.postMessage({ target: 'ballengine', ...msg }, BE);
+
+a) Randomize button:      send({ type: 'randomize' })
+b) Download video button: send({ type: 'export' })        // records locally, then downloads
+c) Mode picker: wait for the 'ready' message, it lists every mode as e.data.modes = [{ id, name }].
+   Build a <select> or buttons from it and on change: send({ type: 'set-mode', mode: id })
+   The player answers { type: 'mode-changed', mode }.
+d) Look controls (optional): send({ type: 'set-settings', settings: { theme: 'gold_luxury', title_text: 'Hi' } })
+   The player answers { type: 'settings-changed', settings } with what it applied.
+
+window.addEventListener('message', (e) => {
+  if (e.origin !== BE || e.data?.source !== 'ballengine') return;
+  if (e.data.type === 'ready') { /* enable your buttons; build the picker from e.data.modes */ }
+});
+
+Disable the site's buttons until 'ready' arrives, and while a download is being made.
+
+## Level 3: everything else
+Messages the player sends (e.data.type):
+- ready            { mode, modes: [{id, name}], remaining }   remaining = videos left this month
+- randomized
+- mode-changed     { mode }
+- settings-changed { settings }
+- export-progress  { progress }  0 to 100, for a progress bar
+- export-done      { video, remaining }  video is the MP4 as a Blob: upload it to the user's
+                   server with FormData if they want to keep it
+- export-failed    { message }   the device could not make it; nothing was counted
+- limit-reached    the site's monthly videos are used up: show the user a friendly message
+- cloud-queued     { jobId }        a cloud video started (see Cloud videos below)
+- cloud-progress   { jobId, progress }
+- cloud-done       { jobId, url }   url = signed MP4 link, valid 15 minutes: fetch it server-side to keep it
+- cloud-failed     { code, message } nothing was charged
+- error            { message }
+Per-user limit: add &visitor=<their user id> to the iframe URL.
+
+## Cloud videos (only if the user wants them)
+Like BallEngine itself, the player can make an HD video on BallEngine's GPUs, paid from the site
+owner's cloud credits (their plan's monthly credits, then bought ones). The owner switches it on
+and sets limits in the console at https://ballengine.app/developer. Then either:
+- the player shows its own Cloud video button, or
+- the page starts one: send({ type: 'cloud-render', quality: '1080p60' })   // or '720p30'
+If the owner chose "Only with a token from your server" (e.g. cloud videos for paying users only):
+on the SERVER, with the secret key, POST https://ballengine.app/api/v1/embed/cloud-tokens
+{ "site_key": "be_pk_YOUR_KEY", "visitor": "<user id>" } returns { token }; pass it to the page and
+send({ type: 'cloud-render', token }). Never put the secret key in the page.
+
+## Rules
+- Never put a secret key (be_sk_...) in a web page. Only the public key (be_pk_...) goes there.
+- "This player is not set up for this website" means the page's address is not registered for this
+  key. Tell the user to contact BallEngine support with the exact address (https://example.com and
+  https://www.example.com are different; http://localhost too).
+- Cloud-rendered videos (longer, 16:9, or for slow devices) come from the same platform: POST
+  https://ballengine.app/api/v1/videos from the user's SERVER with their secret key and the same look
+  settings as the player. Docs: https://ballengine.app/developer/docs. Only add it if asked.
+
+## Done when
+The simulation plays on the page, Randomize changes it, and Download video saves an MP4.

@@ -1,0 +1,7 @@
+Webcloner three-engine summary
+Target: https://ballengine.app/
+Capture folder: /home/ubuntu/webcloner/captures/all-ballengine.app-20261113T143310Z
+Playwright exit: 0
+Wget / Browsertrix overall exit: 1
+Details: playwright/report.txt and extra/extra-capture-report.txt
+These tools do not produce private source code or a working backend.

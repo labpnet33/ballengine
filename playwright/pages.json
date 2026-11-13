@@ -1,0 +1,643 @@
+[
+  {
+    "url": "https://ballengine.app/",
+    "depth": 0,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine | Simulador de Bolas Rebotando",
+    "links": 114,
+    "finalUrl": "https://ballengine.app/es"
+  },
+  {
+    "url": "https://ballengine.app/fr",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine | Bouncing Ball Simulator",
+    "links": 114,
+    "finalUrl": "https://ballengine.app/fr"
+  },
+  {
+    "url": "https://ballengine.app/de",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine | Hüpfende-Ball-Simulator",
+    "links": 114,
+    "finalUrl": "https://ballengine.app/de"
+  },
+  {
+    "url": "https://ballengine.app/ja",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine | バウンドボール シミュレーター",
+    "links": 114,
+    "finalUrl": "https://ballengine.app/ja"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine | 彈跳球模擬器",
+    "links": 114,
+    "finalUrl": "https://ballengine.app/zh-tw"
+  },
+  {
+    "url": "https://ballengine.app/plans",
+    "depth": 1,
+    "status": 200,
+    "title": "會員方案 | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/plans"
+  },
+  {
+    "url": "https://ballengine.app/es/plans",
+    "depth": 1,
+    "status": 200,
+    "title": "Planes de suscripción | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/es/plans"
+  },
+  {
+    "url": "https://ballengine.app/fr/plans",
+    "depth": 1,
+    "status": 200,
+    "title": "Forfaits d'abonnement | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/fr/plans"
+  },
+  {
+    "url": "https://ballengine.app/de/plans",
+    "depth": 1,
+    "status": 200,
+    "title": "Membership Plans | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/de/plans"
+  },
+  {
+    "url": "https://ballengine.app/ja/plans",
+    "depth": 1,
+    "status": 200,
+    "title": "Membership Plans | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/ja/plans"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/plans",
+    "depth": 1,
+    "status": 200,
+    "title": "會員方案 | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/zh-tw/plans"
+  },
+  {
+    "url": "https://ballengine.app/faq",
+    "depth": 1,
+    "status": 200,
+    "title": "FAQ - Bouncing Ball Simulator | BallEngine",
+    "links": 46,
+    "finalUrl": "https://ballengine.app/faq"
+  },
+  {
+    "url": "https://ballengine.app/support",
+    "depth": 1,
+    "status": 200,
+    "title": "支援中心 | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/support"
+  },
+  {
+    "url": "https://ballengine.app/es/support",
+    "depth": 1,
+    "status": 200,
+    "title": "Centro de Soporte | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/es/support"
+  },
+  {
+    "url": "https://ballengine.app/fr/support",
+    "depth": 1,
+    "status": 200,
+    "title": "Centre d'assistance | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/fr/support"
+  },
+  {
+    "url": "https://ballengine.app/de/support",
+    "depth": 1,
+    "status": 200,
+    "title": "Support-Center | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/de/support"
+  },
+  {
+    "url": "https://ballengine.app/ja/support",
+    "depth": 1,
+    "status": 200,
+    "title": "サポートセンター | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/ja/support"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/support",
+    "depth": 1,
+    "status": 200,
+    "title": "支援中心 | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/zh-tw/support"
+  },
+  {
+    "url": "https://ballengine.app/about",
+    "depth": 1,
+    "status": 200,
+    "title": "About The Studio: BallEngine | BallEngine",
+    "links": 70,
+    "finalUrl": "https://ballengine.app/about"
+  },
+  {
+    "url": "https://ballengine.app/how-it-works",
+    "depth": 1,
+    "status": 200,
+    "title": "How It Works | BallEngine Bouncing Ball Simulator | BallEngine",
+    "links": 65,
+    "finalUrl": "https://ballengine.app/how-it-works"
+  },
+  {
+    "url": "https://ballengine.app/blog",
+    "depth": 1,
+    "status": 200,
+    "title": "Blog | BallEngine",
+    "links": 50,
+    "finalUrl": "https://ballengine.app/blog"
+  },
+  {
+    "url": "https://ballengine.app/tutorials",
+    "depth": 1,
+    "status": 200,
+    "title": "Creator Tutorials | How to Make Satisfying Physics Videos | BallEngine",
+    "links": 53,
+    "finalUrl": "https://ballengine.app/tutorials"
+  },
+  {
+    "url": "https://ballengine.app/help",
+    "depth": 1,
+    "status": 200,
+    "title": "Help | BallEngine",
+    "links": 119,
+    "finalUrl": "https://ballengine.app/help"
+  },
+  {
+    "url": "https://ballengine.app/login",
+    "depth": 1,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/login"
+  },
+  {
+    "url": "https://ballengine.app/es/login",
+    "depth": 1,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login"
+  },
+  {
+    "url": "https://ballengine.app/fr/login",
+    "depth": 1,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login"
+  },
+  {
+    "url": "https://ballengine.app/de/login",
+    "depth": 1,
+    "status": 200,
+    "title": "Einloggen | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/de/login"
+  },
+  {
+    "url": "https://ballengine.app/ja/login",
+    "depth": 1,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login",
+    "depth": 1,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login"
+  },
+  {
+    "url": "https://ballengine.app/signup",
+    "depth": 1,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/signup"
+  },
+  {
+    "url": "https://ballengine.app/es/signup",
+    "depth": 1,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup",
+    "depth": 1,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup"
+  },
+  {
+    "url": "https://ballengine.app/de/signup",
+    "depth": 1,
+    "status": 200,
+    "title": "Registrieren | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/de/signup"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup",
+    "depth": 1,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup",
+    "depth": 1,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup"
+  },
+  {
+    "url": "https://ballengine.app/modes",
+    "depth": 1,
+    "status": 200,
+    "title": "All 45 Bouncing Ball Simulator Modes | BallEngine",
+    "links": 226,
+    "finalUrl": "https://ballengine.app/modes"
+  },
+  {
+    "url": "https://ballengine.app/automation",
+    "depth": 1,
+    "status": 200,
+    "title": "自動化：發布、排程與 Autopilot | BallEngine",
+    "links": 42,
+    "finalUrl": "https://ballengine.app/automation"
+  },
+  {
+    "url": "https://ballengine.app/es/automation",
+    "depth": 1,
+    "status": 200,
+    "title": "Automatización: publicación, programación y Autopilot | BallEngine",
+    "links": 42,
+    "finalUrl": "https://ballengine.app/es/automation"
+  },
+  {
+    "url": "https://ballengine.app/fr/automation",
+    "depth": 1,
+    "status": 200,
+    "title": "Automatisation : publication, programmation et Autopilot | BallEngine",
+    "links": 42,
+    "finalUrl": "https://ballengine.app/fr/automation"
+  },
+  {
+    "url": "https://ballengine.app/de/automation",
+    "depth": 1,
+    "status": 200,
+    "title": "Automatisierung: Veröffentlichen, Planen und Autopilot | BallEngine",
+    "links": 42,
+    "finalUrl": "https://ballengine.app/de/automation"
+  },
+  {
+    "url": "https://ballengine.app/ja/automation",
+    "depth": 1,
+    "status": 200,
+    "title": "オートメーション：公開・予約投稿・Autopilot | BallEngine",
+    "links": 42,
+    "finalUrl": "https://ballengine.app/ja/automation"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/automation",
+    "depth": 1,
+    "status": 200,
+    "title": "自動化：發布、排程與 Autopilot | BallEngine",
+    "links": 42,
+    "finalUrl": "https://ballengine.app/zh-tw/automation"
+  },
+  {
+    "url": "https://ballengine.app/play",
+    "depth": 1,
+    "status": 200,
+    "title": "免費彈跳球遊戲 | BallEngine",
+    "links": 4,
+    "finalUrl": "https://ballengine.app/play"
+  },
+  {
+    "url": "https://ballengine.app/es/play",
+    "depth": 1,
+    "status": 200,
+    "title": "Juegos gratis de pelotas que rebotan | BallEngine",
+    "links": 4,
+    "finalUrl": "https://ballengine.app/es/play"
+  },
+  {
+    "url": "https://ballengine.app/fr/play",
+    "depth": 1,
+    "status": 200,
+    "title": "Jeux gratuits de balles rebondissantes | BallEngine",
+    "links": 4,
+    "finalUrl": "https://ballengine.app/fr/play"
+  },
+  {
+    "url": "https://ballengine.app/de/play",
+    "depth": 1,
+    "status": 200,
+    "title": "Kostenlose Bouncing-Ball-Spiele | BallEngine",
+    "links": 4,
+    "finalUrl": "https://ballengine.app/de/play"
+  },
+  {
+    "url": "https://ballengine.app/ja/play",
+    "depth": 1,
+    "status": 200,
+    "title": "無料のバウンドボールゲーム | BallEngine",
+    "links": 4,
+    "finalUrl": "https://ballengine.app/ja/play"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/play",
+    "depth": 1,
+    "status": 200,
+    "title": "免費彈跳球遊戲 | BallEngine",
+    "links": 4,
+    "finalUrl": "https://ballengine.app/zh-tw/play"
+  },
+  {
+    "url": "https://ballengine.app/play/brick-breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "打磚塊 | BallEngine",
+    "links": 0,
+    "finalUrl": "https://ballengine.app/play/brick-breaker"
+  },
+  {
+    "url": "https://ballengine.app/es/play/brick-breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "Rompeladrillos | BallEngine",
+    "links": 0,
+    "finalUrl": "https://ballengine.app/es/play/brick-breaker"
+  },
+  {
+    "url": "https://ballengine.app/fr/play/brick-breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "Brick Breaker | BallEngine",
+    "links": 0,
+    "finalUrl": "https://ballengine.app/fr/play/brick-breaker"
+  },
+  {
+    "url": "https://ballengine.app/de/play/brick-breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "Brick Breaker | BallEngine",
+    "links": 0,
+    "finalUrl": "https://ballengine.app/de/play/brick-breaker"
+  },
+  {
+    "url": "https://ballengine.app/ja/play/brick-breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "ブロック崩し | BallEngine",
+    "links": 0,
+    "finalUrl": "https://ballengine.app/ja/play/brick-breaker"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/play/brick-breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "打磚塊 | BallEngine",
+    "links": 0,
+    "finalUrl": "https://ballengine.app/zh-tw/play/brick-breaker"
+  },
+  {
+    "url": "https://ballengine.app/developer/docs",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine Developer Docs: Website Player, Video API and MCP Server | BallEngine",
+    "links": 49,
+    "finalUrl": "https://ballengine.app/developer/docs"
+  },
+  {
+    "url": "https://ballengine.app/developer",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine Developer Platform: Website Player, Video API and Claude | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/developer"
+  },
+  {
+    "url": "https://ballengine.app/download",
+    "depth": 1,
+    "status": 200,
+    "title": "下載 BallEngine for Windows | BallEngine",
+    "links": 41,
+    "finalUrl": "https://ballengine.app/download"
+  },
+  {
+    "url": "https://ballengine.app/es/download",
+    "depth": 1,
+    "status": 200,
+    "title": "Descargar BallEngine para Windows | BallEngine",
+    "links": 41,
+    "finalUrl": "https://ballengine.app/es/download"
+  },
+  {
+    "url": "https://ballengine.app/fr/download",
+    "depth": 1,
+    "status": 200,
+    "title": "Télécharger BallEngine pour Windows | BallEngine",
+    "links": 41,
+    "finalUrl": "https://ballengine.app/fr/download"
+  },
+  {
+    "url": "https://ballengine.app/de/download",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine für Windows herunterladen | BallEngine",
+    "links": 41,
+    "finalUrl": "https://ballengine.app/de/download"
+  },
+  {
+    "url": "https://ballengine.app/ja/download",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine for Windows をダウンロード | BallEngine",
+    "links": 41,
+    "finalUrl": "https://ballengine.app/ja/download"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/download",
+    "depth": 1,
+    "status": 200,
+    "title": "下載 BallEngine for Windows | BallEngine",
+    "links": 41,
+    "finalUrl": "https://ballengine.app/zh-tw/download"
+  },
+  {
+    "url": "https://ballengine.app/affiliate",
+    "depth": 1,
+    "status": 200,
+    "title": "推薦計畫 | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/es/affiliate",
+    "depth": 1,
+    "status": 200,
+    "title": "Programa de afiliados | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/es/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/fr/affiliate",
+    "depth": 1,
+    "status": 200,
+    "title": "Programme d'affiliation | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/fr/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/de/affiliate",
+    "depth": 1,
+    "status": 200,
+    "title": "Partnerprogramm | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/de/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/ja/affiliate",
+    "depth": 1,
+    "status": 200,
+    "title": "アフィリエイトプログラム | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/ja/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/affiliate",
+    "depth": 1,
+    "status": 200,
+    "title": "推薦計畫 | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/zh-tw/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/affiliate-terms",
+    "depth": 1,
+    "status": 200,
+    "title": "Affiliate Program Terms | BallEngine",
+    "links": 54,
+    "finalUrl": "https://ballengine.app/affiliate-terms"
+  },
+  {
+    "url": "https://ballengine.app/ball-simulator",
+    "depth": 1,
+    "status": 200,
+    "title": "Bouncing Ball Simulator Online: Grow Your Channel | BallEngine",
+    "links": 230,
+    "finalUrl": "https://ballengine.app/ball-simulator"
+  },
+  {
+    "url": "https://ballengine.app/music-ball-simulator",
+    "depth": 1,
+    "status": 200,
+    "title": "Music Ball Simulator | Play Any Song In Sync | BallEngine",
+    "links": 62,
+    "finalUrl": "https://ballengine.app/music-ball-simulator"
+  },
+  {
+    "url": "https://ballengine.app/ball-simulator-alternatives",
+    "depth": 1,
+    "status": 200,
+    "title": "Ball Simulator Alternatives | How To Choose One | BallEngine",
+    "links": 62,
+    "finalUrl": "https://ballengine.app/ball-simulator-alternatives"
+  },
+  {
+    "url": "https://ballengine.app/modes/rhythmic",
+    "depth": 1,
+    "status": 200,
+    "title": "Rhythmic Mode: Music-Synced Bouncing Ball Video Maker | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/rhythmic"
+  },
+  {
+    "url": "https://ballengine.app/modes/escape",
+    "depth": 1,
+    "status": 200,
+    "title": "Escape Mode: Concentric Rotating Ring Breakout Challenge | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/escape"
+  },
+  {
+    "url": "https://ballengine.app/modes/drawer",
+    "depth": 1,
+    "status": 200,
+    "title": "Drawer Mode: Bouncing Ball Drawing Trails Simulator | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/drawer"
+  },
+  {
+    "url": "https://ballengine.app/modes/spawner",
+    "depth": 1,
+    "status": 200,
+    "title": "Accumulate Mode: Bouncing Balls That Fill the Screen | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/spawner"
+  },
+  {
+    "url": "https://ballengine.app/modes/ghost-escape",
+    "depth": 1,
+    "status": 200,
+    "title": "Ghost Escape: Bouncing Ball Self-Trapping Maze Simulator | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/ghost-escape"
+  },
+  {
+    "url": "https://ballengine.app/modes/breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "Breaker Mode: Satisfying Glass Breaking Physics Simulator | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/breaker"
+  },
+  {
+    "url": "https://ballengine.app/modes/glass-tower",
+    "depth": 1,
+    "status": 200,
+    "title": "Glass Tower Mode: Doubling Glass Breaking Ball Videos | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/glass-tower"
+  }
+]

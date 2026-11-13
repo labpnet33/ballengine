@@ -1,0 +1,495 @@
+<!DOCTYPE html><html lang="en" class="dark" data-rh-managed="lang"><head>
+  <!--
+    GOOGLE CONSENT MODE v2 — DEFAULTS. This block must stay ABOVE the gtag.js tag below,
+    and it must stay inline (not bundled): the guarantee it provides is purely one of ORDERING.
+
+    Until now GA4 and GTM loaded on every page with no consent signal at all, which means they set
+    their cookies immediately — while the banner's only button flipped a localStorage string and
+    changed nothing. Anything that arrives after the tags have already stored an identifier is too
+    late; the storage happened.
+
+    So everything non-essential starts DENIED for everyone. In that state the tags still load and
+    still function, but they set no cookies and send no identifiers — and `consent update` (from
+    src/lib/consent.ts, or the replay below) upgrades them in place, with no page reload.
+
+    `security_storage` is granted from the start: it is the anti-fraud/abuse signal, which is
+    strictly necessary and is not something a visitor is asked to opt into.
+
+    The replay is what stops a RETURNING visitor being denied for the second or so it takes React to
+    boot — long enough to lose the pageview they already agreed to send. It reads the same key and
+    honours the same version as src/lib/consent.ts (CONSENT_STORAGE_KEY / CONSENT_VERSION); if you
+    change either there, change it here. It is wrapped in try/catch because localStorage throws
+    outright in some private-mode and embedded-webview contexts, and a throw here would take the
+    tags — and then the app shell — down with it.
+  -->
+  <script>
+    // Admin ▸ Visitor Journeys runs the Studio framed inside /admin to replay a visit. That is not
+    // traffic, so the Google tags below stay off. Same test as src/lib/journeyReplaySandbox.ts.
+    window.__BE_JOURNEY_REPLAY__ = false;
+    try {
+      window.__BE_JOURNEY_REPLAY__ = window.top !== window.self &&
+        /[?&]journeyReplay=1(?:&|$)/.test(location.search) &&
+        window.parent.location.origin === location.origin &&
+        /^\/admin(?:\/|$)/.test(window.parent.location.pathname);
+    } catch (e) { /* cross-origin parent: a normal page */ }
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+      functionality_storage: 'denied',
+      personalization_storage: 'denied',
+      security_storage: 'granted',
+      wait_for_update: 500
+    });
+    try {
+      var beConsent = JSON.parse(localStorage.getItem('be_cookie_consent') || 'null');
+      if (beConsent && beConsent.v === 5 && beConsent.categories) {
+        var c = beConsent.categories;
+        var g = function (on) { return on ? 'granted' : 'denied'; };
+        gtag('consent', 'update', {
+          ad_storage: g(c.marketing),
+          ad_user_data: g(c.marketing),
+          ad_personalization: g(c.marketing),
+          analytics_storage: g(c.analytics),
+          functionality_storage: g(c.preferences),
+          personalization_storage: g(c.preferences),
+          security_storage: 'granted'
+        });
+      }
+    } catch (e) { /* storage unavailable — stay on the denied defaults */ }
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-7BNE2MELD4"></script>
+  <script>
+    if (!window.__BE_JOURNEY_REPLAY__) {
+      gtag('js', new Date());
+
+      gtag('config', 'G-7BNE2MELD4');
+    }
+  </script>
+  <!--
+    No Google Tag Manager. GTM-53MFK2DJ was published EMPTY ("tags": [] in its gtm.js, checked
+    2026-09-26): 113 KB and ~150 ms of main thread per page load that did nothing. GA4 runs from the
+    gtag.js tag above. If a tag is ever needed in GTM, put the loader back and move GA4 into GTM
+    at the same time, so the site never runs GA4 from both.
+  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+  <!--
+    Poisoned-asset self-heal. /assets/* is served with `max-age=1y, immutable`, and
+    Cloudflare applies those headers BY REQUEST PATH — so if an asset request ever
+    transiently returns the SPA-fallback HTML (deploy propagation race), the browser
+    caches that HTML as the asset FOR A YEAR and `immutable` means it never revalidates.
+    Strict MIME checking then refuses the "stylesheet"/"script" on every load, and even
+    reinstalling the desktop app doesn't clear the WebView2 profile cache. This must be
+    INLINE in the document (which always revalidates): when a same-origin /assets/*
+    stylesheet or script fails, re-request it once with a cache-busting query (a new URL
+    bypasses the poisoned cache entry). If the busted URL fails too, the HTML itself is
+    stale — reload the page once (sessionStorage-guarded) to fetch a fresh document.
+  -->
+  <script>
+    (function () {
+      function heal(t, isLink) {
+        var attr = isLink ? 'href' : 'src';
+        var url = t.getAttribute(attr) || '';
+        // Only heal our own hashed assets; external CDNs manage themselves.
+        if (url.indexOf('/assets/') !== 0 &&
+            url.indexOf(location.origin + '/assets/') !== 0) return;
+        if (url.indexOf('cachebust=') === -1) {
+          var busted = url + (url.indexOf('?') > -1 ? '&' : '?') + 'cachebust=' + Date.now();
+          var n;
+          if (isLink) {
+            n = t.cloneNode();
+            n.setAttribute('href', busted);
+          } else {
+            // Cloned <script> elements never execute (the "already started" flag is
+            // copied), so build a fresh element and copy the attributes across.
+            n = document.createElement('script');
+            for (var i = 0; i < t.attributes.length; i++) {
+              n.setAttribute(t.attributes[i].name, t.attributes[i].value);
+            }
+            n.setAttribute('src', busted);
+          }
+          (t.parentNode || document.head).insertBefore(n, t.nextSibling);
+          if (t.parentNode) t.parentNode.removeChild(t);
+        } else if (!sessionStorage.getItem('assetHealReloaded')) {
+          sessionStorage.setItem('assetHealReloaded', '1');
+          location.reload();
+        }
+      }
+      // 404s / network failures fire `error` on the element.
+      window.addEventListener('error', function (e) {
+        var t = e.target;
+        if (!t || !t.tagName || t === window) return;
+        if (t.tagName === 'LINK' && t.rel === 'stylesheet') heal(t, true);
+        else if (t.tagName === 'SCRIPT' && t.src) heal(t, false);
+      }, true);
+      // A stylesheet whose response is HTML fires `load` (not error) and is then
+      // refused by strict MIME checking — the tell is link.sheet === null.
+      window.addEventListener('load', function (e) {
+        var t = e.target;
+        if (!t || t === window || t.tagName !== 'LINK' || t.rel !== 'stylesheet') return;
+        if (!t.sheet) heal(t, true);
+      }, true);
+    })();
+  </script>
+  <meta name="msvalidate.01" content="1AB5EF297A63FC4A7A5FAC0425B89764">
+  <meta name="p:domain_verify" content="0b3a5215135039e9ec98d86539ac5d3a">
+  <title>Publishing to YouTube | Help | BallEngine</title>
+  <!--
+    Per-page <meta name="description">, keywords, Open Graph and Twitter tags are injected
+    per-route by src/components/SEO.tsx (react-helmet) and baked into each page at prerender
+    time. They were intentionally REMOVED from this static shell: hardcoding the homepage's
+    values here made every prerendered sub-page inherit the homepage description / og:title /
+    og:url (react-helmet's meta tags carry no marker, so the prerender dedup kept these static
+    ones and dropped the per-page ones). The <title> above is kept only as a no-JS fallback;
+    react-helmet overrides it per route.
+  -->
+
+  <!-- Favicons & Brand Icons -->
+  <link rel="icon" type="image/x-icon" href="../../favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <link rel="icon" type="image/png" sizes="96x96" href="../../favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="../../favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="../../apple-touch-icon-167x167.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="../../apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="../../apple-touch-icon-120x120.png">
+  <link rel="mask-icon" href="../../safari-pinned-tab.svg" color="#0891b2">
+  <meta name="msapplication-TileColor" content="#0891b2">
+  <meta name="msapplication-config" content="/browserconfig.xml">
+  <meta name="msapplication-TileImage" content="/mstile-150x150.png">
+
+  <!--
+    Structured Data — brand entity graph.
+
+    These three nodes are what Google reads for BRAND queries, and they are joined by
+    `@id` so Search resolves them to ONE entity instead of three loose objects. Keep the
+    `@id` values stable; changing them re-starts entity consolidation from scratch.
+
+    `alternateName` must carry every string a user might type for us — critically the
+    TWO-WORD "Ball Engine", which is a contested generic term (an automotive machine shop
+    and a historic steam-engine maker both own strong signals for it). A previous
+    find-and-replace flattened this list to three copies of the domain and dropped the
+    real alternates; that is why the two-word query surfaced nothing. Do not let a bulk
+    rename touch these values again.
+  -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://ballengine.app/#organization",
+      "name": "BallEngine",
+      "legalName": "Ball Engine Studios",
+      "alternateName": [
+        "Ball Engine",
+        "BallEngine.app",
+        "ballengine.app",
+        "BallEngine Creator Studio"
+      ],
+      "url": "https://ballengine.app/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://ballengine.app/logo.png"
+      },
+      "description": "BallEngine (also written Ball Engine) is the #1 browser-based bouncing ball simulator and creator studio for creating satisfying ball simulations and viral content for TikTok, Reels, and YouTube Shorts.",
+      "sameAs": [
+        "https://youtube.com/@funcirclegames",
+        "https://www.instagram.com/funcirclegames",
+        "https://www.tiktok.com/@funcirclegames",
+        "https://x.com/funcirclegames",
+        "https://www.threads.com/@funcirclegames"
+      ]
+    }
+    </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "@id": "https://ballengine.app/#software",
+      "name": "BallEngine",
+      "alternateName": ["Ball Engine", "BallEngine Simulator", "BallEngine Creator Studio"],
+      "publisher": { "@id": "https://ballengine.app/#organization" },
+      "image": "https://ballengine.app/logo.png",
+      "operatingSystem": "Web",
+      "applicationCategory": "MultimediaApplication",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Starter Studio",
+          "price": "0.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Lite",
+          "price": "19.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Creator",
+          "price": "29.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Pro",
+          "price": "49.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Elite",
+          "price": "99.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Agency",
+          "price": "199.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        }
+      ]
+    }
+    </script>
+  <!--
+    Pricing tiers (Starter / Lite / Creator / Pro / Elite / Agency) are SaaS subscription plans and are already
+    represented as `offers` on the SoftwareApplication schema above. The standalone Product
+    schema was REMOVED: marking subscription plans as Product made Google's Rich Results test
+    flag "missing field review / aggregateRating" on every page, and we have no genuine
+    customer ratings to supply. Fabricating review/aggregateRating to clear the warning would
+    violate Google's structured-data policy (self-serving / fake reviews → manual action).
+    Re-introduce Product + aggregateRating ONLY when real, on-page user reviews exist.
+  -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://ballengine.app/#website",
+      "name": "BallEngine",
+      "alternateName": ["Ball Engine", "ballengine.app"],
+      "url": "https://ballengine.app/",
+      "image": "https://ballengine.app/logo.png",
+      "publisher": { "@id": "https://ballengine.app/#organization" }
+    }
+    </script>
+  <!--
+    BRAND FONTS are self-hosted (src/styles/fonts.css, files in public/fonts/). They used to come
+    from a render-blocking fonts.googleapis.com stylesheet, which put two extra connections
+    (googleapis for the CSS, gstatic for the files) ahead of first paint. Preloading the one face
+    every page paints with (Figtree, latin, upright) starts it in parallel with index.css instead
+    of after it. `crossorigin` is required: fonts are fetched in CORS mode, and a preload without
+    it is a separate request the font load cannot reuse.
+
+    The ~30 text-overlay picker families are NOT here. They load on demand inside the studio;
+    see src/lib/overlayFonts.ts.
+  -->
+  <link rel="preload" href="../../fonts/figtree/v9/_Xms-HUzqDCFdgfMm4S9DQ.woff2" as="font" type="font/woff2" crossorigin="">
+  <link rel="preconnect" href="https://cdn.ballengine.app">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#06b6d4">
+  <script>
+    if ('serviceWorker' in navigator) {
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Unregister existing service workers on localhost to prevent caching issues in development
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          for (const registration of registrations) {
+            registration.unregister().then((success) => {
+              if (success) console.log('SW: Unregistered active service worker on localhost.');
+            });
+          }
+        });
+      } else {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+        });
+      }
+    }
+  </script>
+  <!--
+    /studio is served with an empty #root, so until the entry script runs a phone showed a white
+    page and then the Studio's dark outline (src/components/ui/StudioSkeleton.tsx). This paints the
+    empty root in the Studio's own colour instead. `:empty` stops matching the moment React renders,
+    so it never touches another page. Dark unless the saved Studio config says otherwise, the same
+    test as StudioSkeleton (STORAGE_KEY hypnotic_ball_config_v25).
+  -->
+  <script>
+    try {
+      if (/^\/(?:[a-z]{2}(?:-[a-z]{2,4})?\/)?studio\/?$/i.test(location.pathname)) {
+        document.documentElement.setAttribute('data-boot-studio',
+          /"darkMode"\s*:\s*false/.test(localStorage.getItem('hypnotic_ball_config_v25') || '') ? 'light' : 'dark');
+      }
+    } catch (e) { /* storage blocked: the plain white shell, as before */ }
+  </script>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    html[data-boot-studio] #root:empty { min-height: 100vh; }
+    html[data-boot-studio="dark"] #root:empty { background: #09090b; }
+    html[data-boot-studio="light"] #root:empty { background: #e4e4e7; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.25);
+      background-clip: content-box;
+    }
+
+    /* Dark Mode Scrollbar */
+    .dark ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      background-clip: content-box;
+    }
+
+    .dark ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.25);
+      background-clip: content-box;
+    }
+
+    /* Custom scrollbar class for specific containers */
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(139, 92, 246, 0.4);
+      /* Purple-500 with opacity */
+      background-clip: content-box;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(139, 92, 246, 0.6);
+      background-clip: content-box;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(167, 139, 250, 0.5);
+      /* Purple-400 */
+      background-clip: content-box;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(167, 139, 250, 0.7);
+      background-clip: content-box;
+    }
+  </style>
+  <!--
+    Kick the hero reels request off before the bundle exists.
+
+    The homepage's first visual comes from /api/hero-reels, and that call lives in a React
+    effect — so it could not start until 2.4MB of JavaScript had downloaded, parsed and
+    mounted. Measured cold, the request began at ~2.76s and the thumbnails it names only
+    started downloading at ~4.1s. The response is 3.3KB and `public, max-age=60`, so
+    firing it here puts it in the HTTP cache long before the app asks, and the app's own
+    fetch is then served from cache instead of crossing the network.
+
+    The parsed body is parked on window.__heroReelsPrefetch and home.tsx CONSUMES it, so this is
+    the only /api/hero-reels request of the page load. It used to be a bare warm-up that the app
+    then repeated, which still put a second (sometimes third) request on the wire. The promise
+    resolves null on any failure and never rejects; home.tsx falls back to its own fetch then.
+  -->
+  <script>
+    try {
+      window.__heroReelsPrefetch = fetch('/api/hero-reels')
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; });
+    } catch (e) { /* no fetch: the app's own call still runs */ }
+  </script>
+  <!--
+    REMOVED: the esm.sh importmap (react / react-dom / vite) and the synchronous paddle.js tag.
+
+    The importmap was scaffold residue. Nothing resolved through it — the bundle is
+    self-contained and Vite rewrites every bare specifier at build time — so it only
+    advertised a set of CDN origins we do not use.
+
+    paddle.js was loaded here as a BLOCKING script on every page, including pages with no
+    checkout. It was also redundant: ensurePaddleLoaded() in src/components/PaddleCheckout.tsx
+    already injects the script on demand, with a 5s timeout and adblocker handling — and it
+    even removes any pre-existing paddle.js tag first. Having the tag here meant window.Paddle
+    was always present, so that lazy path short-circuited and was effectively dead code on the
+    web. Checkout now loads Paddle at the moment a plan is clicked, which is what that helper
+    was written for.
+  -->
+  <script type="module" crossorigin="" src="../../assets/index-3pf76ICO.js"></script>
+  <link rel="modulepreload" crossorigin="" href="../../assets/vendor-react-kqrIXDwM.js">
+  <link rel="modulepreload" crossorigin="" href="../../assets/vendor-motion-EOl-odwX.js">
+  <link rel="stylesheet" crossorigin="" href="../../assets/index-DoMKM56W.css">
+<style type="text/css">[data-sonner-toaster][dir=ltr],html[dir=ltr]{--toast-icon-margin-start:-3px;--toast-icon-margin-end:4px;--toast-svg-margin-start:-1px;--toast-svg-margin-end:0px;--toast-button-margin-start:auto;--toast-button-margin-end:0;--toast-close-button-start:0;--toast-close-button-end:unset;--toast-close-button-transform:translate(-35%, -35%)}[data-sonner-toaster][dir=rtl],html[dir=rtl]{--toast-icon-margin-start:4px;--toast-icon-margin-end:-3px;--toast-svg-margin-start:0px;--toast-svg-margin-end:-1px;--toast-button-margin-start:0;--toast-button-margin-end:auto;--toast-close-button-start:unset;--toast-close-button-end:0;--toast-close-button-transform:translate(35%, -35%)}[data-sonner-toaster]{position:fixed;width:var(--width);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;--gray1:hsl(0, 0%, 99%);--gray2:hsl(0, 0%, 97.3%);--gray3:hsl(0, 0%, 95.1%);--gray4:hsl(0, 0%, 93%);--gray5:hsl(0, 0%, 90.9%);--gray6:hsl(0, 0%, 88.7%);--gray7:hsl(0, 0%, 85.8%);--gray8:hsl(0, 0%, 78%);--gray9:hsl(0, 0%, 56.1%);--gray10:hsl(0, 0%, 52.3%);--gray11:hsl(0, 0%, 43.5%);--gray12:hsl(0, 0%, 9%);--border-radius:8px;box-sizing:border-box;padding:0;margin:0;list-style:none;outline:0;z-index:999999999;transition:transform .4s ease}@media (hover:none) and (pointer:coarse){[data-sonner-toaster][data-lifted=true]{transform:none}}[data-sonner-toaster][data-x-position=right]{right:var(--offset-right)}[data-sonner-toaster][data-x-position=left]{left:var(--offset-left)}[data-sonner-toaster][data-x-position=center]{left:50%;transform:translateX(-50%)}[data-sonner-toaster][data-y-position=top]{top:var(--offset-top)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--offset-bottom)}[data-sonner-toast]{--y:translateY(100%);--lift-amount:calc(var(--lift) * var(--gap));z-index:var(--z-index);position:absolute;opacity:0;transform:var(--y);touch-action:none;transition:transform .4s,opacity .4s,height .4s,box-shadow .2s;box-sizing:border-box;outline:0;overflow-wrap:anywhere}[data-sonner-toast][data-styled=true]{padding:16px;background:var(--normal-bg);border:1px solid var(--normal-border);color:var(--normal-text);border-radius:var(--border-radius);box-shadow:0 4px 12px rgba(0,0,0,.1);width:var(--width);font-size:13px;display:flex;align-items:center;gap:6px}[data-sonner-toast]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-y-position=top]{top:0;--y:translateY(-100%);--lift:1;--lift-amount:calc(1 * var(--gap))}[data-sonner-toast][data-y-position=bottom]{bottom:0;--y:translateY(100%);--lift:-1;--lift-amount:calc(var(--lift) * var(--gap))}[data-sonner-toast][data-styled=true] [data-description]{font-weight:400;line-height:1.4;color:#3f3f3f}[data-rich-colors=true][data-sonner-toast][data-styled=true] [data-description]{color:inherit}[data-sonner-toaster][data-sonner-theme=dark] [data-description]{color:#e8e8e8}[data-sonner-toast][data-styled=true] [data-title]{font-weight:500;line-height:1.5;color:inherit}[data-sonner-toast][data-styled=true] [data-icon]{display:flex;height:16px;width:16px;position:relative;justify-content:flex-start;align-items:center;flex-shrink:0;margin-left:var(--toast-icon-margin-start);margin-right:var(--toast-icon-margin-end)}[data-sonner-toast][data-promise=true] [data-icon]>svg{opacity:0;transform:scale(.8);transform-origin:center;animation:sonner-fade-in .3s ease forwards}[data-sonner-toast][data-styled=true] [data-icon]>*{flex-shrink:0}[data-sonner-toast][data-styled=true] [data-icon] svg{margin-left:var(--toast-svg-margin-start);margin-right:var(--toast-svg-margin-end)}[data-sonner-toast][data-styled=true] [data-content]{display:flex;flex-direction:column;gap:2px}[data-sonner-toast][data-styled=true] [data-button]{border-radius:4px;padding-left:8px;padding-right:8px;height:24px;font-size:12px;color:var(--normal-bg);background:var(--normal-text);margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end);border:none;font-weight:500;cursor:pointer;outline:0;display:flex;align-items:center;flex-shrink:0;transition:opacity .4s,box-shadow .2s}[data-sonner-toast][data-styled=true] [data-button]:focus-visible{box-shadow:0 0 0 2px rgba(0,0,0,.4)}[data-sonner-toast][data-styled=true] [data-button]:first-of-type{margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end)}[data-sonner-toast][data-styled=true] [data-cancel]{color:var(--normal-text);background:rgba(0,0,0,.08)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-styled=true] [data-cancel]{background:rgba(255,255,255,.3)}[data-sonner-toast][data-styled=true] [data-close-button]{position:absolute;left:var(--toast-close-button-start);right:var(--toast-close-button-end);top:0;height:20px;width:20px;display:flex;justify-content:center;align-items:center;padding:0;color:var(--gray12);background:var(--normal-bg);border:1px solid var(--gray4);transform:var(--toast-close-button-transform);border-radius:50%;cursor:pointer;z-index:1;transition:opacity .1s,background .2s,border-color .2s}[data-sonner-toast][data-styled=true] [data-close-button]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-styled=true] [data-disabled=true]{cursor:not-allowed}[data-sonner-toast][data-styled=true]:hover [data-close-button]:hover{background:var(--gray2);border-color:var(--gray5)}[data-sonner-toast][data-swiping=true]::before{content:'';position:absolute;left:-100%;right:-100%;height:100%;z-index:-1}[data-sonner-toast][data-y-position=top][data-swiping=true]::before{bottom:50%;transform:scaleY(3) translateY(50%)}[data-sonner-toast][data-y-position=bottom][data-swiping=true]::before{top:50%;transform:scaleY(3) translateY(-50%)}[data-sonner-toast][data-swiping=false][data-removed=true]::before{content:'';position:absolute;inset:0;transform:scaleY(2)}[data-sonner-toast][data-expanded=true]::after{content:'';position:absolute;left:0;height:calc(var(--gap) + 1px);bottom:100%;width:100%}[data-sonner-toast][data-mounted=true]{--y:translateY(0);opacity:1}[data-sonner-toast][data-expanded=false][data-front=false]{--scale:var(--toasts-before) * 0.05 + 1;--y:translateY(calc(var(--lift-amount) * var(--toasts-before))) scale(calc(-1 * var(--scale)));height:var(--front-toast-height)}[data-sonner-toast]>*{transition:opacity .4s}[data-sonner-toast][data-x-position=right]{right:0}[data-sonner-toast][data-x-position=left]{left:0}[data-sonner-toast][data-expanded=false][data-front=false][data-styled=true]>*{opacity:0}[data-sonner-toast][data-visible=false]{opacity:0;pointer-events:none}[data-sonner-toast][data-mounted=true][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset)));height:var(--initial-height)}[data-sonner-toast][data-removed=true][data-front=true][data-swipe-out=false]{--y:translateY(calc(var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=false]{--y:translateY(40%);opacity:0;transition:transform .5s,opacity .2s}[data-sonner-toast][data-removed=true][data-front=false]::before{height:calc(var(--initial-height) + 20%)}[data-sonner-toast][data-swiping=true]{transform:var(--y) translateY(var(--swipe-amount-y,0)) translateX(var(--swipe-amount-x,0));transition:none}[data-sonner-toast][data-swiped=true]{user-select:none}[data-sonner-toast][data-swipe-out=true][data-y-position=bottom],[data-sonner-toast][data-swipe-out=true][data-y-position=top]{animation-duration:.2s;animation-timing-function:ease-out;animation-fill-mode:forwards}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=left]{animation-name:swipe-out-left}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=right]{animation-name:swipe-out-right}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=up]{animation-name:swipe-out-up}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=down]{animation-name:swipe-out-down}@keyframes swipe-out-left{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) - 100%));opacity:0}}@keyframes swipe-out-right{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) + 100%));opacity:0}}@keyframes swipe-out-up{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) - 100%));opacity:0}}@keyframes swipe-out-down{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) + 100%));opacity:0}}@media (max-width:600px){[data-sonner-toaster]{position:fixed;right:var(--mobile-offset-right);left:var(--mobile-offset-left);width:100%}[data-sonner-toaster][dir=rtl]{left:calc(var(--mobile-offset-left) * -1)}[data-sonner-toaster] [data-sonner-toast]{left:0;right:0;width:calc(100% - var(--mobile-offset-left) * 2)}[data-sonner-toaster][data-x-position=left]{left:var(--mobile-offset-left)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--mobile-offset-bottom)}[data-sonner-toaster][data-y-position=top]{top:var(--mobile-offset-top)}[data-sonner-toaster][data-x-position=center]{left:var(--mobile-offset-left);right:var(--mobile-offset-right);transform:none}}[data-sonner-toaster][data-sonner-theme=light]{--normal-bg:#fff;--normal-border:var(--gray4);--normal-text:var(--gray12);--success-bg:hsl(143, 85%, 96%);--success-border:hsl(145, 92%, 87%);--success-text:hsl(140, 100%, 27%);--info-bg:hsl(208, 100%, 97%);--info-border:hsl(221, 91%, 93%);--info-text:hsl(210, 92%, 45%);--warning-bg:hsl(49, 100%, 97%);--warning-border:hsl(49, 91%, 84%);--warning-text:hsl(31, 92%, 45%);--error-bg:hsl(359, 100%, 97%);--error-border:hsl(359, 100%, 94%);--error-text:hsl(360, 100%, 45%)}[data-sonner-toaster][data-sonner-theme=light] [data-sonner-toast][data-invert=true]{--normal-bg:#000;--normal-border:hsl(0, 0%, 20%);--normal-text:var(--gray1)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-invert=true]{--normal-bg:#fff;--normal-border:var(--gray3);--normal-text:var(--gray12)}[data-sonner-toaster][data-sonner-theme=dark]{--normal-bg:#000;--normal-bg-hover:hsl(0, 0%, 12%);--normal-border:hsl(0, 0%, 20%);--normal-border-hover:hsl(0, 0%, 25%);--normal-text:var(--gray1);--success-bg:hsl(150, 100%, 6%);--success-border:hsl(147, 100%, 12%);--success-text:hsl(150, 86%, 65%);--info-bg:hsl(215, 100%, 6%);--info-border:hsl(223, 43%, 17%);--info-text:hsl(216, 87%, 65%);--warning-bg:hsl(64, 100%, 6%);--warning-border:hsl(60, 100%, 9%);--warning-text:hsl(46, 87%, 65%);--error-bg:hsl(358, 76%, 10%);--error-border:hsl(357, 89%, 16%);--error-text:hsl(358, 100%, 81%)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]{background:var(--normal-bg);border-color:var(--normal-border);color:var(--normal-text)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]:hover{background:var(--normal-bg-hover);border-color:var(--normal-border-hover)}[data-rich-colors=true][data-sonner-toast][data-type=success]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=success] [data-close-button]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=info]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=info] [data-close-button]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning] [data-close-button]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=error]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}[data-rich-colors=true][data-sonner-toast][data-type=error] [data-close-button]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}.sonner-loading-wrapper{--size:16px;height:var(--size);width:var(--size);position:absolute;inset:0;z-index:10}.sonner-loading-wrapper[data-visible=false]{transform-origin:center;animation:sonner-fade-out .2s ease forwards}.sonner-spinner{position:relative;top:50%;left:50%;height:var(--size);width:var(--size)}.sonner-loading-bar{animation:sonner-spin 1.2s linear infinite;background:var(--gray11);border-radius:6px;height:8%;left:-10%;position:absolute;top:-3.9%;width:24%}.sonner-loading-bar:first-child{animation-delay:-1.2s;transform:rotate(.0001deg) translate(146%)}.sonner-loading-bar:nth-child(2){animation-delay:-1.1s;transform:rotate(30deg) translate(146%)}.sonner-loading-bar:nth-child(3){animation-delay:-1s;transform:rotate(60deg) translate(146%)}.sonner-loading-bar:nth-child(4){animation-delay:-.9s;transform:rotate(90deg) translate(146%)}.sonner-loading-bar:nth-child(5){animation-delay:-.8s;transform:rotate(120deg) translate(146%)}.sonner-loading-bar:nth-child(6){animation-delay:-.7s;transform:rotate(150deg) translate(146%)}.sonner-loading-bar:nth-child(7){animation-delay:-.6s;transform:rotate(180deg) translate(146%)}.sonner-loading-bar:nth-child(8){animation-delay:-.5s;transform:rotate(210deg) translate(146%)}.sonner-loading-bar:nth-child(9){animation-delay:-.4s;transform:rotate(240deg) translate(146%)}.sonner-loading-bar:nth-child(10){animation-delay:-.3s;transform:rotate(270deg) translate(146%)}.sonner-loading-bar:nth-child(11){animation-delay:-.2s;transform:rotate(300deg) translate(146%)}.sonner-loading-bar:nth-child(12){animation-delay:-.1s;transform:rotate(330deg) translate(146%)}@keyframes sonner-fade-in{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}@keyframes sonner-fade-out{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}@keyframes sonner-spin{0%{opacity:1}100%{opacity:.15}}@media (prefers-reduced-motion){.sonner-loading-bar,[data-sonner-toast],[data-sonner-toast]>*{transition:none!important;animation:none!important}}.sonner-loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transform-origin:center;transition:opacity .2s,transform .2s}.sonner-loader[data-visible=false]{opacity:0;transform:scale(.8) translate(-50%,-50%)}</style><meta name="description" content="Connect a channel and upload Shorts or full videos, with a separate YouTube title, description and privacy."><meta name="keywords" content="BallEngine, Ball Engine, ballengine.app, BallEngine Creator Studio, ball simulation, physics simulator, ASMR physics videos, satisfying ball simulation, physics video generator, faceless video generator, TikTok shorts creator, YouTube shorts generator"><meta property="og:type" content="website"><meta property="og:site_name" content="BallEngine"><meta property="og:title" content="Publishing to YouTube | Help | BallEngine"><meta property="og:description" content="Connect a channel and upload Shorts or full videos, with a separate YouTube title, description and privacy."><meta property="og:image" content="https://ballengine.app/og-card.jpg"><meta property="og:url" content="https://ballengine.app/help/publishing-and-distribution/publish-to-youtube"><meta property="og:locale" content="en_US"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@Ballengine_app"><meta name="twitter:title" content="Publishing to YouTube | Help | BallEngine"><meta name="twitter:description" content="Connect a channel and upload Shorts or full videos, with a separate YouTube title, description and privacy."><meta name="twitter:image" content="https://ballengine.app/og-card.jpg"><meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"><link rel="canonical" href="publish-to-youtube.html"><link rel="alternate" hreflang="x-default" href="publish-to-youtube.html"><link rel="alternate" hreflang="en" href="publish-to-youtube.html"><link rel="icon" type="image/x-icon" href="../../favicon.ico"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="../../favicon-96x96.png"><link rel="icon" type="image/png" sizes="48x48" href="../../favicon-48x48.png"><link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png"><link rel="mask-icon" href="../../safari-pinned-tab.svg" color="#0891b2"></head>
+
+<body style="overflow: auto;">
+  <div id="root"><div class="flex flex-col min-h-screen bg-background text-foreground overflow-x-clip selection:bg-primary selection:text-primary-foreground transition-colors duration-500"><header class="fixed left-0 right-0 z-50 w-full border-b border-border bg-card top-0"><div class="container-page"><div class="flex h-16 items-center justify-between gap-4"><a class="flex shrink-0 items-center gap-2.5" href="../../index.html" data-discover="true"><picture class="flex h-9 w-9 items-center justify-center"><source srcset="/logo.webp" type="image/webp"><source srcset="/logo.png" type="image/png"><img alt="" width="36" height="36" class="h-9 w-9 object-contain" src="../../logo.png"></picture><span class="font-display text-lg font-bold tracking-tight text-foreground">BallEngine</span></a><nav class="hidden items-center gap-1 lg:flex"><div class="relative"><button type="button" aria-expanded="false" class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground"><span>Features</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 opacity-60 transition-transform" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div class="relative"><button type="button" aria-expanded="false" class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground"><span>Developer</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 opacity-60 transition-transform" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div class="relative"><button type="button" aria-expanded="false" class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground"><span>Resources</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 opacity-60 transition-transform" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><a class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground" href="../../plans.html" data-discover="true">Pricing</a><a class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground" href="../../studio.html" data-discover="true">Studio</a></nav><div class="hidden items-center gap-2 md:flex"><button type="button" tabindex="0" aria-haspopup="menu" id="base-ui-_r_4_" data-slot="dropdown-menu-trigger" title="Change language" aria-label="Language" class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe be-i be-h-blue be-loop be-wiggle size-4" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><g transform="rotate(-20 12 12)"><ellipse cx="12" cy="12" rx="4" ry="9"></ellipse><path d="M3.5 9h17M3.5 15h17"></path></g></svg></button><div class="h-5 w-px bg-border"></div><div class="flex items-center gap-2"><a class="btn btn-ghost" href="../../login.html" data-discover="true">Log in</a><a class="btn btn-primary" href="../../start.html" data-discover="true">Start free</a></div></div><div class="flex items-center gap-2 lg:hidden"><a class="btn btn-primary btn-sm md:hidden" href="../../start.html" data-discover="true">Start free</a><button type="button" tabindex="0" aria-haspopup="menu" id="base-ui-_r_a_" data-slot="dropdown-menu-trigger" title="Change language" aria-label="Language" class="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted md:hidden" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe be-i be-h-blue be-loop be-wiggle size-4" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><g transform="rotate(-20 12 12)"><ellipse cx="12" cy="12" rx="4" ry="9"></ellipse><path d="M3.5 9h17M3.5 15h17"></path></g></svg></button><button type="button" aria-expanded="false" class="flex h-11 w-11 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted"><span class="sr-only">Toggle main menu</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu be-i size-5" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg></button></div></div></div></header><main class="flex-grow relative pt-28"><div class="bg-background"><div class="container-page lg:flex lg:gap-12"><aside class="hidden lg:block w-72 shrink-0"><div class="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain pb-10 pr-2 pt-2"><div class="flex flex-col gap-6"><div><a class="-ml-1 mb-4 inline-flex min-h-10 items-center gap-1.5 px-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground" href="../../studio.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left be-i be-h-blue be-dash size-4" aria-hidden="true"><g class="be-m"><g transform="matrix(-1 0 0 1 24 0)"><path d="M5 12H19M14 7l5 5-5 5"></path></g></g></svg>Back to Studio</a><a class="t-h3 block transition-colors hover:text-cyan-700 dark:hover:text-cyan-300" href="../../help.html" data-discover="true">Help</a><p class="t-small mt-1">Expert guide for every setting.</p></div><div class="relative"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search be-i be-h-blue be-pop absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.3 15.3 20 20"></path></svg><input placeholder="Search settings..." aria-label="Search" class="field pl-9 pr-9" type="search" value=""></div><nav class="space-y-1" aria-label="Help"><div><button type="button" aria-expanded="false" class="w-full min-h-10 flex items-center gap-2 px-2 rounded-lg text-sm font-semibold transition-colors text-muted-foreground hover:text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-help-circle be-i be-h-blue be-bounce size-4 shrink-0" aria-hidden="true"><path d="M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><circle cx="12" cy="12" r="9"></circle><path d="M9.3 9.4a2.8 2.8 0 0 1 5.4.9c0 1.9-2.7 2.3-2.7 3.8"></path><g class="be-m"><circle cx="12" cy="17.2" r="1.25" stroke="none" style="fill: var(--be-hue, currentColor);"></circle></g></svg><span class="flex-1 text-left truncate">Getting Started</span><span class="text-xs font-medium text-muted-foreground tabular-nums">9</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 transition-transform -rotate-90" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div><button type="button" aria-expanded="false" class="w-full min-h-10 flex items-center gap-2 px-2 rounded-lg text-sm font-semibold transition-colors text-muted-foreground hover:text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout be-i be-h-blue size-4 shrink-0" aria-hidden="true"><path d="M6 3.5h12A2.5 2.5 0 0 1 20.5 6v12a2.5 2.5 0 0 1-2.5 2.5H6A2.5 2.5 0 0 1 3.5 18V6A2.5 2.5 0 0 1 6 3.5Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><path d="M6 3.5h12A2.5 2.5 0 0 1 20.5 6v12a2.5 2.5 0 0 1-2.5 2.5H6A2.5 2.5 0 0 1 3.5 18V6A2.5 2.5 0 0 1 6 3.5ZM3.5 9h17M9 9v11.5"></path></svg><span class="flex-1 text-left truncate">Using the Studio</span><span class="text-xs font-medium text-muted-foreground tabular-nums">8</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 transition-transform -rotate-90" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div><button type="button" aria-expanded="false" class="w-full min-h-10 flex items-center gap-2 px-2 rounded-lg text-sm font-semibold transition-colors text-muted-foreground hover:text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-box be-i be-h-blue size-4 shrink-0" aria-hidden="true"><path d="M12 2.8 20.5 7.5v9L12 21.2 3.5 16.5v-9Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><path d="M12 2.8 20.5 7.5v9L12 21.2 3.5 16.5v-9ZM3.5 7.5 12 12l8.5-4.5M12 12v9.2"></path></svg><span class="flex-1 text-left truncate">Ball Engine Modes</span><span class="text-xs font-medium text-muted-foreground tabular-nums">22</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 transition-transform -rotate-90" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div><button type="button" aria-expanded="false" class="w-full min-h-10 flex items-center gap-2 px-2 rounded-lg text-sm font-semibold transition-colors text-muted-foreground hover:text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap be-i be-h-coral be-loop be-pop size-4 shrink-0" aria-hidden="true"><path d="M14.5 2.5 6 13h5.5l-1.8 5.6L18 10.5h-5.5Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><path d="M14.5 2.5 6 13h5.5l-1.8 5.6L18 10.5h-5.5Z"></path></svg><span class="flex-1 text-left truncate">Visuals &amp; Aesthetics</span><span class="text-xs font-medium text-muted-foreground tabular-nums">8</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 transition-transform -rotate-90" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div><button type="button" aria-expanded="false" class="w-full min-h-10 flex items-center gap-2 px-2 rounded-lg text-sm font-semibold transition-colors text-muted-foreground hover:text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-music be-i be-h-pink be-loop be-bounce size-4 shrink-0" aria-hidden="true"><path d="M14 17.2V3.5c1.4 2.4 4.6 2.6 5.2 6"></path><g class="be-m"><circle cx="11.2" cy="17.4" r="2.9" stroke="none" style="fill: var(--be-hue, currentColor);"></circle></g></svg><span class="flex-1 text-left truncate">Audio &amp; Music</span><span class="text-xs font-medium text-muted-foreground tabular-nums">10</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 transition-transform -rotate-90" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div><button type="button" aria-expanded="false" class="w-full min-h-10 flex items-center gap-2 px-2 rounded-lg text-sm font-semibold transition-colors text-muted-foreground hover:text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-film be-i be-h-purple be-loop be-spin size-4 shrink-0" aria-hidden="true"><path d="M11.5 20H21"></path><g class="be-m"><circle cx="11.5" cy="11.5" r="8.5"></circle><circle cx="11.5" cy="6.8" r="1.5"></circle><circle cx="16.2" cy="11.5" r="1.5"></circle><circle cx="11.5" cy="16.2" r="1.5"></circle><circle cx="6.8" cy="11.5" r="1.5"></circle></g></svg><span class="flex-1 text-left truncate">Rendering &amp; Export</span><span class="text-xs font-medium text-muted-foreground tabular-nums">5</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 transition-transform -rotate-90" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div><button type="button" aria-expanded="true" class="w-full min-h-10 flex items-center gap-2 px-2 rounded-lg text-sm font-semibold transition-colors text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send be-i be-h-blue be-dash size-4 shrink-0" aria-hidden="true"><g class="be-m"><path d="M20.5 3.5 3.5 10.5l7 3 3 7Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><path d="M20.5 3.5 3.5 10.5l7 3 3 7ZM20.5 3.5l-10 10"></path></g></svg><span class="flex-1 text-left truncate">Publishing &amp; Distribution</span><span class="text-xs font-medium text-muted-foreground tabular-nums">18</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 transition-transform" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button><div class="mt-1 mb-3 ml-3 pl-3 border-l border-border space-y-0.5"><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="how-publishing-works.html" data-discover="true">How Publishing Works</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="studio-publish-tab.html" data-discover="true">The Studio Publish Tab, Control by Control</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="connecting-your-accounts.html" data-discover="true">Connecting Your Social Accounts</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="disconnecting-accounts.html" data-discover="true">Disconnecting and Reconnecting an Account</a><a aria-current="page" class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors bg-primary/10 text-cyan-800 dark:text-cyan-300 font-medium" href="publish-to-youtube.html" data-discover="true">Publishing to YouTube</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="publish-to-tiktok.html" data-discover="true">Publishing to TikTok</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="publish-to-instagram.html" data-discover="true">Publishing to Instagram</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="publish-to-facebook.html" data-discover="true">Publishing to Facebook</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="publish-to-x.html" data-discover="true">Publishing to X (Twitter)</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="publish-to-threads.html" data-discover="true">Publishing to Threads</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="publish-to-pinterest.html" data-discover="true">Publishing to Pinterest</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="publish-to-snapchat.html" data-discover="true">Publishing to Snapchat Spotlight</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="scheduling-posts.html" data-discover="true">The Automation Workspace</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="post-queue-and-statuses.html" data-discover="true">The Queue: Post Statuses, Retry and Cancel</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="autopilot.html" data-discover="true">Autopilot: Set-and-Forget Publishing</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="multi-brand-accounts.html" data-discover="true">Managing Multiple Brands</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="publishing-limits-and-quotas.html" data-discover="true">Automation and Publishing Limits</a><a class="block px-3 py-2 rounded-lg text-sm leading-snug transition-colors text-muted-foreground hover:bg-muted hover:text-foreground" href="fixing-publishing-problems.html" data-discover="true">Fixing Publishing Problems</a></div></div><div><button type="button" aria-expanded="false" class="w-full min-h-10 flex items-center gap-2 px-2 rounded-lg text-sm font-semibold transition-colors text-muted-foreground hover:text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share2 be-i be-h-blue be-pop size-4 shrink-0" aria-hidden="true"><circle cx="6" cy="12" r="2.6"></circle><circle cx="18" cy="18.5" r="2.6"></circle><path d="m8.3 10.7 7.4-4M8.3 13.3l7.4 4"></path><g class="be-m"><circle cx="18" cy="5.5" r="2.6"></circle></g></svg><span class="flex-1 text-left truncate">Growth &amp; Viral Reach</span><span class="text-xs font-medium text-muted-foreground tabular-nums">4</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 transition-transform -rotate-90" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div><button type="button" aria-expanded="false" class="w-full min-h-10 flex items-center gap-2 px-2 rounded-lg text-sm font-semibold transition-colors text-muted-foreground hover:text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card be-i be-h-teal size-4 shrink-0" aria-hidden="true"><path d="M5 5h14a2.5 2.5 0 0 1 2.5 2.5v9A2.5 2.5 0 0 1 19 19H5a2.5 2.5 0 0 1-2.5-2.5v-9A2.5 2.5 0 0 1 5 5Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><rect x="2.5" y="5" width="19" height="14" rx="2.5"></rect><path d="M2.5 9.5h19M6 15h4"></path></svg><span class="flex-1 text-left truncate">Plans &amp; Billing</span><span class="text-xs font-medium text-muted-foreground tabular-nums">10</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 transition-transform -rotate-90" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div><button type="button" aria-expanded="false" class="w-full min-h-10 flex items-center gap-2 px-2 rounded-lg text-sm font-semibold transition-colors text-muted-foreground hover:text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code2 be-i be-h-blue size-4 shrink-0" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4.5l-4 15"></path></svg><span class="flex-1 text-left truncate">Developer API</span><span class="text-xs font-medium text-muted-foreground tabular-nums">8</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 transition-transform -rotate-90" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div><button type="button" aria-expanded="false" class="w-full min-h-10 flex items-center gap-2 px-2 rounded-lg text-sm font-semibold transition-colors text-muted-foreground hover:text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gamepad2 be-i be-h-purple size-4 shrink-0" aria-hidden="true"><path d="M6.5 7h11a4 4 0 0 1 4 4.2l-.4 5.3a2.5 2.5 0 0 1-4.4 1.4L14.6 15H9.4l-2.1 2.9a2.5 2.5 0 0 1-4.4-1.4l-.4-5.3A4 4 0 0 1 6.5 7Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><path d="M6.5 7h11a4 4 0 0 1 4 4.2l-.4 5.3a2.5 2.5 0 0 1-4.4 1.4L14.6 15H9.4l-2.1 2.9a2.5 2.5 0 0 1-4.4-1.4l-.4-5.3A4 4 0 0 1 6.5 7ZM7 9.3v3.5M5.25 11.05h3.5"></path></svg><span class="flex-1 text-left truncate">Games &amp; Community</span><span class="text-xs font-medium text-muted-foreground tabular-nums">4</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 transition-transform -rotate-90" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div><button type="button" aria-expanded="false" class="w-full min-h-10 flex items-center gap-2 px-2 rounded-lg text-sm font-semibold transition-colors text-muted-foreground hover:text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-help-circle be-i be-h-blue be-bounce size-4 shrink-0" aria-hidden="true"><path d="M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><circle cx="12" cy="12" r="9"></circle><path d="M9.3 9.4a2.8 2.8 0 0 1 5.4.9c0 1.9-2.7 2.3-2.7 3.8"></path><g class="be-m"><circle cx="12" cy="17.2" r="1.25" stroke="none" style="fill: var(--be-hue, currentColor);"></circle></g></svg><span class="flex-1 text-left truncate">Troubleshooting</span><span class="text-xs font-medium text-muted-foreground tabular-nums">7</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 transition-transform -rotate-90" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div></nav></div></div></aside><div class="flex-1 min-w-0 pb-16"><div class="lg:hidden flex items-center gap-3 py-3 mb-2 border-b border-border"><button type="button" class="btn btn-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-left be-i be-h-blue" aria-hidden="true"><path d="M6 3.5h3v17H6A2.5 2.5 0 0 1 3.5 18V6A2.5 2.5 0 0 1 6 3.5Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><path d="M6 3.5h12A2.5 2.5 0 0 1 20.5 6v12a2.5 2.5 0 0 1-2.5 2.5H6A2.5 2.5 0 0 1 3.5 18V6A2.5 2.5 0 0 1 6 3.5ZM9 3.5v17"></path></svg>All topics</button><a class="text-sm font-semibold text-muted-foreground hover:text-foreground" href="../../help.html" data-discover="true">Help</a></div><div class="mx-auto max-w-3xl pt-4 lg:pt-6"><div class="space-y-12"><header><nav class="flex min-h-10 flex-wrap items-center gap-1.5 text-sm text-muted-foreground" aria-label="Help"><a class="transition-colors hover:text-foreground" href="../../help.html" data-discover="true">Help</a><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right be-i size-3.5" aria-hidden="true"><path d="m9.5 6.5 5.5 5.5-5.5 5.5"></path></svg><span class="text-foreground">Publishing &amp; Distribution</span></nav><h1 class="t-h1 mt-4 text-balance break-words">Publishing to YouTube</h1><p class="t-lead mt-4">Connect a channel and upload Shorts or full videos, with a separate YouTube title, description and privacy.</p><div class="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-y border-border py-3"><span></span><div class="flex flex-wrap gap-2"><button type="button" class="btn btn-secondary btn-sm"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer be-i be-h-blue" aria-hidden="true"><path d="M5 9h14a2 2 0 0 1 2 2v4.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><path d="M6.5 9V3.5h11V9M6.5 17.5H5a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4.5a2 2 0 0 1-2 2h-1.5"></path><rect x="6.5" y="14" width="11" height="7" rx="1"></rect></svg>Print guide</button><button type="button" class="btn btn-secondary btn-sm"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share2 be-i be-h-blue be-pop" aria-hidden="true"><circle cx="6" cy="12" r="2.6"></circle><circle cx="18" cy="18.5" r="2.6"></circle><path d="m8.3 10.7 7.4-4M8.3 13.3l7.4 4"></path><g class="be-m"><circle cx="18" cy="5.5" r="2.6"></circle></g></svg>Copy link</button></div></div></header><nav class="surface-muted p-6" aria-label="On this page"><h2 class="t-label mb-3">On this page</h2><ol class="list-decimal space-y-2 pl-5 text-sm text-foreground/80 marker:text-zinc-400"><li><a href="publish-to-youtube.html#connect" class="transition-colors hover:text-cyan-700 dark:hover:text-cyan-300">Connecting Your Channel</a></li><li><a href="publish-to-youtube.html#fields" class="transition-colors hover:text-cyan-700 dark:hover:text-cyan-300">YouTube-Only Fields</a></li><li><a href="publish-to-youtube.html#shorts" class="transition-colors hover:text-cyan-700 dark:hover:text-cyan-300">Shorts and Hashtags</a></li></ol></nav><div class="space-y-14"><section id="connect" class="scroll-mt-28"><h2 class="font-display text-2xl font-bold leading-tight tracking-[-0.02em] text-foreground md:text-3xl mb-4">Connecting Your Channel</h2><div class="t-body space-y-4 text-foreground/80"><p class="whitespace-pre-wrap">In Automation, Accounts tab, press "Connect" on the YouTube row and sign in with the Google account that owns or manages the channel. Like every platform, it needs a plan that includes automation (Creator, Pro, Elite or Agency) and uses one account slot.</p></div></section><section id="fields" class="scroll-mt-28"><h2 class="font-display text-2xl font-bold leading-tight tracking-[-0.02em] text-foreground md:text-3xl mb-4">YouTube-Only Fields</h2><div class="t-body space-y-4 text-foreground/80"><p class="whitespace-pre-wrap">When YouTube is selected, a YouTube box appears under the platforms.</p></div><div class="my-8 overflow-x-auto rounded-xl border border-border bg-card"><table class="w-full border-collapse text-sm"><thead><tr class="bg-secondary"><th class="t-label whitespace-nowrap border-b border-border px-4 py-3 text-left">Field</th><th class="t-label whitespace-nowrap border-b border-border px-4 py-3 text-left">What it does</th><th class="t-label whitespace-nowrap border-b border-border px-4 py-3 text-left">Limit / default</th><th class="t-label whitespace-nowrap border-b border-border px-4 py-3 text-left">Tip</th></tr></thead><tbody><tr><td class="border-b border-border px-4 py-3 align-top font-medium text-foreground">YouTube title</td><td class="border-b border-border px-4 py-3 align-top text-foreground/80">The video title on YouTube.</td><td class="border-b border-border px-4 py-3 align-top text-foreground/80">Up to 100 characters. Optional.</td><td class="border-b border-border px-4 py-3 align-top text-foreground/80">Leave blank to use your caption. If the caption is too long, the form shows the shortened title YouTube will get. Hashtags are dropped from the title.</td></tr><tr><td class="border-b border-border px-4 py-3 align-top font-medium text-foreground">YouTube description</td><td class="border-b border-border px-4 py-3 align-top text-foreground/80">The video description.</td><td class="border-b border-border px-4 py-3 align-top text-foreground/80">Up to 5,000 characters. Optional.</td><td class="border-b border-border px-4 py-3 align-top text-foreground/80">Only YouTube shows a description.</td></tr><tr><td class="border-b border-border px-4 py-3 align-top font-medium text-foreground">Visibility</td><td class="border-b border-border px-4 py-3 align-top text-foreground/80">Privacy of the upload.</td><td class="border-b border-border px-4 py-3 align-top text-foreground/80">Public (default), Unlisted, Private</td><td class="border-b border-border px-4 py-3 align-top text-foreground/80">Choose Private to check the video on YouTube first, then make it public in YouTube Studio.</td></tr></tbody></table></div></section><section id="shorts" class="scroll-mt-28"><h2 class="font-display text-2xl font-bold leading-tight tracking-[-0.02em] text-foreground md:text-3xl mb-4">Shorts and Hashtags</h2><div class="t-body space-y-4 text-foreground/80"><p class="whitespace-pre-wrap">Export a vertical 9:16 clip (Video tab, Social Aspect Ratio) and YouTube treats a short vertical video as a Short. Your brand hashtags are sent to YouTube as video tags rather than added to the title. See Managing Multiple Brands.</p></div><ol class="my-6 space-y-4"><li class="flex items-start gap-4"><span class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground/80">1</span><span class="t-body whitespace-pre-wrap pt-0.5 text-foreground/80">Choose your video (latest render, local file, or a library video).</span></li><li class="flex items-start gap-4"><span class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground/80">2</span><span class="t-body whitespace-pre-wrap pt-0.5 text-foreground/80">Write the caption, and optionally a YouTube title and description.</span></li><li class="flex items-start gap-4"><span class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground/80">3</span><span class="t-body whitespace-pre-wrap pt-0.5 text-foreground/80">Keep YouTube selected in Platforms.</span></li><li class="flex items-start gap-4"><span class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground/80">4</span><span class="t-body whitespace-pre-wrap pt-0.5 text-foreground/80">Set Visibility.</span></li><li class="flex items-start gap-4"><span class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground/80">5</span><span class="t-body whitespace-pre-wrap pt-0.5 text-foreground/80">Choose Publish now or Schedule, then press the button.</span></li></ol></section></div><nav class="mt-16 grid grid-cols-1 gap-4 border-t border-border pt-10 md:grid-cols-2"><a class="group surface-card p-4 transition-colors hover:border-foreground/25" href="disconnecting-accounts.html" data-discover="true"><span class="t-caption flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left be-i be-h-blue be-dash size-3.5" aria-hidden="true"><g class="be-m"><g transform="matrix(-1 0 0 1 24 0)"><path d="M5 12H19M14 7l5 5-5 5"></path></g></g></svg>Previous</span><span class="t-h4 mt-1 block transition-colors group-hover:text-cyan-700 dark:group-hover:text-cyan-300">Disconnecting and Reconnecting an Account</span></a><a class="group surface-card p-4 text-right transition-colors hover:border-foreground/25" href="publish-to-tiktok.html" data-discover="true"><span class="t-caption flex items-center justify-end gap-1">Next<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right be-i be-h-blue be-dash size-3.5" aria-hidden="true"><g class="be-m"><path d="M5 12H19M14 7l5 5-5 5"></path></g></svg></span><span class="t-h4 mt-1 block transition-colors group-hover:text-cyan-700 dark:group-hover:text-cyan-300">Publishing to TikTok</span></a></nav><section class="@container border-t border-border pt-10"><h2 class="t-h3 mb-1.5">More from BallEngine</h2><p class="t-small mb-6">Guides, plans and answers for making your videos.</p><div class="grid grid-cols-1 gap-3 @lg:grid-cols-2 @3xl:grid-cols-3"><a class="surface-card group block transition-colors hover:border-cyan-600/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600/30 p-4" href="../../plans.html" data-discover="true"><span class="t-h4 flex items-center gap-2 transition-colors group-hover:text-cyan-700 dark:group-hover:text-cyan-300"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card be-i be-h-teal size-4 shrink-0 text-zinc-500" aria-hidden="true"><path d="M5 5h14a2.5 2.5 0 0 1 2.5 2.5v9A2.5 2.5 0 0 1 19 19H5a2.5 2.5 0 0 1-2.5-2.5v-9A2.5 2.5 0 0 1 5 5Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><rect x="2.5" y="5" width="19" height="14" rx="2.5"></rect><path d="M2.5 9.5h19M6 15h4"></path></svg>Plans and pricing</span><p class="t-small mt-1.5">Compare the plans and what each one includes.</p></a><a class="surface-card group block transition-colors hover:border-cyan-600/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600/30 p-4" href="../../tutorials.html" data-discover="true"><span class="t-h4 flex items-center gap-2 transition-colors group-hover:text-cyan-700 dark:group-hover:text-cyan-300"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open be-i be-h-blue size-4 shrink-0 text-zinc-500" aria-hidden="true"><path d="M2.5 5.5h6A3.5 3.5 0 0 1 12 9v11a2.5 2.5 0 0 0-2.5-2.5h-7ZM21.5 5.5h-6A3.5 3.5 0 0 0 12 9v11a2.5 2.5 0 0 1 2.5-2.5h7Z"></path></svg>Tutorials</span><p class="t-small mt-1.5">Step-by-step guides to making ball videos in the Studio.</p></a><a class="surface-card group block transition-colors hover:border-cyan-600/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600/30 p-4" href="../../blog.html" data-discover="true"><span class="t-h4 flex items-center gap-2 transition-colors group-hover:text-cyan-700 dark:group-hover:text-cyan-300"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text be-i be-h-blue size-4 shrink-0 text-zinc-500" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8ZM14 3v5h5M8.5 13h7M8.5 16.5h5"></path></svg>Blog</span><p class="t-small mt-1.5">Articles on making and posting physics videos.</p></a><a class="surface-card group block transition-colors hover:border-cyan-600/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600/30 p-4" href="../../faq.html" data-discover="true"><span class="t-h4 flex items-center gap-2 transition-colors group-hover:text-cyan-700 dark:group-hover:text-cyan-300"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-help-circle be-i be-h-blue be-bounce size-4 shrink-0 text-zinc-500" aria-hidden="true"><path d="M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><circle cx="12" cy="12" r="9"></circle><path d="M9.3 9.4a2.8 2.8 0 0 1 5.4.9c0 1.9-2.7 2.3-2.7 3.8"></path><g class="be-m"><circle cx="12" cy="17.2" r="1.25" stroke="none" style="fill: var(--be-hue, currentColor);"></circle></g></svg>FAQ</span><p class="t-small mt-1.5">Common questions about plans, exports and the Studio.</p></a><a class="surface-card group block transition-colors hover:border-cyan-600/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600/30 p-4" href="../../support.html" data-discover="true"><span class="t-h4 flex items-center gap-2 transition-colors group-hover:text-cyan-700 dark:group-hover:text-cyan-300"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle be-i be-h-blue size-4 shrink-0 text-zinc-500" aria-hidden="true"><path d="M12 3a8.5 8.5 0 1 1-4.1 16L3.5 20.5l1.2-4.1A8.5 8.5 0 0 1 12 3Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><path d="M12 3a8.5 8.5 0 1 1-4.1 16L3.5 20.5l1.2-4.1A8.5 8.5 0 0 1 12 3Z"></path></svg>Contact support</span><p class="t-small mt-1.5">Get help from our team directly</p></a></div></section></div></div></div></div></div></main><footer class="border-t border-border bg-background pt-12 pb-8"><div class="container-page"><div class="mb-10 grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-3 lg:grid-cols-7"><div class="col-span-2 space-y-4 md:col-span-3 lg:col-span-2"><a class="inline-flex items-center gap-3" href="../../index.html" data-discover="true"><picture class="flex h-10 w-10 shrink-0 items-center justify-center"><source srcset="/logo.webp" type="image/webp"><source srcset="/logo.png" type="image/png"><img alt="" width="40" height="40" class="h-10 w-10 object-contain" src="../../logo.png"></picture><span class="flex min-w-0 flex-col"><span class="t-h4 leading-none">BallEngine</span><span class="t-caption mt-1">by Ball Engine Studios</span></span></a><p class="t-small max-w-xs">Create satisfying physics videos and synced bouncing ball simulations.</p><div class="flex gap-2"><a href="https://youtube.com/@ballengine_app" target="_blank" rel="noreferrer" aria-label="YouTube" class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card transition-colors hover:border-foreground/25"><svg class="h-4" viewBox="0 0 28 20" role="img" aria-label="YouTube" xmlns="http://www.w3.org/2000/svg" style="min-height: 20px; width: auto;"><title>YouTube</title><path fill="#FF0000" d="M27.4 3.1c-.3-1.2-1.3-2.1-2.5-2.4C22.7 0 14 0 14 0S5.3 0 3.1.7C1.9 1 .9 1.9.6 3.1 0 5.3 0 10 0 10s0 4.7.6 6.9c.3 1.2 1.3 2.1 2.5 2.4C5.3 20 14 20 14 20s8.7 0 10.9-.7c1.2-.3 2.2-1.2 2.5-2.4.6-2.2.6-6.9.6-6.9s0-4.7-.6-6.9z"></path><path fill="#FFFFFF" d="M11.2 14.3l7.3-4.3-7.3-4.3v8.6z"></path></svg></a><a href="https://x.com/Ballengine_app" target="_blank" rel="noreferrer" aria-label="X" class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card transition-colors hover:border-foreground/25"><svg class="h-4 text-foreground" viewBox="0 0 24 24" role="img" aria-label="X" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="min-height: 20px; width: auto;"><title>X</title><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg></a></div></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Product</h2><nav aria-label="Product"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../index.html" data-discover="true">Home</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../start.html" data-discover="true">Start free</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../studio.html" data-discover="true">Studio</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../plans.html" data-discover="true">Pricing</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../automation.html" data-discover="true">Automation</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../developer.html" data-discover="true">Developer platform</a></li><li><a href="https://cdn.ballengine.app/download/BallEngine-Setup.exe?cb=1794215328033" class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1">Download for Windows</a></li></ul></nav></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Learn</h2><nav aria-label="Learn"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../how-it-works.html" data-discover="true">How it works</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../modes.html" data-discover="true">Simulation modes</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../play.html" data-discover="true">Games</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../tutorials.html" data-discover="true">Tutorials</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../blog.html" data-discover="true">Blog</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../roadmap.html" data-discover="true">Roadmap</a></li></ul></nav></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Support</h2><nav aria-label="Support"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../help.html" data-discover="true">Help</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../support.html" data-discover="true">Support center</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../faq.html" data-discover="true">FAQ</a></li></ul></nav></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Company</h2><nav aria-label="Company"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../about.html" data-discover="true">About us</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../affiliate.html" data-discover="true">Affiliate program</a></li></ul></nav></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Legal</h2><nav aria-label="Legal"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../terms-of-service.html" data-discover="true">Terms of service</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../privacy-policy.html" data-discover="true">Privacy policy</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../refund-policy.html" data-discover="true">Refund policy</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../cookie-policy.html" data-discover="true">Cookie policy</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../acceptable-use.html" data-discover="true">Acceptable use</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../copyright-policy.html" data-discover="true">Copyright policy</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../../data-deletion.html" data-discover="true">Data deletion</a></li><li><button type="button" class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1 text-left">Cookie preferences</button></li></ul></nav></div></div><div class="flex flex-wrap gap-x-4 gap-y-1 border-t border-border pt-6"><a aria-current="true" class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 font-semibold text-foreground" href="../../index.html" data-discover="true">English</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../../es.html" data-discover="true">Español</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../../fr.html" data-discover="true">Français</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../../de.html" data-discover="true">Deutsch</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../../ja.html" data-discover="true">日本語</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../../zh-tw.html" data-discover="true">繁體中文</a></div><p class="t-caption mt-4 font-normal text-muted-foreground">© 2026 Ball Engine Studios. All rights reserved.</p></div></footer><section aria-label="Notifications alt+T" tabindex="-1" aria-live="polite" aria-relevant="additions text" aria-atomic="false"></section></div></div>
+  <noscript>
+    <div style="padding: 20px; font-family: sans-serif;">
+      <!-- No heading elements in here. This block is copied into EVERY prerendered page, so a
+           heading here gave all 1,400 URLs a second, homepage-worded H1 next to the page's own. -->
+      <p><strong>BallEngine</strong> (also written <strong>Ball Engine</strong>, at
+        <strong>ballengine.app</strong>) is a browser-based bouncing ball simulator
+        and creator studio for music-synced 2D and 3D physics videos.</p>
+
+      <p><strong>Plans</strong></p>
+      <ul>
+        <!-- Keep in sync with src/constants/pricing.ts and the SoftwareApplication offers above.
+             These drifted to a stale $29/$159, then $99, and contradicted the JSON-LD on the same page. -->
+        <li><strong>Starter Studio:</strong> Free. The full Studio with a live preview; exporting a video needs a plan.</li>
+        <li><strong>Lite:</strong> $19/mo. No watermark, 1080p, commercial license, 15 exports per month (one video every other day).</li>
+        <li><strong>Creator:</strong> $29/mo. Every 2D setting, commercial license, no watermark, 30 exports per month, Automation Lite included (60 posts a month). The recommended plan.</li>
+        <li><strong>Pro:</strong> $49/mo. Everything in Creator, 3D settings, 4K rendering, your own watermark text, 60 exports per month, Automation Growth included (240 posts a month).</li>
+        <li><strong>Elite:</strong> $99/mo. Everything in Pro, 150 exports per month, Automation Scale included (600 posts a month), 200 GB storage.</li>
+        <li><strong>Agency:</strong> $199/mo. Everything in Elite, 500 exports per month, Automation Max included (2,000 posts a month), 500 GB storage.</li>
+      </ul>
+
+      <nav>
+        <a href="../../index.html">Home</a> |
+        <a href="../../modes.html">All modes</a> |
+        <a href="../../play.html">Games</a> |
+        <a href="../../plans.html">Pricing</a> |
+        <a href="../../support.html">Support</a>
+      </nav>
+
+      <p>BallEngine, ballengine.app</p>
+      <p>Follow BallEngine:</p>
+      <nav>
+        <a href="https://youtube.com/@funcirclegames">YouTube</a> |
+        <a href="https://www.instagram.com/funcirclegames">Instagram</a> |
+        <a href="https://www.tiktok.com/@funcirclegames">TikTok</a> |
+        <a href="https://x.com/funcirclegames">Twitter / X</a> |
+        <a href="https://www.threads.com/@funcirclegames">Threads</a>
+      </nav>
+    </div>
+  </noscript>
+
+
+
+<!-- Cloudflare Pages Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "61906db637f044638bdee99f6e5c9222"}'></script><!-- Cloudflare Pages Analytics --><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a59ed1a23cd541ea',t:'MTc5NDU4MzgzOQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a59ed1a23cd541ea',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body></html>
