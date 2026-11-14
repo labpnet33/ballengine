@@ -6,6 +6,8 @@
  *
  * Configuration snapshots only; uploads/audio/video are not stored here.
  */
+import {isPublicMusic,publicMusic} from './music-bank.mjs';
+import {isPrivateMusic,privateMusic,serveAsset,musicUsage} from './music-media.mjs';
 const MAX_CONFIG_BYTES=250000;
 const MAX_SAVES=50;
 const MAX_LIBRARY_BYTES=10000000;
@@ -94,11 +96,14 @@ export default {
     if(req.method==='OPTIONS')return ALLOW_ORIGIN(origin)?options(origin):fail('Origin is not allowed',403);
     if(origin&&!ALLOW_ORIGIN(origin))return fail('Origin is not allowed',403);
     if(url.pathname==='/health'&&req.method==='GET')return json({ok:true,service:'ballengine-guest-saves',version:1},200,origin);
+    if(isPublicMusic(url.pathname))return publicMusic(req);
+    if(url.pathname.startsWith('/api/assets/'))return env.DB?serveAsset(req,env):fail('Cloud database is not configured',503,origin);
     if(!env.DB)return fail('Cloud database is not configured',503,origin);
     const auth=req.headers.get('Authorization')||'';
     const key=auth.startsWith('Bearer ')?auth.slice(7):'';
     if(!/^be1_[A-Za-z0-9_-]{43}$/.test(key))return fail('Missing or invalid cloud recovery key',401,origin);
     const library=await sha256(key);
+    if(isPrivateMusic(url.pathname))return privateMusic(req,env,library,origin,json,fail,rateLimit);
     const db=env.DB;
     const parts=url.pathname.split('/').filter(Boolean);
     const base=parts[0]==='api';
@@ -108,7 +113,8 @@ export default {
       if(['POST','PUT','DELETE'].includes(req.method))await rateLimit(db,req);
       if(resource==='storage'&&parts[2]==='usage'&&req.method==='GET'){
         const usage=await db.prepare('SELECT COUNT(*) total, COALESCE(SUM(size_bytes),0) used FROM saves WHERE library_id=?').bind(library).first();
-        return json({used_bytes:usage.used,limit_bytes:MAX_LIBRARY_BYTES,total_saves:usage.total},200,origin);
+        const media=await musicUsage(db,library);
+        return json({used_bytes:usage.used,limit_bytes:MAX_LIBRARY_BYTES,total_saves:usage.total,...media},200,origin);
       }
       if(resource!=='saves')return fail('Not found',404,origin);
       if(!id&&req.method==='GET'){
