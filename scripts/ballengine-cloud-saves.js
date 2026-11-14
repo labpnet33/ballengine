@@ -58,7 +58,7 @@
     // Send only these supported endpoints to our independent Worker and keep
     // all the existing React UI, MIDI parser, audio slicer and file picker.
     const isCloudApi=url.origin===location.origin &&
-      (/^\/api\/(?:saves|upload|songs|melodies|song-bank|xmidi)(?:\/|$)/.test(url.pathname)||url.pathname==='/api/storage/usage');
+      (/^\/api\/(?:saves|upload|songs|melodies|song-bank|xmidi|guest-publishing)(?:\/|$)/.test(url.pathname)||url.pathname==='/api/storage/usage');
     if(!isCloudApi)return delegate(input,init);
     try{
       const headers=new Headers((init&&init.headers)||(input instanceof Request?input.headers:undefined));
@@ -97,7 +97,7 @@
       restore.type='button';restore.className='btn btn-sm border border-white/10 px-2';restore.textContent='Use existing key';
       const note=document.createElement('p');
       note.className='text-zinc-500 leading-relaxed';
-      note.textContent='Cloud projects sync across devices with the same key. Keep it private. Uploaded media and local saves stay on this device.';
+      note.textContent='Cloud projects, uploaded music and guest publishing drafts/reminders sync by this private key. Local-only settings stay on this device.';
       copy.addEventListener('click',async()=>{
         try{
           const key=recoveryKey();
