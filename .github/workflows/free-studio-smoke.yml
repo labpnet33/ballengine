@@ -1,0 +1,33 @@
+name: Smoke-test free Studio export preview
+on:
+  push:
+    branches:
+      - preview/free-studio-export-controls-20261114
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  free-studio-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install browser controller
+        run: npm install --prefix "$RUNNER_TEMP/studio-qa" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build local Studio
+        run: node scripts/build-static.cjs
+      - name: Verify free controls and export
+        run: |
+          CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/studio-qa/node_modules" node scripts/test-free-studio.cjs
+      - name: Save screenshot and browser report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: free-studio-smoke
+          path: |
+            free-studio-smoke.png
+            free-studio-smoke.json
+          if-no-files-found: ignore
+          retention-days: 7
