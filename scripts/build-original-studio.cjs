@@ -77,3 +77,55 @@ console.log('Additional public static assets copied:',copied);
 console.log('Already present:',already);
 console.log('Sound effects:',soundCount,'Mode thumbnails:',modeCount);
 console.log('Runtime note: authenticated APIs and server-side rendering are not part of this capture.');
+
+
+// Vite's entrypoint references extra dynamic JS chunks and simulation workers.
+// Collect only publicly served, hashed /assets/*.js resources. Never request
+// authenticated APIs, account data, or any original /studio page here.
+async function collectPublicLazyModules() {
+  const bundle=fs.readFileSync(originalBundle,'utf8');
+  const paths=[...new Set(bundle.match(/assets\/[A-Za-z0-9._-]+\.js/g)||[])]
+    .filter(rel=>!fs.existsSync(path.join(web,rel)));
+  if(!paths.length){console.log('All referenced Studio JS modules available.');return;}
+  console.log('Missing Vite JS modules and workers:',paths.length);
+  const pending=paths.slice();
+  let added=0;
+  const failed=[];
+  async function worker() {
+    while(pending.length) {
+      const rel=pending.shift();
+      const url='https://ballengine.app/'+rel;
+      try {
+        const response=await fetch(url,{
+          redirect:'manual',signal:AbortSignal.timeout(15000),
+          headers:{Accept:'application/javascript, text/javascript;q=0.9, */*;q=0.1'}
+        });
+        if(!response.ok || new URL(response.url).origin!=='https://ballengine.app')
+          throw new Error('HTTP '+response.status);
+        const mime=(response.headers.get('content-type')||'').toLowerCase();
+        if(mime.includes('html') || (!mime.includes('javascript') && !mime.includes('text/plain') && !mime.includes('octet-stream')))
+          throw new Error('Unexpected MIME '+mime);
+        const body=Buffer.from(await response.arrayBuffer());
+        if(!body.length || body.length>25*1024*1024 || /^\\s*<!doctype|^\\s*<html/i.test(body.subarray(0,256).toString('utf8')))
+          throw new Error('Invalid or oversized script');
+        const file=path.join(web,rel);
+        fs.mkdirSync(path.dirname(file),{recursive:true});
+        fs.writeFileSync(file,body);
+        added++;
+        console.log('Fetched original public JS:',rel,'('+body.length+' bytes)');
+      } catch(e) {
+        failed.push(rel+' ('+String(e.message||e)+')');
+      }
+    }
+  }
+  await Promise.all([worker(),worker(),worker()]);
+  console.log('Public JS modules recovered:',added,'Still missing:',failed.length);
+  if(failed.length) {
+    console.warn('Unavailable modules:');
+    for(const line of failed)console.warn(' - '+line);
+  }
+}
+collectPublicLazyModules().catch(e=>{
+  console.error('Original asset collection failed:',e);
+  process.exitCode=1;
+});
