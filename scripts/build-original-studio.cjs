@@ -115,12 +115,17 @@ needed.forEach(verify);
 const studioDir=path.join(web,'studio');
 fs.mkdirSync(studioDir,{recursive:true});
 // Absolute asset paths work both at /studio and /studio/.
+// All original Studio URLs must use the same local preview user entitlement.
+// Keep this idempotent when Vercel retries or reuses a build directory.
+const guestAdapter='<script src="/studio-guest-preview.js"></script>';
 const studioDocument=originalStudio
   .replaceAll('src="assets/', 'src="/assets/')
   .replaceAll('href="assets/', 'href="/assets/')
   .replaceAll("src='assets/", "src='/assets/")
   .replaceAll("href='assets/", "href='/assets/")
-  .replace('</head>', '<script src="/studio-guest-preview.js"></script></head>');
+  .replace('</head>', (originalStudio.includes(guestAdapter)?'':guestAdapter)+'</head>');
+// /studio.html is also reachable directly and via the Vercel /studio rewrite.
+fs.writeFileSync(path.join(web,'studio.html'),studioDocument,'utf8');
 fs.writeFileSync(path.join(studioDir,'index.html'),studioDocument,'utf8');
 fs.copyFileSync(path.join(repo,'scripts','studio-guest-preview.js'),path.join(web,'studio-guest-preview.js'));
 const originalBundle=path.join(web,'assets','index-3pf76ICO.js');
