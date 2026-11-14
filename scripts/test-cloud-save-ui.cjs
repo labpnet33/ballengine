@@ -82,20 +82,43 @@ async function run(){
     report.afterReload=(await panel.innerText()).slice(0,3200);
     assert.ok(report.afterReload.includes('CI browser cloud save'),'Cloud save not visible after reload');
     await page.screenshot({path:path.join(out,'saves-cloud-reloaded.png')});
+    const beforeLoadRequests=report.cloudApi.length;
+    await panel.getByRole('button',{name:'Load',exact:true}).first().click();
+    await page.waitForTimeout(1800);
+    report.loadRequestObserved=report.cloudApi.slice(beforeLoadRequests).some(r=>r.status===200&&r.path.includes('/api/saves/'));
+    report.lastUsed=await page.evaluate(()=>{try{const x=JSON.parse(localStorage.getItem('studio_last_used_save')||'null');return x?{scope:x.scope,action:x.action,key:x.key}:null;}catch{return null;}});
+    report.cloudLoaded=report.lastUsed?.scope==='CLOUD'&&report.lastUsed.key===cloudId;
+    assert.ok(report.cloudLoaded||report.loadRequestObserved,'Cloud save Load action did not restore the selected project');
     await panel.getByRole('button',{name:'Local',exact:true}).first().click();
     await page.waitForTimeout(800);
     assert.ok((await panel.innerText()).includes('CI browser local save'),'Local browser save was lost');
     report.phase='second-device';
     const newContext=await browser.newContext({viewport:{width:1440,height:900},serviceWorkers:'block'});
-    await newContext.addInitScript(k=>localStorage.setItem('ballengine_cloud_recovery_v1',k),key);
     const device=await newContext.newPage();
+    // Exercise the actual "Use existing key" flow instead of pre-seeding
+    // localStorage in the test; the second device should start with its own key.
+    device.on('dialog',async dialog=>{
+      if(dialog.type()==='prompt')await dialog.accept(key);
+      else if(dialog.type()==='confirm')await dialog.accept();
+      else await dialog.dismiss();
+    });
     await device.goto(base+'/studio?mode=rhythmic',{waitUntil:'domcontentloaded',timeout:45000});
     await device.waitForTimeout(6000);
     await device.locator('button[title="Saves (6)"]').first().click();
     const panel2=device.locator('div.flex.flex-col.gap-3').filter({has:device.getByText('Save system',{exact:true})}).last();
     await panel2.getByRole('button',{name:'Cloud',exact:true}).first().click();
-    await device.waitForTimeout(1400);
-    report.secondBrowser=(await panel2.innerText()).includes('CI browser cloud save');
+    await device.waitForTimeout(800);
+    await panel2.getByRole('button',{name:'Use existing key',exact:true}).click();
+    await device.waitForTimeout(2700);
+    if(await device.locator('button[title="Saves (6)"]').count()){
+      await device.locator('button[title="Saves (6)"]').first().click();
+    }
+    const restoredPanel=device.locator('div.flex.flex-col.gap-3').filter({has:device.getByText('Save system',{exact:true})}).last();
+    await restoredPanel.getByRole('button',{name:'Cloud',exact:true}).first().click();
+    await device.waitForTimeout(1300);
+    report.secondBrowser=(await restoredPanel.innerText()).includes('CI browser cloud save');
+    report.recoveryKeySwitched=await device.evaluate((expected)=>localStorage.getItem('ballengine_cloud_recovery_v1')===expected,key);
+    assert.ok(report.recoveryKeySwitched,'Use existing key did not activate the chosen recovery key');
     assert.ok(report.secondBrowser,'Same recovery key did not restore cloud save in another browser');
     await newContext.close();
     report.phase='passed';
