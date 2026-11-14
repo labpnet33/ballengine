@@ -1,0 +1,29 @@
+name: Audit 27 experimental animation engines
+on:
+  push:
+    branches: [fix/production-home-route]
+    paths:
+      - scripts/test-experimental-mode-engines.cjs
+      - .github/workflows/experimental-engine-readiness.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  animation-engine-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        mode_range: ['0:9','9:18','18:27']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install test browser controller
+        run: npm install --prefix "$RUNNER_TEMP/engine-audit" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Measure canvas animation and controls
+        env:
+          MODE_RANGE: ${{ matrix.mode_range }}
+          BALLENGINE_BASE: https://ballengine.vercel.app
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/engine-audit/node_modules" node scripts/test-experimental-mode-engines.cjs
