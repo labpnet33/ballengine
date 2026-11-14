@@ -199,6 +199,11 @@ capturedApp=capturedApp.slice(0,exportBegin)+standaloneExport+
   capturedApp.slice(exportFinish+remoteExportEnd.length);
 console.log('Standalone local MP4 export enabled using original frame renderer; upstream ticket not requested.');
 fs.writeFileSync(originalBundle,capturedApp,'utf8');
+// Vercel's static build would otherwise report READY even if the edited 14MB
+// browser bundle had a JavaScript syntax error.
+require('node:child_process').execFileSync(process.execPath,
+  ['--check',originalBundle],{stdio:'pipe',timeout:30000,maxBuffer:1024*1024});
+console.log('Patched original Studio JavaScript syntax checked.');
 console.log('Local guest fallback enabled in original /home React route.');
 
 
