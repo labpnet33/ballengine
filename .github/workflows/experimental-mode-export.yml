@@ -27,6 +27,7 @@ jobs:
       - name: Record and verify real video MP4 in experimental simulation
         env:
           TEST_MODE: ${{ matrix.mode }}
+          TEST_DURATION: '2'
         run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/experimental-export/node_modules" node scripts/test-record-export.cjs
       - name: Keep evidence
         if: always()
