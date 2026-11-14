@@ -121,7 +121,15 @@ const homeSource=path.join(web,'index.html');
 const homeHTML=fs.readFileSync(homeSource,'utf8');
 if(!homeHTML.includes('id="root"') || !homeHTML.includes('index-3pf76ICO.js'))
   throw new Error('Original homepage shell missing. Refusing to create /home from an incomplete page.');
-const homeDocument=homeHTML.replace('</head>', '<base href="/"></head>');
+// Apply the same local guest profile on the homepage as in Studio, so
+// returning from /studio never depends on an unavailable upstream login API.
+const guestAdapter='<script src="/studio-guest-preview.js"></script>';
+const homeDocument=homeHTML
+  .replaceAll('<base href="/">','')
+  .replaceAll(guestAdapter,'')
+  .replace('</head>','<base href="/">'+guestAdapter+'</head>');
+// The root entrypoint must behave the same as /home for fresh visitors.
+fs.writeFileSync(homeSource,homeDocument,'utf8');
 const homeDir=path.join(web,'home');
 fs.mkdirSync(homeDir,{recursive:true});
 fs.writeFileSync(path.join(web,'home.html'),homeDocument,'utf8');
@@ -130,7 +138,6 @@ console.log('Homepage route /home prepared from original HTML shell.');
 // Absolute asset paths work both at /studio and /studio/.
 // All original Studio URLs must use the same local preview user entitlement.
 // Keep this idempotent when Vercel retries or reuses a build directory.
-const guestAdapter='<script src="/studio-guest-preview.js"></script>';
 const studioDocument=originalStudio
   .replaceAll('src="assets/', 'src="/assets/')
   .replaceAll('href="assets/', 'href="/assets/')
