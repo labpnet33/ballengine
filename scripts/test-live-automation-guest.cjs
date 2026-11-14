@@ -17,7 +17,7 @@ async function main(){
     page.on('pageerror',e=>jsErrors.push(String(e).slice(0,220)));
     await page.goto(base+'/automation',{waitUntil:'domcontentloaded',timeout:40000});
     await page.locator('[data-be-guest-publisher]').waitFor({state:'visible',timeout:30000});
-    await page.getByText('Guest draft scheduling is available in the publishing planner.',{exact:false}).waitFor({state:'visible',timeout:15000});
+    await page.getByText('Guest draft scheduling is available in Overview and Publish.',{exact:false}).waitFor({state:'visible',timeout:15000});
     const data=await page.evaluate(()=>{
       const main=document.querySelector('#root main');
       const planner=main?.querySelector('[data-be-guest-publisher]');
@@ -51,7 +51,7 @@ async function main(){
         const response=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:40000});
         assert.equal(response.status(),200,route+' returned 404');
         await page.locator('#root main').waitFor({state:'visible',timeout:30000});
-        await page.waitForTimeout(5000);
+        await page.waitForTimeout(800);
         console.log('LIVE_AUTOMATION_ASSET_DEBUG '+JSON.stringify(await page.evaluate(()=>({
           route:location.pathname,base:document.baseURI,
           scripts:[...document.querySelectorAll('script[src]')].map(s=>({raw:s.getAttribute('src'),resolved:s.src})).slice(0,12),
@@ -64,21 +64,24 @@ async function main(){
         // /index.html has captured homepage SSR markup; wait for the ORIGINAL
         // React Router to hydrate and render the requested Automation tab.
         await page.locator('h1').filter({hasText:/Automation/i}).first().waitFor({state:'visible',timeout:25000});
-        await page.locator('[data-be-guest-publisher]').first().waitFor({state:'visible',timeout:25000});
-        await page.getByText('Guest draft scheduling is available in the publishing planner.',{exact:false}).waitFor({state:'visible',timeout:12000});
+        await page.getByText('Guest draft scheduling is available in Overview and Publish.',{exact:false}).waitFor({state:'visible',timeout:12000});
+        if(slug==='publish')await page.locator('[data-be-guest-publisher]').first().waitFor({state:'visible',timeout:25000});
+        else await page.waitForTimeout(1600);
         const state=await page.evaluate(()=>({
           title:document.title,
           text:document.querySelector('#root main')?.innerText?.slice(0,600)||'',
           pathname:location.pathname,
           hasReactRoot:!!document.querySelector('#root main'),
           hasGuestPlanner:!!document.querySelector('#root main [data-be-guest-publisher]'),
+          nativeTabVisible:location.pathname.includes('/accounts')?(document.querySelector('#root main')?.innerText.includes('Posting as')):location.pathname.includes('/autopilot')?(document.querySelector('#root main')?.innerText.includes('Automatic posting is not configured.')):(document.querySelector('#root main')?.innerText.includes('Choose the video')),
           obsoleteWarningVisible:[...document.querySelectorAll('#root main div,#root main span,#root main p')].some(e=>e.children.length===0&&e.textContent?.trim()==='Automation is not active on this account, so connecting accounts, scheduling and Autopilot are all switched off. Every plan covers every platform.'),
           has404:document.body.innerText.includes('404_NOT_FOUND')||document.body.innerText.includes('This page doesn’t exist')
         }));
         assert.equal(state.pathname,route,'Navigation unexpectedly redirected');
         assert.ok(state.hasReactRoot&&!state.has404,'React Automation route did not render at '+route);
         assert.ok(state.text.includes('Automation'),'Original Automation tab not rendered at '+route);
-        assert.ok(state.hasGuestPlanner,'Working guest planner missing from '+route);
+        assert.equal(state.hasGuestPlanner,slug==='publish','Guest planner obscured native '+slug+' tab');
+        assert.ok(state.nativeTabVisible,'Native Automation '+slug+' content not visible');
         assert.equal(state.obsoleteWarningVisible,false,'Obsolete subscription warning still visible at '+route);
         console.log('LIVE_AUTOMATION_DEEP_ROUTE_OK '+JSON.stringify({route,status:response.status(),...state}));
       }
