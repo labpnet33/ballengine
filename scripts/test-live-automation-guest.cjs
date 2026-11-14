@@ -51,6 +51,16 @@ async function main(){
         const response=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:40000});
         assert.equal(response.status(),200,route+' returned 404');
         await page.locator('#root main').waitFor({state:'visible',timeout:30000});
+        await page.waitForTimeout(5000);
+        console.log('LIVE_AUTOMATION_ASSET_DEBUG '+JSON.stringify(await page.evaluate(()=>({
+          route:location.pathname,base:document.baseURI,
+          scripts:[...document.querySelectorAll('script[src]')].map(s=>({raw:s.getAttribute('src'),resolved:s.src})).slice(0,12),
+          styles:[...document.querySelectorAll('link[rel="stylesheet"]')].map(s=>({raw:s.getAttribute('href'),resolved:s.href})).slice(0,8),
+          title:document.title,
+          h1:[...document.querySelectorAll('h1')].map(x=>x.textContent).slice(0,8),
+          rootText:document.querySelector('#root main')?.innerText.slice(0,400),
+          resourceErrors:performance.getEntriesByType('resource').filter(x=>x.responseStatus>=400).map(x=>({url:x.name,status:x.responseStatus})).slice(0,15)
+        }))));
         // /index.html has captured homepage SSR markup; wait for the ORIGINAL
         // React Router to hydrate and render the requested Automation tab.
         await page.locator('h1').filter({hasText:/Automation/i}).first().waitFor({state:'visible',timeout:25000});
