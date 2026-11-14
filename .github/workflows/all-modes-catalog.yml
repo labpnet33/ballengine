@@ -1,0 +1,25 @@
+name: Verify All simulation modes catalog
+on:
+  push:
+    branches: [fix/production-home-route]
+    paths:
+      - scripts/ballengine-guest-publishing.js
+      - scripts/test-all-mode-catalog.cjs
+      - .github/workflows/all-modes-catalog.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-mode-catalog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install browser controller
+        run: npm install --prefix "$RUNNER_TEMP/mode-catalog" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Prepare original site
+        run: node scripts/build-original-studio.cjs
+      - name: Test mode catalog on desktop and Android-sized screen
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/mode-catalog/node_modules" node scripts/test-all-mode-catalog.cjs
