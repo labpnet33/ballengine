@@ -16,10 +16,11 @@ const server=http.createServer((req,res)=>{
  }catch{res.writeHead(400).end();}
 });
 (async()=>{
- await new Promise(ok=>server.listen(0,'127.0.0.1',ok));
+ const remote=process.env.BALLENGINE_BASE||'';
+ if(!remote)await new Promise(ok=>server.listen(0,'127.0.0.1',ok));
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage']});
  try{
-  const base='http://127.0.0.1:'+server.address().port;
+  const base=remote||'http://127.0.0.1:'+server.address().port;
   for(const viewport of [{width:1440,height:900},{width:390,height:844}]){
    const context=await browser.newContext({viewport,serviceWorkers:'block'});
    const page=await context.newPage();
@@ -66,5 +67,5 @@ const server=http.createServer((req,res)=>{
     console.log('ALL_MODES_EXPERIMENTAL_OPEN '+JSON.stringify({viewport:viewport.width,mode:'Flow 3D',url:state.path,canvas:state.canvas,errors:errors.slice(0,5)}));
    }finally{await context.close();}
   }
- }finally{await browser.close();await new Promise(ok=>server.close(ok));}
-})().catch(e=>{console.error('ALL_MODES_CATALOG_FAIL',String(e.stack||e));process.exitCode=1;server.close();});
+ }finally{await browser.close();if(server.listening)await new Promise(ok=>server.close(ok));}
+})().catch(e=>{console.error('ALL_MODES_CATALOG_FAIL',String(e.stack||e));process.exitCode=1;if(server.listening)server.close();});
