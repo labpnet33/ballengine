@@ -22,6 +22,107 @@
     note:'font-size:12px;opacity:.77;line-height:1.55;margin:5px 0 10px;',
     headline:'font-size:15px;font-weight:750;margin:0 0 5px;'
   };
+
+  // Enhance the EXISTING Home mode grid, not a second route or a replacement
+  // screen. The original 18 normal cards remain untouched; users can opt in
+  // to seeing the 27 experimental cards already present in the Studio menu.
+  // This does not claim unfinished features are production ready.
+  const experimentalModes=[
+    ['Bloom','phase-bloom','phase-bloom','2D','Balls sync their individual rhythms'],
+    ['Phonk Drop','phonk-drop','phonk-drop','2D','The ball grows until the beat drops'],
+    ['Marble','marble-run','marble-run','2D','Roll through a marble course'],
+    ['Race','ball-race','ball-race','2D','Race down a long track'],
+    ['Targets','target-hit','target-hit','2D','Hit every target'],
+    ['Sand','falling-sand','falling-sand','2D','Sand, water and fire particles'],
+    ['Plinko','plinko','plinko','2D','Drop through pegs into scoring bins'],
+    ['Colors','color-match','color-match','2D','Shatter matching colors'],
+    ['Spin','spin-battle','spin-battle','2D','Spin and stack to fill the silo'],
+    ['Lava','lava-survival','lava-survival','2D','Escape the rising hazard'],
+    ['Slice 3D','glass-slice','glass-slice','3D','Slice a fruit to each note'],
+    ['Flood 3D','flood-fill','flood-fill','3D','Fill a room with rising particles'],
+    ['Disks 3D','eulers-disk','eulers-disk','3D','Spinning disks move with the beat'],
+    ['Drum 3D','drum-sort','drum-sort','3D','Sort tumbling balls into color bands'],
+    ['Plinko 3D','plinko-3d','plinko-3d','3D','Drop through a three-dimensional peg board'],
+    ['Chladni 3D','chladni','chladni','3D','Sand patterns follow musical notes'],
+    ['Voxels 3D','voxel','voxel','3D','Cube clusters bloom on the beat'],
+    ['Domino 3D','domino-3d','domino-3d','3D','Create a domino chain reaction'],
+    ['Race 3D','marble-race-3d','marble-race-3d','3D','Marbles compete on a 3D track'],
+    ['Attractor 3D','attractor','attractor','3D','Explore a chaotic particle attractor'],
+    ['Flow 3D','flow-field',null,'3D','Particle motion and smoke-like streams'],
+    ['Blobs 3D','metaballs','metaballs','3D','Liquid blobs merge and split'],
+    ['Galaxy 3D','galaxy','galaxy','3D','Stars form a spinning galaxy'],
+    ['Fireflies 3D','fireflies','fireflies','3D','Lights synchronize with music'],
+    ['Basin 3D','pendulum-basin','pendulum-basin','3D','Magnetic basins form fractals'],
+    ['Slime 3D','slime','slime','3D','A living network finds its food'],
+    ['Evacuate 3D','crowd-evacuation','crowd-evacuation','3D','Crowds race for the exits']
+  ];
+  let allModesExpanded=false;
+  function homeModeGrid(){
+    if(!['/home','/',''].includes(location.pathname.replace(/\/+$/,'')))return null;
+    const main=document.querySelector('#root');
+    if(!main)return null;
+    const title=[...main.querySelectorAll('h2')].find(e=>e.textContent?.trim()==='What do you want to make?');
+    const section=title?.closest('section');
+    const grid=section?.querySelector('ul.grid');
+    if(!grid||grid.querySelectorAll(':scope > li:not([data-be-extra-mode]) a[href^="/studio?mode="]').length!==18)return null;
+    return {title,section,grid};
+  }
+  function extraModeCard(entry){
+    const [label,slug,thumb,kind,description]=entry;
+    const li=node('li');li.dataset.beExtraMode=slug;
+    const a=node('a',null,null,'group block overflow-hidden rounded-2xl border border-border bg-card transition-colors hover:border-white/20');
+    a.href='/studio?mode='+encodeURIComponent(slug);
+    a.setAttribute('aria-label',label+' — experimental mode');
+    const media=node('div',null,'position:relative;overflow:hidden;aspect-ratio:4/5;background:linear-gradient(150deg,#111827,#0f172a 55%,#164e63);');
+    if(thumb){
+      const img=node('img');img.src='/mode-thumbs/'+thumb+'.webp';
+      img.alt='';img.loading='lazy';img.decoding='async';
+      img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+      img.addEventListener('error',()=>{img.remove();});
+      media.append(img);
+    }else{
+      media.append(node('div',label,'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#e2e8f0;font-size:20px;padding:18px;text-align:center;'));
+    }
+    const mark=node('span','Experimental','position:absolute;z-index:2;top:9px;right:9px;background:rgba(9,9,11,.87);border:1px solid rgba(255,255,255,.2);color:#f4f4f5;border-radius:6px;padding:3px 6px;font-size:10px;font-weight:600;');
+    media.append(mark);
+    const details=node('div',null,'padding:12px;');
+    details.append(node('h3',label,'font-size:14px;font-weight:700;line-height:1.3;'));
+    details.append(node('p',description,'font-size:12px;line-height:1.5;opacity:.72;margin-top:5px;'));
+    details.append(node('p','In development · '+kind,'font-size:11px;opacity:.67;margin-top:6px;'));
+    a.append(media,details);li.append(a);
+    return li;
+  }
+  function enhanceHomeModeCatalog(){
+    const view=homeModeGrid();if(!view)return;
+    const {section,grid}=view;
+    let controls=section.querySelector('[data-be-all-modes-toggle]');
+    if(!controls){
+      controls=node('div',null,'display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:-3px 0 16px;');
+      controls.dataset.beAllModesToggle='1';
+      const toggle=button('Show all 45 simulation modes',()=>{
+        allModesExpanded=!allModesExpanded;
+        enhanceHomeModeCatalog();
+      });
+      toggle.dataset.beAllModesButton='1';
+      toggle.setAttribute('aria-expanded','false');
+      controls.append(toggle,node('span','18 regular modes · 27 in development','font-size:12px;opacity:.7;'));
+      section.insertBefore(controls,grid);
+    }
+    const toggle=controls.querySelector('[data-be-all-modes-button]');
+    if(toggle){
+      toggle.textContent=allModesExpanded?'Show only 18 regular modes':'Show all 45 simulation modes';
+      toggle.setAttribute('aria-expanded',String(allModesExpanded));
+    }
+    const extra=grid.querySelectorAll(':scope > li[data-be-extra-mode]');
+    if(!allModesExpanded){
+      for(const item of extra)item.remove();
+    }else if(extra.length!==experimentalModes.length){
+      for(const item of extra)item.remove();
+      const fragment=document.createDocumentFragment();
+      for(const mode of experimentalModes)fragment.append(extraModeCard(mode));
+      grid.append(fragment);
+    }
+  }
   function node(tag,text,style,cls){
     const e=document.createElement(tag);
     if(text!==null&&text!==undefined)e.textContent=String(text);
@@ -364,13 +465,14 @@
   // only when this page is visible and install promptly after tab clicks.
   function start(){
     mount();
-    document.addEventListener('click',()=>setTimeout(mount,150),{capture:true});
+    enhanceHomeModeCatalog();
+    document.addEventListener('click',()=>setTimeout(()=>{mount();enhanceHomeModeCatalog();},150),{capture:true});
     setInterval(()=>{
-      if(document.visibilityState==='visible'&&
-        (location.pathname.startsWith('/studio')||automationMain())){
+      if(document.visibilityState!=='visible')return;
+      if(location.pathname.startsWith('/studio')||automationMain()){
         mount();
         clarifyAutomationStatus();
-      }
+      }else enhanceHomeModeCatalog();
     },1500);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
