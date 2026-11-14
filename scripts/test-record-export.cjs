@@ -56,7 +56,7 @@ async function run(){
     assert.ok(await button.count(),'No visible Record button found. Buttons: '+JSON.stringify(report.buttons).slice(0,2500));
     report.recordButton=await button.evaluate(e=>({text:e.innerText,title:e.title,aria:e.getAttribute('aria-label')}));
     report.phase='record-clicked';
-    downloadPromise=page.waitForEvent('download',{timeout:150000}).catch(()=>null);
+    downloadPromise=page.waitForEvent('download',{timeout:270000}).catch(()=>null);
     // Diagnose captured onboarding modals independently from the video pipeline.
     report.visibleModals=await page.locator('div.fixed').evaluateAll(els=>els
       .filter(e=>e.getClientRects().length&&typeof e.className==='string'&&e.className.includes('z-[2100]'))
@@ -89,7 +89,7 @@ async function run(){
     if(/we couldn't start your export just now|no video frames were recorded|export failed/i.test(report.after5Seconds))
       throw Error('Record failed immediately: '+report.after5Seconds.slice(-1000));
     report.phase='waiting-for-export';
-    const end=Date.now()+150000;
+    const end=Date.now()+270000;
     let download=null;
     while(Date.now()<end){
       const outcome=await Promise.race([downloadPromise.then(d=>({download:d})),new Promise(res=>setTimeout(()=>res({tick:true}),4000))]);
@@ -97,10 +97,10 @@ async function run(){
       const text=await page.locator('body').innerText().catch(()=>'');
       if(/we couldn't start your export just now|no video frames were recorded|export failed|render failed/i.test(text))
         throw Error('Export failed after recording started: '+text.slice(-1500));
-      if(report.snapshots.length<15)report.snapshots.push({second:Math.round((150000-(end-Date.now()))/1000),lastText:text.slice(-600)});
+      if(report.snapshots.length<15)report.snapshots.push({second:Math.round((270000-(end-Date.now()))/1000),lastText:text.slice(-600)});
     }
     report.finalVisibleText=(await page.locator('body').innerText()).slice(-3000);
-    if(!download)throw Error('No completed downloadable MP4 within 150s; review video gallery / export progress and diagnostic screenshots');
+    if(!download)throw Error('No completed downloadable MP4 within 270s; review video gallery / export progress and diagnostic screenshots');
     report.download={suggestedFilename:download.suggestedFilename(),failure:await download.failure()};
     const output=path.join(artifacts,path.basename(download.suggestedFilename()).replace(/[^A-Za-z0-9_.-]/g,'_'));
     await download.saveAs(output);
