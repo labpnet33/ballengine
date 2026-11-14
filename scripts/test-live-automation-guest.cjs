@@ -100,6 +100,18 @@ async function main(){
       assert.equal(tab.planner,plannerExpected,'Unchanged page or stale form after clicking '+name);
       console.log('LIVE_AUTOMATION_TAB_CLICK_OK '+JSON.stringify({tab:name,path:tab.path,planner:tab.planner}));
     }
+    await page.locator('nav[aria-label="Automation"]').getByRole('button',{name:'Autopilot',exact:true}).click({timeout:15000});
+    await page.waitForURL('**/automation/autopilot',{timeout:15000});
+    await page.getByText('Recurring manual posting reminders are available:',{exact:false})
+      .waitFor({state:'visible',timeout:15000});
+    const pitch=await page.locator('#root main').innerText();
+    assert.ok(!pitch.includes('Growth, Scale and Max include it'),'Outdated automatic-posting plan advertisement still visible');
+    const action=page.locator('[data-be-autopilot-reminder-link]').first();
+    await action.waitFor({state:'visible',timeout:12000});
+    await action.click({timeout:15000});
+    await page.waitForURL('**/automation/publish',{timeout:15000});
+    await page.locator('[data-be-guest-publisher]').first().waitFor({state:'visible',timeout:15000});
+    console.log('LIVE_AUTOPILOT_REMINDER_CTA_OK '+JSON.stringify({route:new URL(page.url()).pathname,button:'Set recurring posting reminder',planner:true}));
   }finally{await browser.close();}
 }
 main().catch(e=>{console.error('LIVE_AUTOMATION_GUEST_STATUS_FAIL',String(e.stack||e));process.exitCode=1;});
