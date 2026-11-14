@@ -27,6 +27,7 @@ async function upload(bytes,filename,mime){
   return req('/api/upload','POST',f);
 }
 async function main(){
+try{
   const songs=await req('/api/song-bank','GET',undefined,null);
   assert.equal(songs.status,200);
   assert.ok(songs.data.songs.length>=50,'Original MIDI song bank not populated');
