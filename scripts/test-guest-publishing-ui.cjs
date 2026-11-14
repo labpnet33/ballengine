@@ -14,6 +14,7 @@ const server=http.createServer((req,res)=>{
    if(rel==='automation'||rel==='automation/')rel='automation/index.html';
    if(rel==='automation/queue'||rel==='automation/queue/')rel='automation/queue/index.html';
    if(rel==='automation/brands'||rel==='automation/brands/')rel='automation/brands/index.html';
+   for(const tab of ['accounts','publish','autopilot','plan'])if(rel==='automation/'+tab||rel==='automation/'+tab+'/')rel='automation/'+tab+'/index.html';
    const file=path.resolve(web,rel);
    if(!file.startsWith(web+path.sep))return res.writeHead(403).end();
    fs.readFile(file,(err,buf)=>err?res.writeHead(404).end():res.writeHead(200,{'Content-Type':mime[path.extname(file)]||'application/octet-stream'}).end(buf));
@@ -119,8 +120,24 @@ const report={stage:'init',studioPlanner:false,automationPlanner:false,mp4Upload
 
    report.automationPlanner=true;
    await screenshot('automation-queue');
+   for(const tab of ['accounts','publish','autopilot']){
+     report.stage='automation-'+tab;
+     const response=await page.goto(base+'/automation/'+tab,{waitUntil:'domcontentloaded',timeout:45000});
+     assert.equal(response.status(),200,'Existing Automation '+tab+' route missing');
+     await page.locator('h1').filter({hasText:'Automation'}).first().waitFor({state:'visible',timeout:30000});
+     await page.locator('[data-be-guest-publisher]').first().waitFor({state:'visible',timeout:30000});
+     await page.getByText('Guest draft scheduling is available in the publishing planner.',{exact:false})
+       .waitFor({state:'visible',timeout:12000});
+     assert.equal(await page.getByText('Automation is not active on this account, so connecting accounts, scheduling and Autopilot are all switched off. Every plan covers every platform.',{exact:true}).count(),0,
+       'Obsolete subscription warning is still shown on '+tab);
+     console.log('GUEST_AUTOMATION_TAB_PASS '+JSON.stringify({tab,url:page.url(),title:await page.title()}));
+   }
+   // Return to the shared queue before using its Mark posted action.
+   await page.goto(base+'/automation',{waitUntil:'domcontentloaded',timeout:45000});
+   const queueAgain=page.locator('[data-be-guest-publisher]').first();
+   await queueAgain.getByText(job.title,{exact:true}).waitFor({timeout:25000});
    report.stage='mark-posted';
-   await second.getByRole('button',{name:'Mark posted'}).first().click({timeout:15000});
+   await queueAgain.getByRole('button',{name:'Mark posted'}).first().click({timeout:15000});
    await second.getByText(/next recurring reminder created/i).waitFor({timeout:25000});
    const after=await direct('/api/guest-publishing/jobs');
    assert.equal(after.data.jobs.length,2,'Weekly reminder was not generated');
