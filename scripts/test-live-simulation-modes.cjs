@@ -2,7 +2,7 @@
 const {chromium}=require('playwright-core');
 const assert=require('node:assert/strict');
 const base=process.env.BALLENGINE_BASE||'https://ballengine.vercel.app';
-const names=['rhythmic','ball-crush','ball-race','glass-tower','domino-3d','jelly-3d','magnet','wave-3d'];
+const names=['rhythmic','escape','drawer','spawner','ghost-escape','breaker','glass-tower','flag-battle','weapon-battle','merge-evolution','glass-rush','grid-merge','wave-3d','marble-run-3d','ball-crush','jelly-3d','cut-count','magnet'];
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage']});
  const ctx=await browser.newContext({viewport:{width:1440,height:900},serviceWorkers:'block'});
@@ -55,6 +55,36 @@ const names=['rhythmic','ball-crush','ball-race','glass-tower','domino-3d','jell
        img:[...document.querySelectorAll('img[src*="/mode-thumbs/"]')].filter(x=>x.getClientRects().length)
          .map(x=>({src:x.getAttribute('src'),parent:x.parentElement?.parentElement?.innerText.slice(0,140)})).slice(-80)
      }))));
+   }
+   // Try the actual original development entries, without forcing clicks or
+   // manufacturing a "working" result for unfinished engines.
+   for(const [title,label] of [
+     ['Every ball keeps its own beat until they all line up. In development.','Bloom'],
+     ['Racers sprint down a long track. In development.','Race'],
+     ['A chain reaction ending in a giant. In development.','Domino 3D'],
+     ['Reverse-the-spin, hidden shapes, afterimages and stereograms','Illusions']
+   ]){
+      const candidate=page.locator('[title="'+title.replaceAll('"','\\"')+'"]').first();
+      const count=await candidate.count();let click=null;
+      const before=page.url();
+      if(count){
+        try{await candidate.click({timeout:7000});await page.waitForTimeout(1300);click='clicked';}
+        catch(e){click=String(e).slice(0,260);}
+      }
+      const state=await page.evaluate(()=>({
+        url:location.pathname+location.search,
+        selected:document.querySelector('button[title="Change mode"]')?.innerText,
+        text:document.querySelector('#root')?.innerText.slice(0,650),
+        dialog:[...document.querySelectorAll('[role="dialog"],[role="alertdialog"]')].filter(e=>e.getClientRects().length).map(e=>e.innerText.slice(0,400)),
+        toast:[...document.querySelectorAll('[role="alert"],[role="status"]')].filter(e=>e.getClientRects().length).map(e=>e.innerText.slice(0,300))
+      }));
+      console.log('SIMULATION_DEV_CLICK '+JSON.stringify({label,count,click,before,state}));
+      if(state.url!==new URL(before).pathname+new URL(before).search){
+        await page.goto(base+'/studio?mode=rhythmic',{waitUntil:'domcontentloaded',timeout:45000});
+        await page.waitForTimeout(1300);
+        await page.getByRole('button',{name:/In development.*27/i}).first().click({timeout:8000});
+        await page.waitForTimeout(400);
+      }
    }
    const pickers=page.getByText(/All simulation modes/i);
    console.log('SIMULATION_PICKER_COUNT '+await pickers.count());
