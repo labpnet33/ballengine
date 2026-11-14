@@ -114,6 +114,19 @@ needed.forEach(verify);
 // project Root Directory is nested. Publish /studio/index.html explicitly.
 const studioDir=path.join(web,'studio');
 fs.mkdirSync(studioDir,{recursive:true});
+// /home is an existing client-side route, but this capture is deployed as static HTML.
+// Reuse the original homepage shell for direct visits and reloads. Do not replace the UI.
+// <base href="/"> keeps relative fonts, icons and JS/CSS rooted correctly at /home/.
+const homeSource=path.join(web,'index.html');
+const homeHTML=fs.readFileSync(homeSource,'utf8');
+if(!homeHTML.includes('id="root"') || !homeHTML.includes('index-3pf76ICO.js'))
+  throw new Error('Original homepage shell missing. Refusing to create /home from an incomplete page.');
+const homeDocument=homeHTML.replace('</head>', '<base href="/"></head>');
+const homeDir=path.join(web,'home');
+fs.mkdirSync(homeDir,{recursive:true});
+fs.writeFileSync(path.join(web,'home.html'),homeDocument,'utf8');
+fs.writeFileSync(path.join(homeDir,'index.html'),homeDocument,'utf8');
+console.log('Homepage route /home prepared from original HTML shell.');
 // Absolute asset paths work both at /studio and /studio/.
 // All original Studio URLs must use the same local preview user entitlement.
 // Keep this idempotent when Vercel retries or reuses a build directory.
