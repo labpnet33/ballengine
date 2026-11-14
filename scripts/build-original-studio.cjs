@@ -173,6 +173,15 @@ let capturedApp=fs.readFileSync(originalBundle,'utf8');
 if (capturedApp.split(homeRouteBefore).length!==2)
   throw new Error('Expected exactly one original /home auth guard. Review frontend version before changing routes.');
 capturedApp=capturedApp.replace(homeRouteBefore,homeRouteAfter);
+// The existing Studio duration selector is rendered by qda(), which already
+// receives onReset:i from the same parent as the original Saves-section button.
+// Reuse that exact React callback in the top toolbar (not a DOM-cloned click),
+// keeping the reset's undo/history behavior and all existing Studio controls.
+const durationToolbarBefore='const Hr=s.jsxs("div",{"data-tour":"capture-duration","data-tour-exact-length":!0,className:"flex items-center gap-1.5 shrink-0",children:[s.jsxs("select",';
+const durationToolbarAfter='const Hr=s.jsxs("div",{"data-tour":"capture-duration","data-tour-exact-length":!0,className:"flex items-center gap-1.5 shrink-0",children:[s.jsxs("button",{type:"button",onClick:i,title:Xe("Reset to default"),"aria-label":Xe("Reset to default"),className:"btn btn-sm h-8 sm:h-10 px-2 sm:px-2.5 border border-white/10 bg-white/5 text-zinc-100 hover:border-white/20 hover:bg-white/10 shrink-0 inline-flex items-center gap-1.5",children:[s.jsx(Di,{className:"w-3.5 h-3.5 shrink-0","aria-hidden":"true"}),s.jsx("span",{className:"hidden sm:inline",children:Xe("Reset to default")})]}),s.jsxs("select",';
+if(capturedApp.split(durationToolbarBefore).length!==2)
+  throw new Error('Expected one original duration toolbar. Review the captured bundle before adding reset.');
+capturedApp=capturedApp.replace(durationToolbarBefore,durationToolbarAfter);
 fs.writeFileSync(originalBundle,capturedApp,'utf8');
 console.log('Local guest fallback enabled in original /home React route.');
 
