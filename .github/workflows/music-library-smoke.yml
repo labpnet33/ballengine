@@ -1,0 +1,31 @@
+name: Test BallEngine Song Bank and uploads
+on:
+  push:
+    branches: [fix/production-home-route]
+    paths:
+      - cloud-saves/**
+      - scripts/test-music-api.cjs
+      - scripts/test-music-ui.cjs
+      - scripts/ballengine-cloud-saves.js
+      - .github/workflows/music-library-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  music-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Validate Worker and browser code
+        run: |
+          node --check cloud-saves/worker.mjs
+          node --check cloud-saves/music-media.mjs
+          node --check cloud-saves/music-bank.mjs
+          node --check scripts/ballengine-cloud-saves.js
+      - name: Check media encoder
+        run: ffmpeg -version | head -n 1
+      - name: Test MP3 upload, MIDI, cloud Song Library and playback
+        run: node scripts/test-music-api.cjs
