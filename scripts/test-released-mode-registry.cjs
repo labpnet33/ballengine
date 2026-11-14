@@ -24,10 +24,21 @@ const server=http.createServer((req,res)=>{
   let errors=[];page.on('pageerror',e=>errors.push(String(e).slice(0,250)));
   await page.goto(base+'/home',{waitUntil:'domcontentloaded',timeout:45000});
   await page.waitForTimeout(3500);
-  const normal=page.locator('#root section:has(h2:text-is("What do you want to make?")) a[href^="/studio?mode="]');
-  const homeLinks=await normal.count();
-  console.log('RELEASED_MODE_HOME '+JSON.stringify({links:homeLinks,errors:errors.slice(0,8)}));
-  assert.equal(homeLinks,45,'All 45 built-in mode links should appear in the original live Home registry');
+  const section=page.locator('#root section:has(h2:text-is("What do you want to make?"))');
+  const normal=section.locator('a[href^="/studio?mode="]');
+  const homeNative=await section.locator('li:not([data-be-extra-mode]) a[href^="/studio?mode="]').count();
+  assert.ok(homeNative>=18&&homeNative<=45,'Released original Home native mode count invalid');
+  const button=section.locator('[data-be-all-modes-button]');
+  await button.waitFor({state:'visible',timeout:18000});
+  assert.equal(await normal.filter({visible:true}).count(),18,'Home must initially show original 18 cards');
+  await button.click();
+  await page.waitForFunction(()=>[...document.querySelectorAll('#root section li a[href^="/studio?mode="]')].filter(x=>!!x.getClientRects().length).length===45,{timeout:15000});
+  const homeLinks=await normal.filter({visible:true}).count();
+  const slugs=await normal.evaluateAll(els=>els.filter(x=>x.getClientRects().length).map(x=>new URL(x.href).searchParams.get('mode')));
+  console.log('RELEASED_MODE_HOME '+JSON.stringify({homeNative,links:homeLinks,unique:new Set(slugs).size,errors:errors.slice(0,8)}));
+  assert.equal(homeLinks,45,'All 45 mode links should appear after toggling on');
+  assert.equal(new Set(slugs).size,45,'Duplicate promoted Home mode links');
+  assert.equal(await section.getByText('In development',{exact:false}).count(),0,'Promoted Home still calls the modes unfinished');
   for(const [slug,title] of [['phase-bloom','Bloom'],['flow-field','Flow 3D'],['domino-3d','Domino 3D']]){
    errors=[];
    await page.goto(base+'/studio?mode='+slug,{waitUntil:'domcontentloaded',timeout:45000});
