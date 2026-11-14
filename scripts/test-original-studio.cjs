@@ -55,9 +55,15 @@ assert.ok(patchedBundle.includes('children:[s.jsxs("button",{type:"button",onCli
   'Toolbar reset button is missing or no longer wired to original onReset callback');
 assert.ok(patchedBundle.includes('children:Xe("Reset to default")})]}),s.jsxs("select",'),
   'Toolbar reset should appear directly before the duration selector');
+assert.ok(patchedBundle.includes('const Wt=null,Xt=!1,Gt={raw:null,tid:"local-"+crypto.randomUUID(),res:uV(Ve,ke),wm:!1,stamp:null};'),
+  'Native local MP4 export still requires the private upstream export ticket');
+assert.ok(!patchedBundle.includes('let Ot=null,Wt=null,Xt=!1;try{const jt=crypto.randomUUID()'),
+  'Original export ticket request is still present');
 const adapter=fs.readFileSync(path.join(root,'studio-guest-preview.js'),'utf8');
 assert.ok(adapter.includes('window.__BALLENGINE_LOCAL_GUEST__=guest'),
   'Local guest fallback is missing from the shared homepage/Studio bootstrap');
+assert.ok(adapter.includes("url.pathname==='/api/studio/video-export' && method==='POST'"),
+  'Legacy local export telemetry is still calling the missing upstream API');
 console.log('Original Studio intact; merged public routes and worker/CDN assets verified.');
 
 const mime={
@@ -106,6 +112,13 @@ async function main(){
    const locks=await page.evaluate(async()=>{
      const r=await fetch('/api/ui-locks');return{status:r.status,data:await r.json()};
    });
+   const localExportStatus=await page.evaluate(async()=>{
+     const response=await fetch('/api/studio/video-export',{
+       method:'POST',headers:{'Content-Type':'application/json'},body:'{"completed":true}'
+     });
+     return {status:response.status,json:await response.json()};
+   });
+   assert.equal(localExportStatus.status,200,'Local export telemetry did not resolve');
    const stuckOverlay=await page.getByText('Checking your plan and settings.',{exact:true}).count();
    const creatorLockButtons=await page.getByRole('button',{name:/Unlock Creator/i}).count();
    const tourPromptVisible=await page.getByText('Quick tour?',{exact:true}).isVisible();
@@ -115,6 +128,7 @@ async function main(){
      title:await page.title(),
      guest,
      locks,
+     localExportStatus,
      stuckOverlay,
      creatorLockButtons,
      tourPromptVisible,
