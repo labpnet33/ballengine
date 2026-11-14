@@ -41,6 +41,28 @@ async function main(){
     assert.ok(data.scheduleButton);
     assert.ok(data.cloudLibraryKey);
     console.log('LIVE_AUTOMATION_GUEST_STATUS_PASS '+JSON.stringify({...data,jsErrors}));
+
+    // Verify all existing Automation tabs as real deep links, including
+    // direct navigation and browser reload. These are not new pages:
+    // original React route content must render behind their Vercel rewrites.
+    for(const slug of ['accounts','publish','autopilot']){
+      for(const trailing of ['', '/']){
+        const route='/automation/'+slug+trailing;
+        const response=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:40000});
+        assert.equal(response.status(),200,route+' returned 404');
+        await page.locator('#root main').waitFor({state:'visible',timeout:30000});
+        const state=await page.evaluate(()=>({
+          title:document.title,
+          text:document.querySelector('#root main')?.innerText?.slice(0,600)||'',
+          pathname:location.pathname,
+          hasReactRoot:!!document.querySelector('#root main'),
+          has404:document.body.innerText.includes('404_NOT_FOUND')||document.body.innerText.includes('This page doesn’t exist')
+        }));
+        assert.equal(state.pathname,route,'Navigation unexpectedly redirected');
+        assert.ok(state.hasReactRoot&&!state.has404,'React Automation route did not render at '+route);
+        console.log('LIVE_AUTOMATION_DEEP_ROUTE_OK '+JSON.stringify({route,status:response.status(),...state}));
+      }
+    }
   }finally{await browser.close();}
 }
 main().catch(e=>{console.error('LIVE_AUTOMATION_GUEST_STATUS_FAIL',String(e.stack||e));process.exitCode=1;});
