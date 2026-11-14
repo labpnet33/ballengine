@@ -29,6 +29,13 @@ for (const rel of expectedPublicFiles) {
 const originalStudio=fs.readFileSync(path.join(root,'studio','index.html'),'utf8');
 assert.ok(originalStudio.includes('index-3pf76ICO.js')&&originalStudio.includes('id="root"'),
   'Original captured React Studio replaced or damaged');
+const directStudio=fs.readFileSync(path.join(root,'studio.html'),'utf8');
+for (const [route,html] of [['/studio',originalStudio],['/studio.html',directStudio]]) {
+  assert.ok(html.includes('<script src="/studio-guest-preview.js"></script>'),
+    'Enterprise preview profile bootstrap missing on '+route);
+  assert.equal((html.match(/studio-guest-preview\.js/g)||[]).length,1,
+    'Guest profile adapter duplicated on '+route);
+}
 console.log('Original Studio intact; merged public routes and worker/CDN assets verified.');
 
 const mime={
