@@ -7,6 +7,14 @@
   "cleanUrls": false,
   "rewrites": [
     {
+      "source": "/home",
+      "destination": "/home.html"
+    },
+    {
+      "source": "/home/",
+      "destination": "/home/index.html"
+    },
+    {
       "source": "/studio",
       "destination": "/studio.html"
     },
