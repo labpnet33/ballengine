@@ -148,6 +148,15 @@ const studioDocument=originalStudio
 fs.writeFileSync(path.join(web,'studio.html'),studioDocument,'utf8');
 fs.writeFileSync(path.join(studioDir,'index.html'),studioDocument,'utf8');
 fs.copyFileSync(path.join(repo,'scripts','studio-guest-preview.js'),path.join(web,'studio-guest-preview.js'));
+// Keep the existing pricing page and UI, but load the shared adapter there too
+// so the missing private plan API's retry panel is suppressed on direct visits.
+const plansPath=path.join(web,'plans.html');
+const plansHTML=fs.readFileSync(plansPath,'utf8');
+if(!plansHTML.includes('</head>'))throw new Error('Original plans page head missing.');
+fs.writeFileSync(plansPath,
+  plansHTML.replaceAll(guestAdapter,'').replace('</head>',guestAdapter+'</head>'),
+  'utf8');
+
 const originalBundle=path.join(web,'assets','index-3pf76ICO.js');
 const newBundle=path.join(staticCapture,'assets','index-3pf76ICO.js');
 const digest=f=>crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex');
