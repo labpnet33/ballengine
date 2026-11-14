@@ -17,7 +17,7 @@ async function req(path,method='GET',body,token=key){
   });
   const b=await r.text();
   let data;try{data=JSON.parse(b);}catch{data={text:b.slice(0,200)};}
-  assert.equal(r.headers.get('Access-Control-Allow-Origin'),origin,'CORS denied');
+  assert.equal(r.headers.get('Access-Control-Allow-Origin'),origin,'CORS denied for '+method+' '+path+' (HTTP '+r.status+', body='+b.slice(0,250)+')');
   return {status:r.status,data};
 }
 async function upload(bytes,filename,mime){
