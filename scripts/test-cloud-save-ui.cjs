@@ -102,7 +102,7 @@ async function run(){
       else if(dialog.type()==='confirm')await dialog.accept();
       else await dialog.dismiss();
     });
-    await device.goto(base+'/studio?mode=rhythmic',{waitUntil:'domcontentloaded',timeout:45000});
+    await device.goto(base+'/studio?mode=escape',{waitUntil:'domcontentloaded',timeout:45000});
     await device.waitForTimeout(6000);
     await device.locator('button[title="Saves (6)"]').first().click();
     const panel2=device.locator('div.flex.flex-col.gap-3').filter({has:device.getByText('Save system',{exact:true})}).last();
@@ -118,6 +118,21 @@ async function run(){
     await device.waitForTimeout(1300);
     report.secondBrowser=(await restoredPanel.innerText()).includes('CI browser cloud save');
     report.recoveryKeySwitched=await device.evaluate((expected)=>localStorage.getItem('ballengine_cloud_recovery_v1')===expected,key);
+    report.secondBeforeLoadMode=await device.locator('button[title="Change mode"]').first().innerText();
+    const remoteLoads=[];
+    device.on('response',response=>{
+      try{
+        const path=new URL(response.url()).pathname;
+        if(path.startsWith('/api/saves/')&&response.url().includes('ballengine-project-saves.labpnet33.workers.dev'))
+          remoteLoads.push({path,status:response.status()});
+      }catch{}
+    });
+    await restoredPanel.getByRole('button',{name:'Load',exact:true}).first().click();
+    await device.waitForTimeout(2200);
+    report.secondAfterLoadMode=await device.locator('button[title="Change mode"]').first().innerText();
+    report.secondCloudLoadRequests=remoteLoads;
+    report.secondModeRestored=/Rhythmic/i.test(report.secondAfterLoadMode);
+    assert.ok(report.secondModeRestored,'Cloud Load did not restore saved Rhythmic mode from Escape on second browser');
     assert.ok(report.recoveryKeySwitched,'Use existing key did not activate the chosen recovery key');
     assert.ok(report.secondBrowser,'Same recovery key did not restore cloud save in another browser');
     await newContext.close();
