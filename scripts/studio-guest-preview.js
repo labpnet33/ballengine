@@ -93,6 +93,24 @@
       }
     }
   }
+  // The captured billing view can show a retry panel because the private
+  // subscription service is not included. Suppress only this exact error
+  // panel; never hide other account messages or plan information.
+  function suppressPlanLoadError(scope) {
+    if (!scope || scope.nodeType!==1) return;
+    const sections=[];
+    const parentSection=scope.closest?.('section');
+    if(parentSection) sections.push(parentSection);
+    sections.push(...scope.querySelectorAll('section'));
+    for(const section of sections) {
+      if(!section.matches('section.mb-10.rounded-2xl.border.border-border.bg-card')) continue;
+      const message=section.querySelector(':scope > div > p.t-body.text-muted-foreground');
+      const retry=section.querySelector(':scope > div > button.btn.btn-secondary');
+      if(message?.textContent?.trim()!=="Couldn't load your plan." ||
+         retry?.textContent?.trim()!=='Try again') continue;
+      section.style.setProperty('display','none','important');
+    }
+  }
   let walkthroughQueued=false;
   const scheduledScopes=new Set();
   function scheduleWalkthroughCheck(scope) {
@@ -101,7 +119,7 @@
     walkthroughQueued=true;
     queueMicrotask(()=>{
       walkthroughQueued=false;
-      for(const node of scheduledScopes)suppressWalkthrough(node);
+      for(const node of scheduledScopes){suppressWalkthrough(node);suppressPlanLoadError(node);}
       scheduledScopes.clear();
     });
   }
@@ -113,7 +131,7 @@
       }
     }
   });
-  walkthroughObserver.observe(document.documentElement,{childList:true,subtree:true});
+  walkthroughObserver.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
   if(document.body)scheduleWalkthroughCheck(document.body);
   else document.addEventListener('DOMContentLoaded',()=>scheduleWalkthroughCheck(document.body),{once:true});
   console.info('[BallEngine preview] Local unrestricted UI guest enabled; backend-dependent premium services are not available from this static capture.');
