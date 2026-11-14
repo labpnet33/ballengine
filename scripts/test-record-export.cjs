@@ -42,9 +42,18 @@ async function run(){
   let downloadPromise;
   try{
     report.phase='loading';
-    await page.goto('http://127.0.0.1:'+port+'/studio?mode=rhythmic',{waitUntil:'domcontentloaded',timeout:45000});
+    const testMode=process.env.TEST_MODE||'rhythmic';
+    await page.goto('http://127.0.0.1:'+port+'/studio?mode='+encodeURIComponent(testMode),{waitUntil:'domcontentloaded',timeout:45000});
     await page.waitForTimeout(10000);
+    // Some original experimental 3D modes ask for explicit user confirmation.
+    const load3d=page.getByRole('button',{name:'Load 3D',exact:true}).first();
+    if(await load3d.isVisible().catch(()=>false)){
+      await load3d.click({timeout:15000});
+      await page.waitForTimeout(3500);
+      report.accepted3DPrompt=true;
+    }
     report.url=page.url();
+    report.testMode=testMode;
     report.browserCapabilities=await page.evaluate(()=>({VideoEncoder:typeof VideoEncoder,MediaRecorder:typeof MediaRecorder,OffscreenCanvas:typeof OffscreenCanvas,WebAssembly:typeof WebAssembly}));
     report.buttons=await page.locator('button').evaluateAll(els=>els.map(e=>({text:(e.innerText||'').trim().slice(0,100),title:e.title||'',aria:e.getAttribute('aria-label')||'',disabled:e.disabled,visible:!!e.getClientRects().length})).filter(x=>x.visible).slice(0,100));
     await page.screenshot({path:path.join(artifacts,'studio-before-record.png')});
