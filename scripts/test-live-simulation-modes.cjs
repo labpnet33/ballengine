@@ -2,7 +2,7 @@
 const {chromium}=require('playwright-core');
 const assert=require('node:assert/strict');
 const base=process.env.BALLENGINE_BASE||'https://ballengine.vercel.app';
-const names=['phase-bloom','phonk-drop','marble-run','ball-race','target-hit','falling-sand','plinko','color-match','spin-battle','lava-survival','glass-slice','flood-fill','eulers-disk','drum-sort','plinko-3d','chladni','voxel','domino-3d','marble-race-3d','attractor','flow-3d','metaballs','galaxy','fireflies','pendulum-basin','slime','crowd-evacuation','illusions'];
+const names=[];
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage']});
  const ctx=await browser.newContext({viewport:{width:1440,height:900},serviceWorkers:'block'});
@@ -12,6 +12,20 @@ const names=['phase-bloom','phonk-drop','marble-run','ball-race','target-hit','f
    page.on('response',r=>{if(r.status()>=400&&r.url().startsWith(base))failed.push({status:r.status(),path:new URL(r.url()).pathname});});
    await page.goto(base+'/home',{waitUntil:'domcontentloaded',timeout:45000});
    await page.waitForTimeout(3300);
+   console.log('SIMULATION_HOME_STRUCTURE '+JSON.stringify(await page.evaluate(()=>{
+      const links=[...document.querySelectorAll('a[href*="/studio?mode="]')];
+      const link=links[0],heading=[...document.querySelectorAll('h1,h2,h3,h4')].find(x=>x.textContent.includes('What do you want to make?'));
+      function node(n){return n?{tag:n.tagName,cls:n.className?.toString().slice(0,350),outer:n.outerHTML.slice(0,1250),text:n.innerText?.slice(0,250),children:n.children.length}:null;}
+      return {count:links.length,linkAncestry:[link,link?.parentElement,link?.parentElement?.parentElement,link?.parentElement?.parentElement?.parentElement].map(node),
+        headingAncestry:[heading,heading?.parentElement,heading?.parentElement?.parentElement,heading?.parentElement?.parentElement?.parentElement].map(node)};
+   })));
+   console.log('SIMULATION_SOURCE_HINTS '+JSON.stringify((()=>{
+      const fs=require('node:fs'),path=require('node:path'),asset=path.resolve(__dirname,'..','extra','wget','ballengine.app','assets','index-3pf76ICO.js');
+      if(!fs.existsSync(asset))return {error:'bundle not checked out'};
+      const s=fs.readFileSync(asset,'utf8');
+      const terms=['Flow 3D','flow-3d','particle-flow','flow-field','illusions','Illusions','In development'];
+      return terms.map(term=>{const i=s.indexOf(term);return {term,count:s.split(term).length-1,index:i,snippet:i<0?'':s.slice(Math.max(0,i-420),i+440)}});
+   })()));
    console.log('SIMULATION_HOME_CATALOG '+JSON.stringify(await page.evaluate(()=>({
       path:location.pathname,
       headings:[...document.querySelectorAll('h1,h2,h3,h4')].filter(e=>e.getClientRects().length).map(e=>e.innerText.trim()).slice(0,45),
