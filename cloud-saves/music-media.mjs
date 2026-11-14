@@ -11,8 +11,13 @@ function decode(s){const v=atob(s),b=new Uint8Array(v.length);for(let i=0;i<v.le
 async function mediaUrl(req,library,id){const u=new URL('/api/assets/'+id,req.url);u.searchParams.set('token',await hash(enc.encode(library+'|'+id+'|play-v1')));return u.href;}
 function nameOf(v){const n=String(v||'').replace(/[\u0000-\u001f\u007f]/g,' ').trim().slice(0,90);if(!n)throw Object.assign(new Error('Name required'),{status:400});return n;}
 async function usage(db,library){const r=await db.prepare('SELECT COALESCE(SUM(size_bytes),0) used,COUNT(*) count FROM media_uploads WHERE library_id=?').bind(library).first();return {used:Number(r?.used||0),count:Number(r?.count||0)};}
-function mediaType(file,bytes){
+function mediaType(file,bytes,kind='audio'){
   const name=String(file.name||'').toLowerCase(),head=bytes.subarray(0,Math.min(bytes.length,10000));
+  if(kind==='video'){
+    if(!name.endsWith('.mp4')||head.length<32||String.fromCharCode(...head.subarray(4,8))!=='ftyp')
+      throw Object.assign(new Error('Upload a valid MP4 video file.'),{status:415});
+    return 'video/mp4';
+  }
   if(/\.(mid|midi)$/.test(name)){if(head.length<14||String.fromCharCode(...head.subarray(0,4))!=='MThd')throw Object.assign(new Error('Invalid MIDI file'),{status:415});return 'audio/midi';}
   if(name.endsWith('.wav')){if(head.length<44||String.fromCharCode(...head.subarray(0,4))!=='RIFF'||String.fromCharCode(...head.subarray(8,12))!=='WAVE')throw Object.assign(new Error('Invalid WAV file'),{status:415});return 'audio/wav';}
   if(!name.endsWith('.mp3'))throw Object.assign(new Error('Upload MP3, WAV or MIDI only'),{status:415});
@@ -21,7 +26,7 @@ function mediaType(file,bytes){
   let frame=false;for(let i=0;i<head.length-1;i++)if(head[i]===255&&(head[i+1]&0xe0)===0xe0){frame=true;break;}
   if(!id3&&!frame)throw Object.assign(new Error('Invalid MP3 file content'),{status:415});return 'audio/mpeg';
 }
-async function upload(req,env,library,origin,json,fail){
+async function upload(req,env,library,origin,json,fail,kind='audio'){
   const db=env.DB;
   if(req.method==='GET'){
     const checksum=new URL(req.url).searchParams.get('checksum')||'';
@@ -36,7 +41,7 @@ async function upload(req,env,library,origin,json,fail){
   if(file.size<14||file.size>MAX_FILE)return fail('Upload must be between 14 bytes and 10 MB.',413,origin);
   const bytes=new Uint8Array(await file.arrayBuffer());
   let mime;
-  try{mime=mediaType(file,bytes);}
+  try{mime=mediaType(file,bytes,kind);}
   catch(invalid){return fail(invalid?.message||'Invalid MP3, WAV or MIDI file',Number(invalid?.status)||415,origin);}
   const checksum=await hash(bytes);
   const supplied=String(form.get('checksum')||'');
@@ -44,7 +49,7 @@ async function upload(req,env,library,origin,json,fail){
   const found=await db.prepare('SELECT * FROM media_uploads WHERE library_id=? AND checksum=?').bind(library,checksum).first();
   if(found)return json({url:await mediaUrl(req,library,found.id),key:found.id,size:found.size_bytes,type:found.mime},200,origin);
   const u=await usage(db,library);
-  if(u.used+bytes.length>MAX_TOTAL)return json({error:'Music library is full (40 MB). Delete an unused song to free space.',code:'QUOTA',limit:MAX_TOTAL,currentUsage:u.used},403,origin);
+  if(u.used+bytes.length>MAX_TOTAL)return json({error:'Media library full (40 MB combined audio/video). Delete unused uploads to free space.',code:'QUOTA',limit:MAX_TOTAL,currentUsage:u.used},403,origin);
   const id=crypto.randomUUID();
   try{
     await db.prepare('INSERT INTO media_uploads(id,library_id,name,mime,size_bytes,checksum,created_at) VALUES(?,?,?,?,?,?,?)').bind(id,library,nameOf(file.name),mime,bytes.length,checksum,Date.now()).run();
@@ -166,3 +171,10 @@ export async function privateMusic(req,env,library,origin,json,fail,rateLimit){
   }catch(e){console.warn('Audio endpoint error',e?.name||'Error');return fail([400,413,415,422].includes(e?.status)?e.message:'Music storage operation failed',e?.status||500,origin);}
 }
 export async function musicUsage(db,library){const u=await usage(db,library);return {limit:MAX_TOTAL,total:u.used,media_count:u.count};}
+
+// Reuse the existing private, chunked storage for small MP4 posting drafts.
+// The default /api/upload route remains audio-only.
+export async function uploadGuestVideo(req,env,library,origin,json,fail){
+  return upload(req,env,library,origin,json,fail,'video');
+}
+export {mediaUrl as signedMediaUrl};
