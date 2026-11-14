@@ -48,6 +48,12 @@ for (const [route,html] of [['/studio',originalStudio],['/studio.html',directStu
   assert.equal((html.match(/studio-guest-preview\.js/g)||[]).length,1,
     'Guest profile adapter duplicated on '+route);
 }
+const patchedBundle=fs.readFileSync(path.join(root,'assets','index-3pf76ICO.js'),'utf8');
+assert.ok(patchedBundle.includes('beAuthUser||window.__BALLENGINE_LOCAL_GUEST__||null'),
+  'Original /home route is still dependent on a remote login session');
+const adapter=fs.readFileSync(path.join(root,'studio-guest-preview.js'),'utf8');
+assert.ok(adapter.includes('window.__BALLENGINE_LOCAL_GUEST__=guest'),
+  'Local guest fallback is missing from the shared homepage/Studio bootstrap');
 console.log('Original Studio intact; merged public routes and worker/CDN assets verified.');
 
 const mime={
