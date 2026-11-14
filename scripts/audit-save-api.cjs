@@ -18,3 +18,15 @@ for(const term of patterns){
   }
   console.log('AUDIT_TERM_SUMMARY',JSON.stringify({term,matchesCaptured:n}));
 }
+
+const regions=[
+ ['save-service',2995700,3012900],
+ ['save-ui',6712000,6756000],
+ ['local-save-service',2924000,2990000]
+];
+for(const [name,start,end] of regions){
+  const slice=s.slice(start,end);
+  for(let off=0;off<slice.length;off+=5000){
+    console.log('AUDIT_DETAIL',JSON.stringify({name,at:start+off,content:slice.slice(off,off+5000)}));
+  }
+}
