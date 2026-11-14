@@ -1,0 +1,32 @@
+name: Verify live BallEngine Automation routing
+on:
+  push:
+    branches: [fix/production-home-route]
+    paths:
+      - .github/workflows/live-automation-route-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check-live-route:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Verify public production routes and guest publishing adapter
+        env:
+          SITE: https://ballengine.vercel.app
+        run: |
+          python3 - <<'PY'
+          import os,urllib.request,urllib.error
+          base=os.environ['SITE']
+          for route in ['/automation','/automation/','/studio']:
+              req=urllib.request.Request(base+route,headers={'User-Agent':'BallEngine-Automation-Route-Smoke/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=25) as response:
+                  html=response.read(250000).decode('utf-8','replace')
+                  status=response.status
+                  assert status==200,(route,status)
+                  assert 'id="root"' in html,(route,'missing React app')
+                  assert '/ballengine-cloud-saves.js' in html,(route,'missing cloud adapter')
+                  assert '/ballengine-guest-publishing.js' in html,(route,'missing publishing planner')
+                  print('LIVE_AUTOMATION_ROUTE_OK',route,status,len(html))
+          PY
