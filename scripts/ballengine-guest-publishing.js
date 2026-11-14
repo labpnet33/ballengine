@@ -88,8 +88,8 @@
   }
   const obsoleteAutomationWarning='Automation is not active on this account, so connecting accounts, scheduling and Autopilot are all switched off. Every plan covers every platform.';
   function automationMain(){
-    // All existing original Automation tabs use the same React dashboard.
-    // Keep one guest planner and accurate account-status wording on each tab.
+    // All original Automation tabs share the same captured React layout.
+    // Only Overview and Publish contain our guest manual posting composer.
     if(!/^\/automation(?:\/(?:accounts|publish|autopilot))?\/?$/.test(location.pathname))return null;
     return document.querySelector('#root main');
   }
@@ -111,29 +111,32 @@
   function findAutomationHost(){
     const main=automationMain();
     if(!main)return null;
-    // Put working guest controls in the existing dashboard content area next
-    // to the original status message, not outside the page/sidebar layout.
+    const route=location.pathname.replace(/\/+$/,'');
+    // Accounts and Autopilot are DIFFERENT native tabs. Previously the large
+    // repeated guest form appeared before their content, making them seem
+    // stuck on the Overview screen. Preserve their original content first.
+    if(route!=='/automation'&&route!=='/automation/publish')return null;
     return automationWarning()?.parentElement||main;
   }
   function clarifyAutomationStatus(){
     const main=automationMain();
     if(!main)return;
-    const planner=main.querySelector('[data-be-guest-publisher]');
-    if(!planner)return;
+    // The disabled subscription banner still needs accurate guest-mode
+    // wording on Accounts and Autopilot, where no planner is rendered.
     // The captured original paid-plan backend doesn't exist on this hosted
     // guest copy. Don't falsely activate that subscription, social OAuth,
     // or automatic delivery. Show the real working manual planner instead.
     const replacements=new Map([
       [obsoleteAutomationWarning,
-       'Guest draft scheduling is available in the publishing planner. Automatic social posting and Autopilot require separately authorized account connections.'],
+       'Guest draft scheduling is available in Overview and Publish. Automatic social posting and Autopilot require separately authorized account connections.'],
       ['Connect your socials, schedule ahead and let Autopilot post for you. Included with Creator, Pro, Elite and Agency.',
        'Save publishing drafts and plan when to post videos. Direct social connections and unattended Autopilot posting are not configured in guest mode.'],
       ['No automation on this account','Guest drafts and reminders are available'],
       ['Not active','Auto-publishing off'],
       ['Connecting an account is part of an automation plan. Every plan covers every platform.',
-       'Social account connection requires separately authorized provider integration. You can prepare drafts and schedule manual posting reminders below.'],
+       'Social account connections require official authorization and a publishing backend. Prepare manual posting drafts under Overview or Publish.'],
       ['Autopilot is not part of your current plan.',
-       'Automatic posting is not configured for this guest website. You can schedule and manage manual posting reminders below.']
+       'Automatic posting is not configured. Set manual posting reminders under Overview or Publish.']
     ]);
     for(const e of main.querySelectorAll('div,p,span')){
       if(e.children.length!==0||e.closest('[data-be-guest-publisher]'))continue;
@@ -153,8 +156,24 @@
   function mount(){
     const studioHost=findStudioHost();
     const host=studioHost||findAutomationHost();
-    if(!host){return;}
-    if(host.querySelector('[data-be-guest-publisher]')){clarifyAutomationStatus();return;}
+    const route=location.pathname.replace(/\/+$/,'');
+    if(!host){
+      // When the original React tabs navigate without a full reload, remove
+      // a stale form from Accounts/Autopilot instead of covering their UI.
+      if(automationMain()){
+        for(const item of document.querySelectorAll('#root main [data-be-guest-publisher]'))item.remove();
+        clarifyAutomationStatus();
+      }
+      return;
+    }
+    const existing=host.querySelector('[data-be-guest-publisher]');
+    if(existing){
+      const warning=!studioHost?automationWarning():null;
+      if(route==='/automation/publish'&&existing.nextElementSibling)host.appendChild(existing);
+      else if(route==='/automation'&&warning?.parentElement===host&&existing.nextElementSibling!==warning)
+        host.insertBefore(existing,warning);
+      clarifyAutomationStatus();return;
+    }
     // An existing form might be in the original Publish composer. This is
     // a DIV with buttons type=button, never a nested HTML form.
     const root=node('section',null,css.box);
@@ -308,7 +327,10 @@
     // Insert only inside the existing view. React may remount it; remount
     // is detected without mutating its original components.
     const originalGate=!studioHost?automationWarning():null;
-    if(originalGate?.parentElement===host)host.insertBefore(root,originalGate);
+    // On Overview, provide the guest planner immediately. On Publish, show
+    // the native original publishing tab FIRST and its guest planner BELOW.
+    // Accounts/Autopilot contain no duplicate composer at all.
+    if(route==='/automation'&&originalGate?.parentElement===host)host.insertBefore(root,originalGate);
     else host.appendChild(root);
     clarifyAutomationStatus();
     refresh();
