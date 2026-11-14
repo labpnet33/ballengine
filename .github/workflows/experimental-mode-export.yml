@@ -1,0 +1,38 @@
+name: Validate experimental MP4 recording/export
+on:
+  push:
+    branches: [fix/production-home-route]
+    paths:
+      - scripts/test-record-export.cjs
+      - .github/workflows/experimental-mode-export.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  experimental-mode-mp4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: ['phase-bloom','domino-3d','flow-field']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install browser controller
+        run: npm install --prefix "$RUNNER_TEMP/experimental-export" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Prepare original frontend
+        run: node scripts/build-original-studio.cjs
+      - name: Record and verify real video MP4 in experimental simulation
+        env:
+          TEST_MODE: ${{ matrix.mode }}
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/experimental-export/node_modules" node scripts/test-record-export.cjs
+      - name: Keep evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: experimental-mp4-${{ matrix.mode }}
+          path: test-results/record-export/
+          retention-days: 5
+          if-no-files-found: ignore
