@@ -38,7 +38,8 @@ async function upload(req,env,library,origin,json,fail,kind='audio'){
   if(Number(req.headers.get('Content-Length')||0)>MAX_FILE+256000)return fail('Maximum audio upload is 10 MB.',413,origin);
   const form=await req.formData(),file=form.get('file');
   if(!(file instanceof File))return fail('No audio file selected',400,origin);
-  if(file.size<14||file.size>MAX_FILE)return fail('Upload must be between 14 bytes and 10 MB.',413,origin);
+  if(file.size<14)return fail('Upload content is too short to be a valid media file.',415,origin);
+  if(file.size>MAX_FILE)return fail('Maximum file size is 10 MB.',413,origin);
   const bytes=new Uint8Array(await file.arrayBuffer());
   let mime;
   try{mime=mediaType(file,bytes,kind);}
