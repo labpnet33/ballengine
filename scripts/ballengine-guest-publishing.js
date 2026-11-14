@@ -136,12 +136,36 @@
       ['Connecting an account is part of an automation plan. Every plan covers every platform.',
        'Social account connections require official authorization and a publishing backend. Prepare manual posting drafts under Overview or Publish.'],
       ['Autopilot is not part of your current plan.',
-       'Automatic posting is not configured. Set manual posting reminders under Overview or Publish.']
+       'Automatic posting is not configured. Set manual posting reminders under Overview or Publish.'],
+      ['Autopilot posts for you on a rhythm you set once. Growth, Scale and Max include it, and so do Pro, Elite and Agency.',
+       'Recurring manual posting reminders are available: choose a video, platforms, and a daily or weekly schedule. Your queue saves the next posting dates, but videos are not uploaded automatically.']
     ]);
     for(const e of main.querySelectorAll('div,p,span')){
       if(e.children.length!==0||e.closest('[data-be-guest-publisher]'))continue;
       const updated=replacements.get(e.textContent?.trim());
       if(updated)e.textContent=updated;
+    }
+    // Offer a real, working action from the original Autopilot tab, without
+    // misrepresenting the unavailable social-account authorization backend.
+    if(location.pathname.replace(/\/+$/,'')==='/automation/autopilot'){
+      const nativeDescription='Recurring manual posting reminders are available: choose a video, platforms, and a daily or weekly schedule. Your queue saves the next posting dates, but videos are not uploaded automatically.';
+      const intro=[...main.querySelectorAll('p,div,span')]
+        .find(e=>e.children.length===0&&e.textContent?.trim()===nativeDescription);
+      if(intro&&!main.querySelector('[data-be-autopilot-reminder-link]')){
+        const go=button('Set recurring posting reminder',()=>{
+          const publish=[...main.querySelectorAll('nav[aria-label="Automation"] button')]
+            .find(e=>e.textContent?.trim()==='Publish');
+          if(publish)publish.click();
+          else window.location.assign('/automation/publish');
+          window.setTimeout(()=>{
+            document.querySelector('#root main [data-be-guest-publisher]')
+              ?.scrollIntoView({behavior:'smooth',block:'start'});
+          },450);
+        },true);
+        go.dataset.beAutopilotReminderLink='1';
+        go.style.marginTop='12px';
+        intro.insertAdjacentElement('afterend',go);
+      }
     }
     const card=automationWarning();
     if(card){
