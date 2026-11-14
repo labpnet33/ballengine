@@ -82,6 +82,24 @@ const report={stage:'init',studioPlanner:false,automationPlanner:false,mp4Upload
    const second=page.locator('[data-be-guest-publisher]').first();
    await second.waitFor({state:'visible',timeout:20000});
    await second.getByText(job.title,{exact:true}).waitFor({timeout:20000});
+
+   console.log('AUTOMATION_LAYOUT_AUDIT '+JSON.stringify(await page.evaluate(()=>{
+     const warning='Automation is not active on this account, so connecting accounts, scheduling and Autopilot are all switched off. Every plan covers every platform.';
+     const main=document.querySelector('#root main');
+     const messages=[...document.querySelectorAll('#root main *')].filter(e=>e.children.length===0&&e.textContent?.trim()===warning);
+     function desc(e){if(!e)return null;return {tag:e.tagName,cls:e.className,childCount:e.children.length,text:e.innerText?.slice(0,350)};}
+     const target=messages[0];
+     return {
+       main:desc(main),
+       mainChildren:[...main.children].map(desc).slice(0,10),
+       mainGrandchildren:[...main.children].flatMap(e=>[...e.children]).map(desc).slice(0,12),
+       message:desc(target),
+       ancestry:target?[target,target.parentElement,target.parentElement?.parentElement,target.parentElement?.parentElement?.parentElement].map(desc):[],
+       headings:[...main.querySelectorAll('h1,h2,h3')].map(desc).slice(0,16),
+       plannerParent:desc(document.querySelector('[data-be-guest-publisher]')?.parentElement)
+     };
+   })));
+
    report.automationPlanner=true;
    await screenshot('automation-queue');
    report.stage='mark-posted';
