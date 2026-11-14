@@ -55,7 +55,10 @@ const studioDir=path.join(web,'studio');
 fs.mkdirSync(studioDir,{recursive:true});
 // Absolute asset paths work both at /studio and /studio/.
 const studioDocument=originalStudio
-  .replace(/(\\b(?:src|href)=["'])assets\\//g,'$1/assets/');
+  .replaceAll('src="assets/', 'src="/assets/')
+  .replaceAll('href="assets/', 'href="/assets/')
+  .replaceAll("src='assets/", "src='/assets/")
+  .replaceAll("href='assets/", "href='/assets/");
 fs.writeFileSync(path.join(studioDir,'index.html'),studioDocument,'utf8');
 const originalBundle=path.join(web,'assets','index-3pf76ICO.js');
 const newBundle=path.join(staticCapture,'assets','index-3pf76ICO.js');
