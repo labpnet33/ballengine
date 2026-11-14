@@ -17,6 +17,9 @@
     legacy_music_catalog:true,
     is_suspended:false
   });
+  // The captured /home route reads this synchronously so it never redirects
+  // to /login while the local guest auth request is still initializing.
+  window.__BALLENGINE_LOCAL_GUEST__=guest;
   // Discard previously cached FREE profile so existing preview visitors see the new local settings.
   try { window.localStorage.removeItem('user_profile_cache'); } catch {}
   const nativeFetch=window.fetch.bind(window);
