@@ -36,7 +36,7 @@ kbd{font-size:10px;background:#273142;border:1px solid #3c4c60;border-radius:4px
 @media(max-width:1180px){.studio-layout{grid-template-columns:68px 270px minmax(320px,1fr)}.quick{grid-column:2/-1;border-top:1px solid #2b3747;border-left:none;display:grid;grid-template-columns:1fr 1fr;align-content:start}.rail{grid-row:span 2}}
 @media(max-width:760px){.app-top{padding:0 10px}.project-name,.tag{display:none}.studio-layout{display:flex;flex-direction:column}.rail{order:1;flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid #2d3a4a;padding:4px;gap:2px;align-items:center}.rail-bottom{margin:0}.rail-button{min-width:54px;min-height:52px;font-size:9px}.rail-button .symbol{font-size:16px}.preview{order:2;padding:14px 10px 22px}.canvas-holder{width:min(100%,310px);max-height:none}.inspector{order:3;border-top:1px solid #28303d;border-right:0}.panel-body{max-height:none;padding:10px 16px 28px}.quick{order:4;display:flex;padding:12px;border-left:0;border-top:1px solid #28303d}.preview-heading{padding:4px}.top-actions .btn{padding:8px 9px;font-size:11px}}
 </style></head><body>
-<header class="app-top"><a href="/" class="brand">Ball<b>Engine</b></a><div class="top-center"><span class="project-name">Untitled Simulation</span><span class="tag">LOCAL GUEST</span></div><div class="top-actions"><button class="btn" type="button" id="headerRandom">✧ Randomize</button><button class="btn primary" type="button" id="headerSave">Save Scene</button></div></header>
+<header class="app-top"><a href="/" class="brand">Ball<b>Engine</b></a><div class="top-center"><span class="project-name">Untitled Simulation</span><span class="tag">FREE LOCAL STUDIO</span></div><div class="top-actions"><button class="btn" type="button" id="headerRandom">✧ Randomize</button><button class="btn primary" type="button" id="headerSave">Save Scene</button></div></header>
 <main class="studio-layout">
 <nav class="rail" aria-label="Studio sections"><button type="button" class="rail-button active" data-tab="basics" title="Basics (0)" aria-label="Basics"><span class="symbol">◈</span><span>Basics</span></button>
 <button type="button" class="rail-button " data-tab="engine" title="Engine (1)" aria-label="Engine"><span class="symbol">⬡</span><span>Engine</span></button>
@@ -55,8 +55,8 @@ kbd{font-size:10px;background:#273142;border:1px solid #3c4c60;border-radius:4px
 <section data-pane="engine" class="pane"><h3 class="section-title">Engine controls</h3><div class="group"><p class="muted">The selected scene mode is controlled from Basics. Switch modes to change collision geometry and movement.</p><button class="btn" type="button" id="engineMode">Change Mode in Basics</button></div><h3 class="section-title">Mode behavior</h3><p class="muted">Escape creates rotating rings. Rhythmic follows a zigzag path. Spawner uses a bounded bouncing-ball arena. More original mode algorithms are not yet implemented.</p></section>
 <section data-pane="physics" class="pane"><h3 class="section-title">Physics & Dynamics</h3><div class="group"><div class="field"><label for="gravity">Gravity <output id="gravityVal">200</output></label><input id="gravity" type="range" min="0" max="600" value="200" step="10"></div><div class="field"><label for="restitution">Bounce <output id="restitutionVal">95</output></label><input id="restitution" type="range" min="50" max="110" value="95" step="5"></div><p class="muted">Gravity and bounce are applied in Spawner mode. Speed is controlled under Basics.</p></div><h3 class="section-title">Ball Initial State</h3><button class="btn" type="button" id="physicsReset">Reset Simulation</button></section>
 <section data-pane="arts" class="pane"><h3 class="section-title">Balls & Lights</h3><div class="group"><div class="field"><label for="size">Ball Size <output id="sizeVal">12</output></label><input id="size" type="range" min="4" max="32" value="12" step="1"></div><div class="field"><label for="glow">Glow <output id="glowVal">18</output></label><input id="glow" type="range" min="0" max="45" value="18" step="1"></div><div class="field"><label for="color">Ball Color</label><input id="color" type="color" value="#22d3ee"></div><div class="field"><label for="bg">Background</label><input id="bg" type="color" value="#070711"></div></div><h3 class="section-title">Effects</h3><div class="group"><label class="check"><input id="trails" type="checkbox" checked> Motion trails</label><div class="field"><label class="check"><input id="particles" type="checkbox" checked> Collision particles</label></div></div></section>
-<section data-pane="audio" class="pane"><h3 class="section-title">Sound, MIDI & Audio</h3><div class="group"><div class="field"><label for="audio">Import local audio</label><input type="file" id="audio" accept="audio/*"></div><label class="check"><input id="sync" type="checkbox" checked> Beat-reactive movement</label><p class="muted">Audio plays locally. Beat energy can influence the animation. Original MIDI editing and server music libraries are not yet available.</p></div></section>
-<section data-pane="video" class="pane"><h3 class="section-title">Recording & Export</h3><div class="group"><div class="field"><label for="duration">Recording length</label><select id="duration"><option value="10">10 seconds</option><option value="20">20 seconds</option><option value="30" selected>30 seconds</option><option value="60">60 seconds</option></select></div><p class="muted">Browser WebM export at 540 × 960, 30 fps. Audio is not mixed into the recording yet.</p><button class="btn primary" type="button" id="videoRecord">Record Video</button></div></section>
+<section data-pane="audio" class="pane"><h3 class="section-title">Sound, MIDI & Audio</h3><div class="group"><div class="field"><label for="audio">Import local audio</label><input type="file" id="audio" accept="audio/*"></div><label class="check"><input id="sync" type="checkbox" checked> Beat-reactive movement</label><p class="muted">Audio stays on your device. Beat energy can influence the animation and imported audio can be included in exported clips. A built-in music catalog and MIDI editor are not available.</p></div></section>
+<section data-pane="video" class="pane"><h3 class="section-title">Recording & Export</h3><div class="group"><div class="field"><label for="duration">Recording length</label><select id="duration"><option value="10">10 seconds</option><option value="20">20 seconds</option><option value="30" selected>30 seconds</option><option value="60">60 seconds</option><option value="120">120 seconds</option></select></div><p class="muted">Record 540 × 960 WebM video at 30 fps, with your imported music included when supported. No account, credits, watermark, or server upload required.</p><div class="btn-row"><button class="btn primary" type="button" id="videoRecord">Record Video</button><button class="btn" type="button" id="stopRecord" disabled>Stop Recording</button><button class="btn" type="button" id="saveFrame">Save PNG</button></div></div></section>
 <section data-pane="cloud" class="pane"><h3 class="section-title">Save system</h3><div class="group"><p class="muted">Guest scenes are saved in this browser only. No account or cloud service required.</p><div class="btn-row"><button class="btn primary" id="saveScene" type="button">Save Locally</button><button class="btn" id="loadScene" type="button">Load Last</button></div></div><h3 class="section-title">Export / Import</h3><div class="group"><button class="btn" id="exportConfig" type="button">Export Scene JSON</button><div class="field"><label for="importConfig">Import scene JSON</label><input id="importConfig" type="file" accept=".json,application/json"></div></div></section>
 <section data-pane="publish" class="pane"><h3 class="section-title">Publishing</h3><div class="group"><p class="muted">A guest session does not connect your YouTube, Instagram, or TikTok accounts. Export a video locally and upload it using your own account.</p><button class="btn primary" id="publishRecord" type="button">Export Video</button></div></section>
 <section data-pane="tutorials" class="pane"><h3 class="section-title">Using the Studio</h3><div class="group"><p class="muted">1. Open Basics and pick a scene.</p><p class="muted">2. Tune the physics and Arts settings.</p><p class="muted">3. Optionally import local music under Audio.</p><p class="muted">4. Press Record, then save your WebM.</p><p class="muted">5. Save a scene to your browser under Cloud.</p></div></section>
@@ -65,7 +65,7 @@ kbd{font-size:10px;background:#273142;border:1px solid #3c4c60;border-radius:4px
 <div class="canvas-holder"><canvas id="scene" width="540" height="960" aria-label="BallEngine animation preview"></canvas></div>
 <div class="preview-footer"><span id="status" class="status" role="status">Live preview running</span><span>540 × 960 · 30 FPS export</span></div>
 <div class="preview-controls"><button class="btn primary" id="record" type="button">● Record / Export WebM</button></div>
-<p class="notice">Guest preview build. The original Studio layout is being reconstructed; only the controls shown as working are implemented. Your project stays in this browser.</p>
+<p class="notice">Independent local Studio: simulation, music import, recording, saving, and export work without sign-in or paid credits. Some original paid/server features are not part of this capture.</p>
 </section>
 <aside class="quick"><div class="quick-card"><h2>Quick Actions</h2><div class="btn-row"><button class="btn" id="quickRandom" type="button">Randomize</button><button class="btn" id="quickSave" type="button">Save</button></div><p>Quickly experiment and keep a good scene.</p></div>
 <div class="quick-card"><h2>Recording</h2><p>Current output</p><div class="stat-grid"><div class="stat"><span>Aspect</span><b>9:16</b></div><div class="stat"><span>Format</span><b>WebM</b></div><div class="stat"><span>Resolution</span><b>540p</b></div><div class="stat"><span>FPS</span><b>30</b></div></div><div class="field"><button class="btn primary" style="width:100%" id="quickRecord" type="button">Record Clip</button></div></div>
@@ -82,7 +82,7 @@ function updateLabels(){$('countVal').textContent=val('count');$('speedVal').tex
 for(const id of inputs){$(id).addEventListener('input',()=>{updateLabels();if(id==='count'||id==='mode')reset()})}
 $('reset').onclick=reset;
 $('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'Pause':'Play';$('status').textContent=playing?'Live preview running':'Preview paused';if(audioElement){if(playing)audioElement.play().catch(()=>{});else audioElement.pause()}};
-$('audio').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;if(audioElement){audioElement.pause();URL.revokeObjectURL(audioElement.src)}audioElement=new Audio(URL.createObjectURL(file));audioElement.loop=true;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();if(source)source.disconnect();source=audioCtx.createMediaElementSource(audioElement);analyser=audioCtx.createAnalyser();analyser.fftSize=256;source.connect(analyser);analyser.connect(audioCtx.destination);await audioCtx.resume();if(playing)await audioElement.play();$('status').textContent='Music loaded: '+file.name}catch(err){$('status').textContent='Music loaded. Playback may require a tap.'}});
+$('audio').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;if(audioElement){audioElement.pause();URL.revokeObjectURL(audioElement.src)}audioElement=new Audio(URL.createObjectURL(file));audioElement.loop=true;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();if(source)source.disconnect();source=audioCtx.createMediaElementSource(audioElement);analyser=audioCtx.createAnalyser();analyser.fftSize=256;source.connect(analyser);analyser.connect(audioCtx.destination);window.ballengineLocalAudio={ctx:audioCtx,source:source,element:audioElement};await audioCtx.resume();if(playing)await audioElement.play();$('status').textContent='Music loaded: '+file.name}catch(err){$('status').textContent='Music loaded. Playback may require a tap.'}});
 function calcBeat(){if(!analyser||!val('sync')){beat*=.9;return}const a=new Uint8Array(analyser.frequencyBinCount);analyser.getByteFrequencyData(a);let sum=0;for(let i=1;i<Math.min(24,a.length);i++)sum+=a[i];beat=beat*.76+(sum/(23*255))*.24}
 function spawn(x,y){if(!val('particles'))return;for(let j=0;j<7;j++)particles.push({x,y,vx:(Math.random()-.5)*250,vy:(Math.random()-.5)*250,life:.4})}
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.04,(now-last)/1000||.016);last=now;if(!playing&&!recording)return;let step=dt*(+val('speed')/100);elapsed+=step;calcBeat();const mode=val('mode'),radius=+val('size')*(1+beat*.32),centerX=W/2,centerY=H/2;ctx.fillStyle=val('bg');if(val('trails')){ctx.globalAlpha=.23;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1}else ctx.fillRect(0,0,W,H);
@@ -94,7 +94,99 @@ const color=val('color');for(let i=0;i<balls.length;i++){let b=balls[i];if(mode=
 ctx.beginPath();ctx.arc(b.x,b.y,radius,0,Math.PI*2);ctx.fillStyle=color;ctx.shadowColor=color;ctx.shadowBlur=+val('glow')+beat*35;ctx.fill();ctx.shadowBlur=0;ctx.beginPath();ctx.arc(b.x-radius*.3,b.y-radius*.3,radius*.25,0,Math.PI*2);ctx.fillStyle='#ffffffaa';ctx.fill()}
 for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;ctx.globalAlpha=Math.max(0,p.life/.4);ctx.fillStyle=color;ctx.fillRect(p.x,p.y,4,4);if(p.life<=0)particles.splice(i,1)}ctx.globalAlpha=1;
 }
-$('record').onclick=async()=>{if(recording)return;if(!canvas.captureStream||!window.MediaRecorder){$('status').textContent='Recording is not supported in this browser';$('status').classList.add('error');return}const stream=canvas.captureStream(30),mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t));if(!mime){$('status').textContent='WebM recording is unavailable';return}let recorder;try{recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:4000000})}catch(e){$('status').textContent='Could not start recording: '+e.message;stream.getTracks().forEach(t=>t.stop());return}const chunks=[];recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};recorder.onerror=()=>{$('status').textContent='Recording failed'};recorder.onstop=()=>{recording=false;$('record').disabled=false;$('record').textContent='Export WebM';stream.getTracks().forEach(t=>t.stop());if(!chunks.length){$('status').textContent='No video data recorded';return}const blob=new Blob(chunks,{type:mime}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='ballengine-guest-'+Date.now()+'.webm';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);$('status').textContent='WebM export ready ('+(blob.size/1048576).toFixed(1)+' MB)'};recording=true;playing=true;$('play').textContent='Pause';$('record').disabled=true;$('record').textContent='Recording…';recorder.start(1000);const duration=+val('duration')*1000,start=performance.now();const progress=()=>{if(!recording)return;const remaining=Math.max(0,Math.ceil((duration-(performance.now()-start))/1000));$('status').textContent='Recording • '+remaining+' seconds remaining';if(remaining>0)requestAnimationFrame(progress);else if(recorder.state==='recording')recorder.stop()};requestAnimationFrame(progress)};
+
+let activeCapture=null;
+function updateRecordControls(active){
+  recording=active;
+  for(const id of ['record','quickRecord','videoRecord','publishRecord'])if($(id))$(id).disabled=active;
+  $('stopRecord').disabled=!active;
+  $('record').textContent=active?'● Recording…':'● Record / Export WebM';
+}
+async function recordLocalVideo(){
+  if(recording)return;
+  if(!canvas.captureStream||!window.MediaRecorder){
+    $('status').textContent='Video recording is not available in this browser. Use desktop Chrome or Edge.';
+    return;
+  }
+  const mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']
+    .find(t=>MediaRecorder.isTypeSupported(t));
+  if(!mime){$('status').textContent='WebM recording is not supported by this browser.';return;}
+  const videoStream=canvas.captureStream(30);
+  const tracks=[...videoStream.getVideoTracks()];
+  const audio=window.ballengineLocalAudio;
+  let audioDestination=null,recorder=null,recordingError=null,finished=false;
+  try{
+    if(audio&&audio.element&&audio.source&&audio.ctx){
+      await audio.ctx.resume();
+      audioDestination=audio.ctx.createMediaStreamDestination();
+      audio.source.connect(audioDestination);
+      tracks.push(...audioDestination.stream.getAudioTracks());
+      if(audio.element.paused){audio.element.currentTime=0;await audio.element.play();}
+    }
+    const stream=new MediaStream(tracks);
+    recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:6000000});
+    const chunks=[];
+    const finish=()=>{
+      if(finished)return;finished=true;
+      updateRecordControls(false);activeCapture=null;
+      videoStream.getTracks().forEach(t=>t.stop());
+      if(audioDestination){
+        try{audio.source.disconnect(audioDestination)}catch(e){}
+        audioDestination.stream.getTracks().forEach(t=>t.stop());
+      }
+      if(recordingError){$('status').textContent='Recording failed: '+recordingError;return;}
+      if(!chunks.length){$('status').textContent='Recording stopped without video data';return;}
+      const blob=new Blob(chunks,{type:mime});
+      if(blob.size<1024){$('status').textContent='Recording was empty';return;}
+      const url=URL.createObjectURL(blob),link=document.createElement('a');
+      link.href=url;link.download='ballengine-local-'+new Date().toISOString().replace(/[:.]/g,'-')+'.webm';
+      document.body.appendChild(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+      $('status').textContent='Saved WebM ('+(blob.size/1048576).toFixed(1)+' MB)'+(audioDestination?' with audio':'');
+    };
+    recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+    recorder.onerror=e=>{recordingError=e.error?.message||'MediaRecorder error'};
+    recorder.onstop=finish;
+    playing=true;$('play').textContent='Pause';
+    updateRecordControls(true);
+    recorder.start(1000);
+    const duration=Number(val('duration'))*1000,started=performance.now();
+    let stopTimer=setTimeout(()=>{if(recorder.state==='recording')recorder.stop()},duration);
+    activeCapture=()=>{
+      clearTimeout(stopTimer);
+      if(recorder.state==='recording')recorder.stop();
+    };
+    $('stopRecord').onclick=activeCapture;
+    const tick=()=>{
+      if(!recording)return;
+      const seconds=Math.max(0,Math.ceil((duration-(performance.now()-started))/1000));
+      $('status').textContent='Recording locally · '+seconds+'s left'+(audioDestination?' · Audio on':'');
+      if(recording)requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }catch(e){
+    if(recorder&&recorder.state==='recording'){try{recorder.stop()}catch(err){}}
+    videoStream.getTracks().forEach(t=>t.stop());
+    if(audioDestination){
+      try{audio.source.disconnect(audioDestination)}catch(err){}
+      audioDestination.stream.getTracks().forEach(t=>t.stop());
+    }
+    updateRecordControls(false);
+    $('status').textContent='Could not start recording: '+(e.message||e);
+  }
+}
+$('record').onclick=recordLocalVideo;
+$('saveFrame').onclick=()=>{
+  if(!canvas.toBlob){$('status').textContent='PNG export not supported';return;}
+  canvas.toBlob(blob=>{
+    if(!blob){$('status').textContent='Could not capture the frame';return;}
+    const url=URL.createObjectURL(blob),link=document.createElement('a');
+    link.href=url;link.download='ballengine-local-frame.png';
+    link.click();setTimeout(()=>URL.revokeObjectURL(url),30000);
+    $('status').textContent='PNG frame saved';
+  },'image/png');
+};
+
 updateLabels();reset();requestAnimationFrame(frame);
 })();
 </script>
