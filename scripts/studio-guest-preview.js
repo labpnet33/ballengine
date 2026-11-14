@@ -51,8 +51,8 @@
   // repeat visits because this standalone preview has no upstream user state.
   // Dismiss only these two identifiable popups; leave Studio controls intact.
   const walkthroughPrompts=[
-    {title:/^Quick tour\\??$/i,detail:/We show you the main buttons\\./i},
-    {title:/^Shuffle just one part$/i,detail:/Like your video but not the trails\\?/i}
+    {title:/^Quick tour\??$/i,detail:/We show you the main buttons\./i},
+    {title:/^Shuffle just one part$/i,detail:/Like your video but not the trails\?/i}
   ];
   const suppressedWalkthroughs=new WeakSet();
   function suppressWalkthrough(scope) {
