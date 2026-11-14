@@ -88,7 +88,9 @@
   }
   const obsoleteAutomationWarning='Automation is not active on this account, so connecting accounts, scheduling and Autopilot are all switched off. Every plan covers every platform.';
   function automationMain(){
-    if(location.pathname.replace(/\/+$/,'')!=='/automation')return null;
+    // All existing original Automation tabs use the same React dashboard.
+    // Keep one guest planner and accurate account-status wording on each tab.
+    if(!/^\/automation(?:\/(?:accounts|publish|autopilot))?\/?$/.test(location.pathname))return null;
     return document.querySelector('#root main');
   }
   function automationWarning(){
@@ -127,7 +129,11 @@
       ['Connect your socials, schedule ahead and let Autopilot post for you. Included with Creator, Pro, Elite and Agency.',
        'Save publishing drafts and plan when to post videos. Direct social connections and unattended Autopilot posting are not configured in guest mode.'],
       ['No automation on this account','Guest drafts and reminders are available'],
-      ['Not active','Auto-publishing off']
+      ['Not active','Auto-publishing off'],
+      ['Connecting an account is part of an automation plan. Every plan covers every platform.',
+       'Social account connection requires separately authorized provider integration. You can prepare drafts and schedule manual posting reminders below.'],
+      ['Autopilot is not part of your current plan.',
+       'Automatic posting is not configured for this guest website. You can schedule and manage manual posting reminders below.']
     ]);
     for(const e of main.querySelectorAll('div,p,span')){
       if(e.children.length!==0||e.closest('[data-be-guest-publisher]'))continue;
@@ -315,7 +321,7 @@
     document.addEventListener('click',()=>setTimeout(mount,150),{capture:true});
     setInterval(()=>{
       if(document.visibilityState==='visible'&&
-        (location.pathname.startsWith('/studio')||location.pathname==='/automation')){
+        (location.pathname.startsWith('/studio')||automationMain())){
         mount();
         clarifyAutomationStatus();
       }
