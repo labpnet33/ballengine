@@ -1,0 +1,60 @@
+name: Verify original BallEngine Publishing planner
+on:
+  push:
+    branches: [fix/production-home-route]
+    paths:
+      - cloud-saves/guest-publishing.mjs
+      - cloud-saves/music-media.mjs
+      - cloud-saves/worker.mjs
+      - scripts/ballengine-guest-publishing.js
+      - scripts/ballengine-cloud-saves.js
+      - scripts/build-original-studio.cjs
+      - scripts/test-guest-publishing-api.cjs
+      - scripts/test-guest-publishing-ui.cjs
+      - .github/workflows/publishing-planner-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  guest-publishing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Syntax validation
+        run: |
+          node --check cloud-saves/worker.mjs
+          node --check cloud-saves/music-media.mjs
+          node --check cloud-saves/guest-publishing.mjs
+          node --check scripts/ballengine-guest-publishing.js
+          node --check scripts/ballengine-cloud-saves.js
+          node --check scripts/build-original-studio.cjs
+          node --check scripts/test-guest-publishing-api.cjs
+          node --check scripts/test-guest-publishing-ui.cjs
+      - name: Install FFmpeg when required
+        run: |
+          if ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+      - name: Verify backend manual scheduling and MP4 storage
+        run: node scripts/test-guest-publishing-api.cjs
+      - name: Install browser driver
+        run: npm install --prefix "$RUNNER_TEMP/studio-qa" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original Studio without replacing UI
+        run: node scripts/build-original-studio.cjs
+      - name: Browser test original Publish and Automation pages
+        timeout-minutes: 5
+        run: |
+          CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/studio-qa/node_modules" node scripts/test-guest-publishing-ui.cjs
+      - name: Upload screenshots and report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ballengine-guest-publishing-ui
+          path: test-results/publishing/
+          if-no-files-found: ignore
+          retention-days: 7
