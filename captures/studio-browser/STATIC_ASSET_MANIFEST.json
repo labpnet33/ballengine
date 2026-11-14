@@ -1,0 +1,950 @@
+{
+  "source_file": "ballengine.app.zip",
+  "static_files": 186,
+  "categories": {
+    "branding/icon": 6,
+    "application assets (JavaScript, CSS, and workers)": 7,
+    "fonts": 7,
+    "mode thumbnails": 18,
+    "sound effects": 122,
+    "demonstration video and media": 25,
+    "3D models": 1
+  },
+  "notes": [
+    "This package intentionally excludes all API responses and authentication/session files.",
+    "It is a browser asset snapshot, not original backend source.",
+    "Inspect before pushing to any public repository; do not upload the raw WACZ or Chrome ZIP."
+  ],
+  "files": [
+    {
+      "path": "captures/studio-browser/ballengine.app/android-chrome-192x192.png",
+      "bytes": 1692,
+      "sha256": "1486b05705ea2de8ff6e6dbb3ca1f5b2b8c1d6b88304905fff07118e666945c0"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/apple-touch-icon.png",
+      "bytes": 1458,
+      "sha256": "d3698eded317beccb928bb61c1e15f2c650b69cae3346e75ef756b28832b8fa8"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/assets/crush.worker-phV1EFRY.js",
+      "bytes": 331998,
+      "sha256": "975f36b5849802814b0d636f00d1dbfa8dc08d432e552f197a0028bcb5caaff0"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/assets/index-3pf76ICO.js",
+      "bytes": 14195304,
+      "sha256": "bee71fe0eb07f8e2ccb1588ff6bc100727f1651fc316dbc978fc001582f5d10e"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/assets/index-DoMKM56W.css",
+      "bytes": 392286,
+      "sha256": "4d3b4aa5398dcc8d516cbbd92bd73ee7994c7c273c4ee07fceb9be424947ed20"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/assets/magnetic.worker-QnwGMRP0.js",
+      "bytes": 343619,
+      "sha256": "89db090ee23c086dd31dd4ab6df841211d466726bc4446781ad9003b69d77128"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/assets/physics.worker-DRvxAjdb.js",
+      "bytes": 59166,
+      "sha256": "084e61a3e802a9c287cfb3ec1b2bf8df461e0ca3aff78fd8a65d47d920ff271a"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/assets/vendor-motion-EOl-odwX.js",
+      "bytes": 128299,
+      "sha256": "6d02626a4f431416c277b55e3f42feb0c5c6430395b44418221682be7e7d81de"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/assets/vendor-react-kqrIXDwM.js",
+      "bytes": 233645,
+      "sha256": "a9753d5a17737bfd1bba1c95f4da4651abd93fdd9f15d7c79220e769be4dbb8a"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/favicon.ico",
+      "bytes": 1131,
+      "sha256": "23dd76e31031e9fca7bee64b109d23ac10204cf48e204f55ac28ff3217552d14"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/favicon.svg",
+      "bytes": 329,
+      "sha256": "165834dd6f7248c1fa7bc98e1b37886fea60b0752fd57d2a886a8b554c11be2a"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/fonts/barlowcondensed/v5/barlow-condensed-latin-600-normal.woff2",
+      "bytes": 22308,
+      "sha256": "215a93c696f442034a46fbb382958f753fda60e30490683aeea6b235fcbb2b66"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/fonts/barlowcondensed/v5/barlow-condensed-latin-700-normal.woff2",
+      "bytes": 22444,
+      "sha256": "3787a5a419171630e6890cfa47c4da067474d005cd0ff8dc11ec090fdc3ee2b8"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/fonts/barlowcondensed/v5/barlow-condensed-latin-800-normal.woff2",
+      "bytes": 22464,
+      "sha256": "2515494e8cc2ca07c86ea78766cfa104b796aa6ed5d66821c01d51dbb0b52bce"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/fonts/figtree/v9/_Xms-HUzqDCFdgfMm4S9DQ.woff2",
+      "bytes": 20156,
+      "sha256": "4ba7d3d096695818fe0686be4f1e82c6b05134e18a22260336130335027462dd"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/fonts/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+      "bytes": 48256,
+      "sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/fonts/jetbrainsmono/v24/tDbV2o-flEEny0FZhsfKu5WU4xD7OwE.woff2",
+      "bytes": 40404,
+      "sha256": "18be452724bfdc236c074ca94a249a7f41a86752c7d04ab258ce9ed5651f6a7e"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/fonts/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2",
+      "bytes": 22288,
+      "sha256": "0640890476fc1198ab4de571fb658de443c4d85b66466ec09534a8737ab1ce9d"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/logo.png",
+      "bytes": 5998,
+      "sha256": "2c94604a4c6a991a9135cd74119ea978863a9be33155ac83dc1d38b49f82d16d"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/logo.webp",
+      "bytes": 4572,
+      "sha256": "b77dd6520abfa4d9712e17f657dafae0a4cf124915e5850a9a28b6314c9c743d"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/ball-crush.webp",
+      "bytes": 6134,
+      "sha256": "9338eaf33d7bf06dad9c36c7b219d5c8044f19d2427ed22eb523b211727cf4d5"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/breaker.webp",
+      "bytes": 10614,
+      "sha256": "3f6ba92424fab20285a65c306200f2615569117aba9950a92318fbabeaed9d3d"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/cut-count.webp",
+      "bytes": 12756,
+      "sha256": "6defe42cbce0afd1a64f9688932e3dde1fc1789f9a5578d6c89f90c665ee7c82"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/drawer.webp",
+      "bytes": 14240,
+      "sha256": "3498572e847e53e44a873b47f8c2948bf0118c9f3b11bee0293b7bb050902979"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/escape.webp",
+      "bytes": 26556,
+      "sha256": "cdbd77493a82588efac736f9adeee028dd4964146ec52650f7a1b4eed2f89459"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/flag-battle.webp",
+      "bytes": 8924,
+      "sha256": "fe24bb95852ca489a077f346f9df41b922da54e50a13cac4f4bf590b2e29d1ea"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/ghost-escape.webp",
+      "bytes": 9200,
+      "sha256": "85f4d413a22f8c5bf04b71b62ebe74d88782359feb11ed71ef1d7cca6f83fd48"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/glass-rush.webp",
+      "bytes": 13486,
+      "sha256": "79d95a2b1b797c9c4183da4157115049fd98e98bec286dbca2e9334fae002358"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/glass-tower.webp",
+      "bytes": 11960,
+      "sha256": "b9374577c7709b1c0db093ad77999093c0516f2652761c9559e79b164c735c9d"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/grid-merge.webp",
+      "bytes": 5688,
+      "sha256": "3e6dd6027c51f9312ccd97dfdf4b4938fe81adf2d0b4d4075b7f7aa1fe70dcfd"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/jelly-3d.webp",
+      "bytes": 3256,
+      "sha256": "a6f39cdd844ceb02664c1a611428db236bb9039ed2609be5f5ef58fa4a8f6b16"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/magnet.webp",
+      "bytes": 9118,
+      "sha256": "bd772a1ba022f38f28e75dbc354643192f33c20269fa7a7151fe9ba798a9c5b7"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/marble-run-3d.webp",
+      "bytes": 5082,
+      "sha256": "8c038534bd76ec29c6ced43a1937aa3dfd0e3dddb104859c099794441732de49"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/merge-evolution.webp",
+      "bytes": 9688,
+      "sha256": "a48f400f0b09468c57194c6e86fc8b80b3200b8eb2adb397a9525d0b32c40775"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/rhythmic.webp",
+      "bytes": 8912,
+      "sha256": "3f2fd38eebb14ba2ca139bcaf62c4d33a52e718a511b8274472b920c720a9a48"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/spawner.webp",
+      "bytes": 13968,
+      "sha256": "d85996ad1b459a2bf2cfd491c44b335ecdb9ddf009e847f81989c6594cf0e785"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/wave-3d.webp",
+      "bytes": 19138,
+      "sha256": "d4ba4a5bc2fe963a4b15af19046b26a448a2d5cb483d77737860d3fefe3e184b"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/mode-thumbs/weapon-battle.webp",
+      "bytes": 7034,
+      "sha256": "3f64b039b7e3d1bace0b7b1962c8aa8989dba70948fea2f75294230c12ce08ba"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cardboard-0-0.wav",
+      "bytes": 9058,
+      "sha256": "44df2615bdc96e9f31fd1087ce986f1187fd5306ac5b59936bf8a1f6f783a061"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cardboard-0-1.wav",
+      "bytes": 9558,
+      "sha256": "cb363a3aaeab21e1405c902c2bc9ca111297fe069df5dda863659f5b5591114c"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cardboard-0-2.wav",
+      "bytes": 8710,
+      "sha256": "46bc0c7ebd0c69a647ea16ff31f2b2acdf79f3788a8c82678222ff86ca32a4bd"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cardboard-1-0.wav",
+      "bytes": 11986,
+      "sha256": "e48f74c75a331c4f287faa02fe9091690d233b129a6494e7a336bf820ee537d9"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cardboard-1-1.wav",
+      "bytes": 10730,
+      "sha256": "d642d179df11171f0efa615ccf8c26eeb598bbb9b367a9674aec9b4332c9c177"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cardboard-1-2.wav",
+      "bytes": 10686,
+      "sha256": "368a3a49cc1840b0a821f8ca64e171b347de238ed42324f99748e562e3db55ce"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/chirp-1-0-0.wav",
+      "bytes": 49438,
+      "sha256": "2c68b0dcf83be0a2517af768d20c95f26f842c2e2d50d5ae282620e069dc2ee8"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/chirp-2-0-0.wav",
+      "bytes": 49438,
+      "sha256": "ececfbd9a3c2800ea4b2190c7f50e2226b62d78466c17e346fde9ec96ddf8ace"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/chirp-3-0-0.wav",
+      "bytes": 49438,
+      "sha256": "5c7d075910fe44f648f2787a6c6c8a4b177ad6327319c854c0c8b6c74af7f981"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/chirp-4-0-0.wav",
+      "bytes": 49438,
+      "sha256": "70d1a94cad4fdf9d20dcf6ac0fc65cb5985b09333405d4adee188329f6f816a2"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/chirp-5-0-0.wav",
+      "bytes": 49438,
+      "sha256": "97bb9c41700d177dcebfc9ff3a1d9e386caae1d77eeaf9a711f82e9499d08ded"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/chirp-6-0-0.wav",
+      "bytes": 49438,
+      "sha256": "aeaa30f02979fff5f06f3eea4b1f2ad902838b1dffc17363320b4e10f4b3b07a"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/chirp-7-0-0.wav",
+      "bytes": 49438,
+      "sha256": "7f080267668bb119c5023215afd63eb8edfcd96ecbf2e2d5ddbcf67562a397bf"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/chirp-final-0-0.wav",
+      "bytes": 95300,
+      "sha256": "1c9573cfbba390163675148981d58fa9576458c795b1bdce5080f8196cbdb904"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/chirp-last-0-0.wav",
+      "bytes": 167624,
+      "sha256": "7af71d9ef883c74c078d78ff727d355588439544784886b7ee2132fddeb3ddc5"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/chirp-refill-0-0.wav",
+      "bytes": 67076,
+      "sha256": "6095400903dea3cc7305278c2590782cb1eb11379839b7d0d4f5ec27f5d7cc4b"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/clank-0-0.wav",
+      "bytes": 25024,
+      "sha256": "9cda25af6695f1a78d2d2f92f36f9f0f1fe98ccc229b0d5247945136c86ce800"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/clank-0-1.wav",
+      "bytes": 24382,
+      "sha256": "5f4a90b138abe06ac41aa9ecf761f41e188f2da8fde9e47025460592ca77595a"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/clank-0-2.wav",
+      "bytes": 26034,
+      "sha256": "335f4d110ef232d68945555b907c88ea934164767cca0677c471c3465241d034"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/clank-1-0.wav",
+      "bytes": 70604,
+      "sha256": "b11af8bdd550d3c10170b0cbbc6953c6aff3dfb0f12432c9e37ed3c80d75d671"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/clank-1-1.wav",
+      "bytes": 70588,
+      "sha256": "55fa18644d6362df7663df2483ec30d0735bcf548d6f25ca9e63c8eb4dc08b5b"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/clank-1-2.wav",
+      "bytes": 70578,
+      "sha256": "8d40d0d5a52546c388b598493819d777f4a4ba77d1f2035f4c8a7c8f8f8130d9"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/clank-2-0.wav",
+      "bytes": 114694,
+      "sha256": "1a417d92e9b287fdd28d2ac6a50c470999910c79b0a5f14cf0d7289ee256c69a"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/clank-2-1.wav",
+      "bytes": 114704,
+      "sha256": "e320a304d9f595cb00fadd879a1560446569aae2fc8e4a34d86869903c6dc174"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/clank-2-2.wav",
+      "bytes": 114704,
+      "sha256": "1c1d1b02640b0bbcd26d523bd4c9debe83dd0e31fb531429a672d054b0e8018d"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-burst-creamy-0-0.wav",
+      "bytes": 77794,
+      "sha256": "ccbfc6a42a97d4759630f4eb98e3bcc96d0e02778b313c571aa47e57a45fa907"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-burst-creamy-0-1.wav",
+      "bytes": 80970,
+      "sha256": "b5e1dc7937d9a456d9c8b9fb9ff6e2a856a3f94cc0b6e8daf278dfefd4c0263c"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-land-creamy-0-0.wav",
+      "bytes": 20182,
+      "sha256": "e052d1f5b68cf5d571ad1b7d54ea39d00e0bd30e0d55a263c135484588407696"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-land-creamy-0-1.wav",
+      "bytes": 18270,
+      "sha256": "5947ed4172f2124fc435489bf4928cb5158024c1177d01ebc758c8c4d649c430"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-land-creamy-0-2.wav",
+      "bytes": 17894,
+      "sha256": "0a97caed8f975df087dc9bc9b0e859f113cae05a5823387ed9610f71bfc94c59"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-land-creamy-1-0.wav",
+      "bytes": 16882,
+      "sha256": "f3a6fce1c8c0231ffd06ba91ed9eaef9f65308ee2e1f334e302d9667c1e1cc32"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-land-creamy-1-1.wav",
+      "bytes": 18094,
+      "sha256": "bea2233f787ca58d82535bdc50ca6a7f3d395ea082c5b9f1155bb089baff62f3"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-land-creamy-1-2.wav",
+      "bytes": 19414,
+      "sha256": "80500ed0cfead530bb85e7c051b8736d874be9972991fd699e8ff4f8b4e518f5"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-slice-creamy-0-0.wav",
+      "bytes": 22034,
+      "sha256": "a590d096329e39e3015317a2eeff16640a48d5901b358e46321c15e80c108ed7"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-slice-creamy-0-1.wav",
+      "bytes": 24348,
+      "sha256": "df8a1d7e1bdb0870a4d8b5a66680fddd9ffedad220f019f1f8457c9bb81f62c1"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-slice-creamy-0-2.wav",
+      "bytes": 24546,
+      "sha256": "a85c8d4f8258e6c7b164868bb6cb304c986af92b0432d2673cf80618cd5dd1cc"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-slice-creamy-0-3.wav",
+      "bytes": 24962,
+      "sha256": "f4d1098af17202242b7cf65e23f78d3220b2b22fc3ba573874135245ab5174c2"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-swish-0-0.wav",
+      "bytes": 21230,
+      "sha256": "7506513749726f1b14d52cd78702152f7227290983d9c555b225b5237a69cb77"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-swish-0-1.wav",
+      "bytes": 21280,
+      "sha256": "1cc524dc4571e9b11633d67c61467ecaabcb87f0e373075b755dbb241737f4f3"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-swish-0-2.wav",
+      "bytes": 20678,
+      "sha256": "6a2cb0189769457c59f480cfbd6585c45c6d102b1b1f34f1def0cbbf550bb493"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-swish-1-0.wav",
+      "bytes": 36458,
+      "sha256": "0847c522ac7449519a717898b635438d45fe4538182cf859fe6a446d61279881"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-swish-1-1.wav",
+      "bytes": 36540,
+      "sha256": "145ca2bc9d85fc38a9f79f5e5527fafca31d62f0d3a25bd5f084430ac370d031"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/cut-swish-1-2.wav",
+      "bytes": 36482,
+      "sha256": "156a3d2e0935f5e4224e1e309d9b38acad85d2fbf84d730cc8a72ef890b51daa"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/domino-0-0.wav",
+      "bytes": 10836,
+      "sha256": "ace14faa115bd223df74afcb125491e898693280da03ed2866d11d5eb8b03331"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/domino-0-1.wav",
+      "bytes": 11352,
+      "sha256": "8f9127c1931595824b6c61d67e5bfff85ce81ba1b4e412991af098d440cd1089"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/domino-0-2.wav",
+      "bytes": 10750,
+      "sha256": "38ebb95fab066d0ee15fef4063e96074d9a83b669f9978d80da8ae99888f6e96"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/domino-0-3.wav",
+      "bytes": 11144,
+      "sha256": "901da4aee22ceaf11f5a990d783b01ecf541d5d9fddef7f65d23e3f3e4997abd"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/domino-0-4.wav",
+      "bytes": 10970,
+      "sha256": "e07a707bd423da7fb6646dfc1622bddcb6d5f0f5af4281014ad4fb1e68f0e49a"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/domino-slam-0-0.wav",
+      "bytes": 66512,
+      "sha256": "021e8128f0643301418ac4ad1618f1d3e7094df9c43c99032fcbb6d7584ab28a"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/domino-slam-0-1.wav",
+      "bytes": 64486,
+      "sha256": "4a00418c28f549705c89a0b4f17830dcff854a410721faf04b633a8e14606bd1"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/domino-slam-0-2.wav",
+      "bytes": 66122,
+      "sha256": "2995cbcab58371bb43cb137b648dad6348557c6c8d53ea7f70ee76cc5c48f1d3"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/footsteps-0-0.wav",
+      "bytes": 17676,
+      "sha256": "d93bc3e7d48343e53e31c469b6d545205fb7894edef1727c25b8e78af59a8c42"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/footsteps-0-1.wav",
+      "bytes": 18062,
+      "sha256": "1031d0bb4190095dfeee85983e511803cfeb9a92f6cc789ff54b2babcf6d2294"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/footsteps-0-2.wav",
+      "bytes": 18696,
+      "sha256": "2af6034b2c3a9342baa1700cf6122898892ed2fc9a69c2014c6d8776ef83f0f9"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/footsteps-0-3.wav",
+      "bytes": 17422,
+      "sha256": "5685fbd1bc0cd6ce8d98e8a4af888dd9acb32d9013a48e53cee911e52afdc1d3"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/glass-break-0-0.wav",
+      "bytes": 51214,
+      "sha256": "81072b8f9b52c6dea641260f5da94c04c96c0183b1402d53f1ba9e9acef3a21c"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/glass-break-0-1.wav",
+      "bytes": 53992,
+      "sha256": "2934fdb6dc0e4926a7be3a75a980ef8df0170b53a81b6262c1df2f05bb42eff3"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/glass-break-1-0.wav",
+      "bytes": 56110,
+      "sha256": "71265823b349995143a660be090a581587fc9b86938ffbb55ac1a71265b3d353"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/glass-break-1-1.wav",
+      "bytes": 55574,
+      "sha256": "15afaf3fafb0d2fc0ab33215172f35623daf617912096116f4a2b94af986e1cb"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/gloop-0-0.wav",
+      "bytes": 39794,
+      "sha256": "4507de1f950e79c0c9c39e14921c9e73f7f4553d9de2123a02df17a06a0a6046"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/gloop-0-1.wav",
+      "bytes": 41290,
+      "sha256": "9100a1ad8bed3a95a47e80c210c8ad7ec3bfaa340d27c63979a9e36706b91a28"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/gloop-0-2.wav",
+      "bytes": 40092,
+      "sha256": "f75b607ce7318d98fde48eca992d4dd319238fb01ec51e9a73a76a56ba193d47"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-0-0.wav",
+      "bytes": 9064,
+      "sha256": "a69b1e76cd83905665817d946f5dd322df1e6c7d9bed4adc7a15c0083c35d44b"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-0-1.wav",
+      "bytes": 8770,
+      "sha256": "5345c140f55bb87300f222b7d3db7654c28c7102dad0abd3c4551010bc1b5ad6"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-0-2.wav",
+      "bytes": 9554,
+      "sha256": "d0fa33b91dc7870e12dea3da697129cdfcc9340b6003268ba40c5b0b1347d4ae"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-1-0.wav",
+      "bytes": 14192,
+      "sha256": "a93897504cd805c04130c5784a7baf989e108cc5de22d050f6776ced69fd0663"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-1-1.wav",
+      "bytes": 14408,
+      "sha256": "0eb92c2dfd48adf4e4d8e4f4b26b36339b240d578f65d2d53e8a63c5d0e864e9"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-1-2.wav",
+      "bytes": 15538,
+      "sha256": "6ce0b051701c4920c8a865531790de4cf16c98c164b5f3901db5067c969122d5"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-2-0.wav",
+      "bytes": 21852,
+      "sha256": "b707353b7c7e42d1b56d4f4ff61227d57a9ff747a5183206d50a4fd7e012d144"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-2-1.wav",
+      "bytes": 21940,
+      "sha256": "b28d45963ef319453dc2b39553d29d1fe1115d7cd237cc416800fff69484e5d7"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-2-2.wav",
+      "bytes": 21174,
+      "sha256": "b3381f795e8877d99fcff268591eaee7c93abb3dd47c73ff15f9f4ffb8e1f4f3"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-3-0.wav",
+      "bytes": 29662,
+      "sha256": "2dcf601530227043af2032b6a942753de0de254d849d834a95326e67314c9819"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-3-1.wav",
+      "bytes": 29430,
+      "sha256": "90bbff37d585356600c997a8cc1defb5e9029af5a5249c24df3f4e47795eb75b"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-3-2.wav",
+      "bytes": 30384,
+      "sha256": "b34d7a4ac4df941e6b044f4cdf892c85c0bfa3a745b5626fb2e555ffee9177eb"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-4-0.wav",
+      "bytes": 37436,
+      "sha256": "8272f4b93626526af423516a4f3e8e21ff9ca88d5b27b33c29eb90ab9f478476"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-4-1.wav",
+      "bytes": 35622,
+      "sha256": "02915eeb3d18139f6090cf2549c0cdf4b27b3e560c5661748aae0e6936e9f4f5"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-4-2.wav",
+      "bytes": 37786,
+      "sha256": "7d4af4dd220002f83f4f4f3f4b36bb57c3cdf9097cc6ceabd21616eb269172d7"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-5-0.wav",
+      "bytes": 45062,
+      "sha256": "3956015ff39d5ae6580fd69e327ca1540a89ea7713cf138976971606593f8a76"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-5-1.wav",
+      "bytes": 45334,
+      "sha256": "0630edaa953ca4c66c12975e1c405911825ee9932c22c939f3518ffd50bb2a9c"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/jelly-5-2.wav",
+      "bytes": 45032,
+      "sha256": "a10b942bf58edcdc48619705665b3905c54e40bc6566b13180b8cba29958bb50"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/magnet-snap-0-0.wav",
+      "bytes": 10392,
+      "sha256": "17e26766fe7104d0a41263c8cab0ab7ad17ca0d360cf78b71cbf84abd861a9f6"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/magnet-snap-0-1.wav",
+      "bytes": 12188,
+      "sha256": "d942c6dac20fb35643b89e04032a0fb0c9a694f1dbf66159d3be4ca8dfd3cf0a"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/magnet-snap-0-2.wav",
+      "bytes": 12780,
+      "sha256": "724e1a7108da9dd61a3961764230d8732e8324c9f6bdabd00a7e6706b70b0139"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/magnet-snap-1-0.wav",
+      "bytes": 11282,
+      "sha256": "dae660886892aca122f4c8112eb70cdae85b628f5327167f914d5c6067e31974"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/magnet-snap-1-1.wav",
+      "bytes": 11896,
+      "sha256": "02fc744f02c215fa04eb59959b1cdf0bea0b5e0be612af5128f6888c1a4803e9"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/magnet-snap-1-2.wav",
+      "bytes": 10622,
+      "sha256": "940326420d136aa17ac4b0e4e63d7a8b70e9ab54df947517354c3efab0fcb8a0"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/marble-0-0.wav",
+      "bytes": 10880,
+      "sha256": "b59d30796775df1030dd95623ea781fff1c1d2e063b50f6c8264bc6722b73545"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/marble-0-1.wav",
+      "bytes": 10686,
+      "sha256": "27a887d92fc73f921c8d150fa28e718ee4f18cc6890a1fcf7aa50ed34db2fabe"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/marble-0-2.wav",
+      "bytes": 10864,
+      "sha256": "29d644190990269bf6e77a5ea44311551cd9fb169fff05dd6ef07b0bc0521c60"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/marble-0-3.wav",
+      "bytes": 10372,
+      "sha256": "86c75756a0ab0aa58aea8bf66f6cd7531e8dc091fa0ce1f035a4e14be3a8e214"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/marble-1-0.wav",
+      "bytes": 13174,
+      "sha256": "95945560fdbc5998d481516e158cc1c0b5933213e9b48dd0c457b1298eebf9d6"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/marble-1-1.wav",
+      "bytes": 10638,
+      "sha256": "c54a28c71e3be138e6e566fb368e09696dcc2ebb4539ff15ff6f47b56e64cabe"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/marble-1-2.wav",
+      "bytes": 11176,
+      "sha256": "8f9b1b17efd914c86406a062b80df07a320f3d25b2f6b723595ccce1355b771b"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/marble-1-3.wav",
+      "bytes": 11072,
+      "sha256": "26ee0fdf5186727946db487c131af7d2fc962b9c0af9f4182ee2315e909c88fe"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/marble-rush-0-0.wav",
+      "bytes": 40754,
+      "sha256": "32876a9b3151530e91142e86eb0a35c2ce4b726a18a8ad873600ffd433537e0b"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/marble-rush-0-1.wav",
+      "bytes": 40716,
+      "sha256": "927549d3cca8992e37996002b481708dd2945fa75714a61009e656f7366a5bd1"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/marble-rush-0-2.wav",
+      "bytes": 41030,
+      "sha256": "4db820b833ae061da919790b4bbb1b38aeb4b9faccf0a2458853a2974190fe97"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/rubble-0-0.wav",
+      "bytes": 19210,
+      "sha256": "d7458012f19afadd79dc94324df97f1e90ebd2db4d8a78ce4458050e90e3e599"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/rubble-0-1.wav",
+      "bytes": 19768,
+      "sha256": "d6bf5ed0fadc8a2099600b75479f4cf8135ccba0ab720a0b82732f41a6ec9f77"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/rubble-0-2.wav",
+      "bytes": 14764,
+      "sha256": "b996880ec96c1ff25696e565f9ad721f9bcc1e1c6f6fe86753fc443e03c13163"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/rubble-1-0.wav",
+      "bytes": 38414,
+      "sha256": "b70cca54226663c51a03d91a7860d5043638af36a897cd2ff77923e72e9e1a19"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/rubble-1-1.wav",
+      "bytes": 38724,
+      "sha256": "1eda6be503002b86b4120a8162858eccf331daea0b4282476d6b42fb8ad1a368"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/rubble-1-2.wav",
+      "bytes": 39050,
+      "sha256": "225c9d0bb563d8fc2a4859bc5bf99b17b1ed319b5b5a2f886a324f0b563cd024"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/rubble-2-0.wav",
+      "bytes": 57784,
+      "sha256": "a5a6888a1b1d5cfc2015616868a3452a7a0a254905478065e24c9cf6a8ad12d6"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/rubble-2-1.wav",
+      "bytes": 62808,
+      "sha256": "9b80113ced12e6f7a13ee04d1b62816726ebb3ddcc97bd94b83b64509eb559c0"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/rubble-2-2.wav",
+      "bytes": 54726,
+      "sha256": "7e9704b2e9678ca8de8752d625bc187f474e8ac922327b93b36334004fed2fc5"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/splash-0-0.wav",
+      "bytes": 43840,
+      "sha256": "aa415489c1d227fcfd6f1ce0269be107d94f894869ffed02fd31ca9001edeffe"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/splash-0-1.wav",
+      "bytes": 44554,
+      "sha256": "f130fe172118a1c663368a4769db89a68f816e38a2622add0155ee5190ce46b6"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/splash-1-0.wav",
+      "bytes": 68844,
+      "sha256": "0169bf1523bc677c7cc7caebb850baf4f96cdfbde7fe704b71161dbb6e1f4b8a"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/splash-1-1.wav",
+      "bytes": 65684,
+      "sha256": "de741bb9d3be17515a6a376bcece51fdba6e13572c6391cf98dac37043c40bb9"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/squelch-0-0.wav",
+      "bytes": 13274,
+      "sha256": "3c338a07e8068c91b6f20a86505d5bd41b79368711fabf972ec1eafbd0007e1c"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/squelch-0-1.wav",
+      "bytes": 12928,
+      "sha256": "962e3a11938b0db7d2d43a1c72f278ad94fbbfc5ceae31bbef93f1cc81cbfa64"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/squelch-0-2.wav",
+      "bytes": 12370,
+      "sha256": "e6f6ee41f283ec4fa3f7df8e0125c0e5ab0a198f3dbf7c889db41de45267716f"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/squelch-1-0.wav",
+      "bytes": 20956,
+      "sha256": "9e419dcd8613f04bc80cf98e5984cb4bc970832886cf4f0d67d4b0e0f22095d2"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/squelch-1-1.wav",
+      "bytes": 21838,
+      "sha256": "af85db36bc9d216dd6e39954a91eb16afd5334bceba65eadc8942592e42623ff"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/squelch-1-2.wav",
+      "bytes": 19822,
+      "sha256": "93457ee08c52157749f576cb6ef6fcb022666c1ec3e824a69209aafedcfa8d09"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/squelch-2-0.wav",
+      "bytes": 30878,
+      "sha256": "de2a323c8bd22972f8824333c502c4ef68e89d629558f67728eba6254867efb8"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/squelch-2-1.wav",
+      "bytes": 29884,
+      "sha256": "394fc639f9fa278539ff228f27e416da04c495ea8e43486ff1d461660bd4b017"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/squelch-2-2.wav",
+      "bytes": 29496,
+      "sha256": "3eb4744a1cc43f5eebb03a8862e64de3100631440ebd526ca584e74d8d77665b"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/squelch-3-0.wav",
+      "bytes": 41002,
+      "sha256": "65e2f2376a4dc9618139f1bb6135868d981a17a5aa88b0ebad2b8c34f462e450"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/squelch-3-1.wav",
+      "bytes": 40638,
+      "sha256": "05d82089b7ff05d09c1ce207b6ea790afdda88322f1319f741765e35f1f7fc75"
+    },
+    {
+      "path": "captures/studio-browser/ballengine.app/sfx/squelch-3-2.wav",
+      "bytes": 40946,
+      "sha256": "65f22bc125247ddeb838585107c945297312099c45baf6f37988ef46e1c9bfa1"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-ball-crush.39d4f25a7d.jpg",
+      "bytes": 47325,
+      "sha256": "39d4f25a7d810224738d6329220fbdf8380a75d4c5586b41a9559ca3f94059ae"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-cut-count.b4a05c225d.webm",
+      "bytes": 1272856,
+      "sha256": "b4a05c225da62c28ad1b518e718eae836d8e693cc18d38d80c2b194898b31de1"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-cut-count.c368278c68.jpg",
+      "bytes": 50670,
+      "sha256": "c368278c6850222078cce8d764944ae59ef8c082351b2174e0db37dde63bee48"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-flag-battle.437cd00bf8.jpg",
+      "bytes": 37053,
+      "sha256": "437cd00bf854a5aae35f0f4c83443770819b452130d0a65587b1a51537b23b96"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-glass-rush.5863e4e1c1.jpg",
+      "bytes": 61637,
+      "sha256": "5863e4e1c1034b13d2e536808a6a644a714aa4258106b963802a649c9e73d1c5"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-glass-tower.5e02c5c58e.jpg",
+      "bytes": 55647,
+      "sha256": "5e02c5c58e4ef2fcc0c3fbbab3f30b1986ede3c4ee02e37841b312a434120efe"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-grid-merge.69800babd1.webm",
+      "bytes": 97173,
+      "sha256": "69800babd188049a299e53b0067580fe87379a796a3ffdf4380cd6961bd76ef9"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-grid-merge.d80fb5cb7f.jpg",
+      "bytes": 30060,
+      "sha256": "d80fb5cb7fa659afac67346a9dfe5c6d7e88916da470dfb6ef89f7fa735db53d"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-jelly-3d.77bd9dbff5.jpg",
+      "bytes": 25771,
+      "sha256": "77bd9dbff5ddb876fda40d03a0668073c7b6d140dad2ed9b9cd93e5764da784a"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-jelly-3d.d8acfb3474.webm",
+      "bytes": 240339,
+      "sha256": "d8acfb34740834b5281e215212a74df24c235350334847921afa0c0b9a16eea6"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-magnet.1e754324d0.jpg",
+      "bytes": 50072,
+      "sha256": "1e754324d007349749d89cd26cdfb9e7c0aee65a0d9db36f57ab84f5e55f7760"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-merge-evolution.958b217c64.jpg",
+      "bytes": 41840,
+      "sha256": "958b217c647c5f89f28b96149ef90d52bcb7f2913ac9ccc942e80553f004222a"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-spawner-circle.38c954da14.jpg",
+      "bytes": 31517,
+      "sha256": "38c954da149093258324d1e4864fdc501cb7386c489ae997c12a36b14617d5d3"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-weapon-battle.0b862f72f0.jpg",
+      "bytes": 31560,
+      "sha256": "0b862f72f0a778fa31d911c6a796d8470cd446e7067997e70546da04f5229e87"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/mode-weapon-battle.caf46a5dee.webm",
+      "bytes": 856461,
+      "sha256": "caf46a5deec6620fd2b7af39128a4b691985f746a5a42fb3bcee80bc956443f9"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/reel-02.f61d8e9e98.jpg",
+      "bytes": 87802,
+      "sha256": "f61d8e9e986b3072a58d83cf3e05e13d6e9a5809a3d81977a9e67a92b0b34aad"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/reel-04.98dad7e005.jpg",
+      "bytes": 60652,
+      "sha256": "98dad7e005a1a23698c1234156a8833fa06e01959262e995ddca0b112e6f346e"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/reel-06.50e55b472f.jpg",
+      "bytes": 29443,
+      "sha256": "50e55b472f3bb1282e21a6ea888cf6d544e7d4aedc53394de348a49f3373e571"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/reel-07.c05b5503fb.jpg",
+      "bytes": 45274,
+      "sha256": "c05b5503fb3b3fc831801ca796a45ac165a97f9b1598f1f3a2c191e6f41e49fa"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/reel-10.101ec05fd9.webm",
+      "bytes": 1013834,
+      "sha256": "101ec05fd906a078dba8da3bfde1b7d29cd1d83b209b7b8bfcfc7fd259a311f0"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/reel-10.82622f4f19.jpg",
+      "bytes": 55225,
+      "sha256": "82622f4f191596f6544041561c3f3d817bf1931df9f814dc66523845e620b708"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/reel-13.236ef9018f.jpg",
+      "bytes": 47472,
+      "sha256": "236ef9018f32f48dd3482bfa1c1388fc1b4ae1474ffe679ae83e3c22cb62b8eb"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/reel-13.56da9c611a.webm",
+      "bytes": 508823,
+      "sha256": "56da9c611af92f5d164732a7294d58f7e3bbcf3560a8cf05d65a6ea4004d2bcf"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/reel-15.4d44495edb.webm",
+      "bytes": 1215630,
+      "sha256": "4d44495edbbac0c34e5c701e447458dfcbd9772c5b9da30ec9ee9a37df2aa915"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/how-to-clips/reel-15.5d06c34772.jpg",
+      "bytes": 35783,
+      "sha256": "5d06c34772b9cf1087772189e73a7f2524089d746aaf57fc0d51612264c2ec83"
+    },
+    {
+      "path": "captures/studio-browser/cdn.ballengine.app/models/instruments/mallet_37d60d3c-4dde-4cdf-9847-81186b6afd8a_1786705098540.glb",
+      "bytes": 22608,
+      "sha256": "6e61d289cc633bfc4af9596cfb40b48a2e4494c83fb154b6f85029bf5d3feb90"
+    }
+  ]
+}
