@@ -1,0 +1,20 @@
+name: Diagnose captured BallEngine Saves API
+on:
+  push:
+    branches: [fix/production-home-route]
+    paths:
+      - scripts/audit-save-api.cjs
+      - .github/workflows/save-library-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Build captured original frontend
+        run: node scripts/build-original-studio.cjs
+      - name: Inspect saves API frontend contracts
+        run: node scripts/audit-save-api.cjs
