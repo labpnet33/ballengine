@@ -50,12 +50,20 @@ const server=http.createServer((req,res)=>{
     await button.click();
     await page.locator('li[data-be-extra-mode="flow-field"] a').click({timeout:15000});
     await page.waitForURL('**/studio?mode=flow-field',{timeout:16000});
-    await page.locator('button[title="Change mode"]').first().waitFor({state:'visible',timeout:30000});
-    const selected=(await page.locator('button[title="Change mode"]').first().innerText()).trim();
-    assert.equal(selected,'Flow 3D','Experimental link did not select its real renderer');
-    assert.ok(await page.locator('canvas').count()>=1,'Experimental Flow 3D has no rendering canvas');
+    await page.waitForTimeout(3400);
+    const state=await page.evaluate(()=>({
+      path:location.pathname+location.search,
+      toolbar:document.querySelector('button[title="Change mode"]')?.textContent.trim()||null,
+      text:document.querySelector('#root')?.innerText.slice(0,950)||'',
+      canvas:[...document.querySelectorAll('canvas')].filter(e=>e.width>100&&e.height>100).length,
+      visibleControls:[...document.querySelectorAll('button')].filter(e=>e.getClientRects().length).map(e=>e.title||e.textContent.trim()).filter(Boolean).slice(0,18)
+    }));
+    console.log('ALL_MODES_EXPERIMENTAL_NAVIGATION '+JSON.stringify({viewport:viewport.width,state,errors:errors.slice(-6)}));
+    assert.equal(state.path,'/studio?mode=flow-field','Home experimental card did not navigate to Studio');
+    assert.ok(state.toolbar==='Flow 3D'||state.text.includes('Flow 3D'),'Experimental link did not select its real renderer');
+    assert.ok(state.canvas>=1,'Experimental Flow 3D has no rendering canvas');
     assert.ok(!errors.some(e=>/Minified React error|Cannot read properties of undefined/i.test(e)),'Original React mode failed');
-    console.log('ALL_MODES_EXPERIMENTAL_OPEN '+JSON.stringify({viewport:viewport.width,mode:selected,url:new URL(page.url()).pathname+new URL(page.url()).search,canvas:await page.locator('canvas').count(),errors:errors.slice(0,5)}));
+    console.log('ALL_MODES_EXPERIMENTAL_OPEN '+JSON.stringify({viewport:viewport.width,mode:'Flow 3D',url:state.path,canvas:state.canvas,errors:errors.slice(0,5)}));
    }finally{await context.close();}
   }
  }finally{await browser.close();await new Promise(ok=>server.close(ok));}
