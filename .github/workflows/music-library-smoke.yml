@@ -35,3 +35,19 @@ jobs:
           node --check scripts/test-music-api.cjs
       - name: Test MP3 upload, MIDI, cloud Song Library and playback
         run: node scripts/test-music-api.cjs
+      - name: Install browser test driver
+        run: npm install --prefix "$RUNNER_TEMP/studio-qa" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original Studio UI
+        run: node scripts/build-original-studio.cjs
+      - name: Test real MP3 and MIDI upload from existing Studio button
+        timeout-minutes: 5
+        run: |
+          CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/studio-qa/node_modules" node scripts/test-music-ui.cjs
+      - name: Upload screenshots and failure report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: original-studio-song-bank-ui
+          path: test-results/music/
+          if-no-files-found: ignore
+          retention-days: 7
