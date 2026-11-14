@@ -26,6 +26,13 @@ for (const rel of expectedPublicFiles) {
   assert.ok(fs.existsSync(file)&&fs.statSync(file).size>0,
     'Missing merged page or static resource: '+rel);
 }
+// Deep-link /home must reuse the original React homepage shell, not a new UI.
+const rootHome=fs.readFileSync(path.join(root,'index.html'),'utf8');
+for(const route of ['home.html','home/index.html']){
+  const html=fs.readFileSync(path.join(root,route),'utf8');
+  assert.ok(html.includes('<base href="/">'),'Missing root asset base on '+route);
+  assert.equal(html.replace('<base href="/">',''),rootHome,'/home must match the existing homepage');
+}
 const originalStudio=fs.readFileSync(path.join(root,'studio','index.html'),'utf8');
 assert.ok(originalStudio.includes('index-3pf76ICO.js')&&originalStudio.includes('id="root"'),
   'Original captured React Studio replaced or damaged');
