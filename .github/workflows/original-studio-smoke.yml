@@ -1,0 +1,35 @@
+name: Smoke-test original BallEngine Studio preview
+on:
+  push:
+    branches: [preview/original-studio-assets]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  studio-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Check Node and browser
+        run: |
+          node --version
+          which google-chrome
+          google-chrome --version
+      - name: Install browser controller
+        run: npm install --prefix "$RUNNER_TEMP/studio-qa" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original Studio assets
+        run: node scripts/build-original-studio.cjs
+      - name: Run browser smoke test
+        run: |
+          CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/studio-qa/node_modules" node scripts/test-original-studio.cjs
+      - name: Save screenshot and report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: studio-original-smoke
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
