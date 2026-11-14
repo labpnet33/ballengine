@@ -252,17 +252,17 @@
     host.appendChild(root);
     refresh();
   }
-  const observe=new MutationObserver(()=>{
-    if(document.visibilityState==='hidden')return;
-    if(!window.__bePublishMountScheduled){
-      window.__bePublishMountScheduled=true;
-      requestAnimationFrame(()=>{window.__bePublishMountScheduled=false;mount();});
-    }
-  });
+  // The original simulation modifies the React tree many times per second;
+  // a subtree MutationObserver would waste CPU during exports. Poll lightly
+  // only when this page is visible and install promptly after tab clicks.
   function start(){
-    if(!document.body)return;
-    observe.observe(document.getElementById('root')||document.body,{childList:true,subtree:true});
     mount();
+    document.addEventListener('click',()=>setTimeout(mount,150),{capture:true});
+    setInterval(()=>{
+      if(document.visibilityState==='visible'&&
+        (location.pathname.startsWith('/studio')||location.pathname==='/automation'))
+        mount();
+    },1500);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();
