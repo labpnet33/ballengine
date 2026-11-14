@@ -83,7 +83,7 @@ const report={stage:'init',studioPlanner:false,automationPlanner:false,mp4Upload
    const second=page.locator('[data-be-guest-publisher]').first();
    await second.waitFor({state:'visible',timeout:20000});
    await second.getByText(job.title,{exact:true}).waitFor({timeout:20000});
-   await page.getByText('Guest draft scheduling is available in the publishing planner.',{exact:false}).waitFor({state:'visible',timeout:12000});
+   await page.getByText('Guest draft scheduling is available in Overview and Publish.',{exact:false}).waitFor({state:'visible',timeout:12000});
    const dashboard=await page.evaluate(()=>{
      const original='Automation is not active on this account, so connecting accounts, scheduling and Autopilot are all switched off. Every plan covers every platform.';
      const main=document.querySelector('#root main');
@@ -125,12 +125,28 @@ const report={stage:'init',studioPlanner:false,automationPlanner:false,mp4Upload
      const response=await page.goto(base+'/automation/'+tab,{waitUntil:'domcontentloaded',timeout:45000});
      assert.equal(response.status(),200,'Existing Automation '+tab+' route missing');
      await page.locator('h1').filter({hasText:'Automation'}).first().waitFor({state:'visible',timeout:30000});
-     await page.locator('[data-be-guest-publisher]').first().waitFor({state:'visible',timeout:30000});
-     await page.getByText('Guest draft scheduling is available in the publishing planner.',{exact:false})
+     await page.getByText('Guest draft scheduling is available in Overview and Publish.',{exact:false})
        .waitFor({state:'visible',timeout:12000});
+     const manualPlanner=page.locator('[data-be-guest-publisher]');
+     if(tab==='publish'){
+       await manualPlanner.first().waitFor({state:'visible',timeout:30000});
+       await page.getByText('Choose the video',{exact:true}).first().waitFor({state:'visible',timeout:15000});
+       const placement=await page.evaluate(()=>{
+         const p=document.querySelector('#root main [data-be-guest-publisher]');
+         const n=[...document.querySelectorAll('#root main *')].find(e=>e.children.length===0&&e.textContent?.trim()==='Choose the video');
+         return {originalBeforePlanner:!!n&&!!p&&!!(n.compareDocumentPosition(p)&Node.DOCUMENT_POSITION_FOLLOWING)};
+       });
+       assert.ok(placement.originalBeforePlanner,'Original Publish step must be visible before the guest planner');
+     }else{
+       await page.waitForTimeout(1600);
+       assert.equal(await manualPlanner.count(),0,'Duplicate guest composer hides original '+tab+' content');
+       const original=await page.locator('#root main').innerText();
+       assert.ok(tab==='accounts'?original.includes('Posting as'):original.includes('Automatic posting is not configured.'),
+         'Original '+tab+' content did not render');
+     }
      assert.equal(await page.getByText('Automation is not active on this account, so connecting accounts, scheduling and Autopilot are all switched off. Every plan covers every platform.',{exact:true}).count(),0,
        'Obsolete subscription warning is still shown on '+tab);
-     console.log('GUEST_AUTOMATION_TAB_PASS '+JSON.stringify({tab,url:page.url(),title:await page.title()}));
+     console.log('GUEST_AUTOMATION_TAB_PASS '+JSON.stringify({tab,url:page.url(),title:await page.title(),plannerCount:await manualPlanner.count()}));
    }
    // Return to the shared queue before using its Mark posted action.
    await page.goto(base+'/automation',{waitUntil:'domcontentloaded',timeout:45000});
