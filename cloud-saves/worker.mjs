@@ -97,7 +97,7 @@ export default {
     if(origin&&!ALLOW_ORIGIN(origin))return fail('Origin is not allowed',403);
     if(url.pathname==='/health'&&req.method==='GET')return json({ok:true,service:'ballengine-guest-saves',version:1},200,origin);
     if(isPublicMusic(url.pathname))return publicMusic(req);
-    if(url.pathname.startsWith('/api/assets/'))return env.DB?serveAsset(req,env):fail('Cloud database is not configured',503,origin);
+    if(url.pathname.startsWith('/api/assets/')&&(req.method==='GET'||req.method==='HEAD'))return env.DB?serveAsset(req,env):fail('Cloud database is not configured',503,origin);
     if(!env.DB)return fail('Cloud database is not configured',503,origin);
     const auth=req.headers.get('Authorization')||'';
     const key=auth.startsWith('Bearer ')?auth.slice(7):'';
