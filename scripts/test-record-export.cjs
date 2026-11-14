@@ -57,7 +57,19 @@ async function run(){
     report.recordButton=await button.evaluate(e=>({text:e.innerText,title:e.title,aria:e.getAttribute('aria-label')}));
     report.phase='record-clicked';
     downloadPromise=page.waitForEvent('download',{timeout:150000}).catch(()=>null);
-    await button.click({timeout:12000});
+    // Diagnose captured onboarding modals independently from the video pipeline.
+    report.visibleModals=await page.locator('div.fixed').evaluateAll(els=>els
+      .filter(e=>e.getClientRects().length&&typeof e.className==='string'&&e.className.includes('z-[2100]'))
+      .map(e=>({className:e.className,text:(e.innerText||e.textContent||'').replace(/\s+/g,' ').slice(0,1700),html:e.outerHTML.slice(0,2500)})).slice(0,8));
+    report.clickBlockedByModal=report.visibleModals.length>0;
+    if(report.clickBlockedByModal){
+      console.warn('RECORD_MODAL_DIAGNOSTICS '+JSON.stringify(report.visibleModals).slice(0,7000));
+      // Bypass an unrelated overlay ONLY in this diagnostic test so the local
+      // renderer can be exercised independently. Not a website workaround.
+      await button.evaluate(el=>el.click());
+    } else {
+      await button.click({timeout:12000});
+    }
     report.started=true;
     await page.waitForTimeout(5000);
     report.after5Seconds=(await page.locator('body').innerText()).slice(-3000);
