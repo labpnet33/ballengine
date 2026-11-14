@@ -18,3 +18,9 @@ jobs:
         run: node scripts/build-original-studio.cjs
       - name: Inspect saves API frontend contracts
         run: node scripts/audit-save-api.cjs
+      - name: Archive the original public browser bundle for code inspection
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: studio-bundle-audit
+          path: extra/wget/ballengine.app/assets/index-3pf76ICO.js
+          retention-days: 1
