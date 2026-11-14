@@ -48,6 +48,67 @@ function walk(folder, relative='') {
   }
 }
 walk(staticCapture);
+
+// Consolidate other public captures into the EXISTING site output directory.
+// Original wget pages and the original Studio entrypoint always take priority.
+// Canonical HTML routes are imported only when no equivalent wget page exists.
+// Query snapshots, service workers, challenges and backend responses are excluded.
+const supplementalCaptures = [
+  {name:'full-site Playwright',root:path.join(repo,'captures','full-site','playwright','site')},
+  {name:'first Playwright',root:path.join(repo,'playwright','site')},
+  {name:'studio tutorial CDN assets',root:path.join(repo,'captures','studio-browser','cdn.ballengine.app')}
+];
+const allowedSupplemental = /\.(?:html?|m?js|css|json|webmanifest|txt|xml|svg|png|jpe?g|gif|webp|avif|ico|woff2?|otf|ttf|wav|mp3|ogg|m4a|mp4|webm|wasm|glb)$/i;
+const deniedRoots = /^(?:api|_api|admin|cdn-cgi|_hosts)(?:\/|$)/i;
+const imported = [];
+function mergeMissingCapture({name,root}) {
+  if (!fs.existsSync(root)) {
+    console.warn('Supplemental capture not found (skipped):',name);
+    return;
+  }
+  let added=0,existing=0,excluded=0,conflicts=0;
+  function visit(dir,relative='') {
+    for (const entry of fs.readdirSync(dir,{withFileTypes:true})) {
+      if (entry.name.startsWith('.')) {excluded++;continue;}
+      const rel=relative?relative+'/'+entry.name:entry.name;
+      if (deniedRoots.test(rel)) {excluded++;continue;}
+      const source=path.join(dir,entry.name);
+      if(entry.isDirectory()){visit(source,rel);continue;}
+      if(!entry.isFile()||!allowedSupplemental.test(rel)||/__q_[a-z0-9]+\./i.test(rel)) {
+        excluded++;continue;
+      }
+      if (['index.html','studio.html','studio/index.html','sw.js'].includes(rel)) {
+        excluded++;continue;
+      }
+      // /about.html and /about/index.html represent the same public route.
+      if (rel.endsWith('/index.html')) {
+        const flat=rel.slice(0,-'/index.html'.length)+'.html';
+        if(fs.existsSync(path.join(web,flat))) {existing++;continue;}
+      }
+      const target=path.join(web,rel);
+      if(fs.existsSync(target)){
+        existing++;
+        if(fs.statSync(target).size!==fs.statSync(source).size) conflicts++;
+        continue;
+      }
+      fs.mkdirSync(path.dirname(target),{recursive:true});
+      fs.copyFileSync(source,target);
+      added++;
+      imported.push(rel);
+    }
+  }
+  visit(root);
+  console.log('Merged',name,':',added,'new assets/pages;',existing,'already covered;',excluded,'excluded;',conflicts,'size conflicts preserved');
+}
+for (const source of supplementalCaptures) mergeMissingCapture(source);
+const requiredMergedPages=['download/index.html','es/download/index.html','fr/download/index.html','de/download/index.html','ja/download/index.html','zh-tw/download/index.html'];
+for (const rel of requiredMergedPages) {
+  if (!fs.existsSync(path.join(web,rel))) {
+    throw new Error('Existing captured public page missing after consolidation: '+rel);
+  }
+}
+console.log('Canonical download pages recovered:',requiredMergedPages.length);
+console.log('Consolidation adds files to the existing original website, not a replacement Studio UI.');
 needed.forEach(verify);
 // Vercel's static output does not apply repository-root rewrites when the
 // project Root Directory is nested. Publish /studio/index.html explicitly.
