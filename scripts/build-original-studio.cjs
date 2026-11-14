@@ -125,11 +125,13 @@ if(!homeHTML.includes('id="root"') || !homeHTML.includes('index-3pf76ICO.js'))
 // returning from /studio never depends on an unavailable upstream login API.
 const guestAdapter='<script src="/studio-guest-preview.js"></script>';
 const cloudAdapter='<script src="/ballengine-cloud-saves.js"></script>';
+const publishingAdapter='<script src="/ballengine-guest-publishing.js"></script>';
 const homeDocument=homeHTML
   .replaceAll('<base href="/">','')
   .replaceAll(guestAdapter,'')
   .replaceAll(cloudAdapter,'')
-  .replace('</head>','<base href="/">'+guestAdapter+cloudAdapter+'</head>');
+  .replaceAll(publishingAdapter,'')
+  .replace('</head>','<base href="/">'+guestAdapter+cloudAdapter+publishingAdapter+'</head>');
 // The root entrypoint must behave the same as /home for fresh visitors.
 fs.writeFileSync(homeSource,homeDocument,'utf8');
 const homeDir=path.join(web,'home');
@@ -145,12 +147,13 @@ const studioDocument=originalStudio
   .replaceAll('href="assets/', 'href="/assets/')
   .replaceAll("src='assets/", "src='/assets/")
   .replaceAll("href='assets/", "href='/assets/")
-  .replace('</head>', (originalStudio.includes(guestAdapter)?'':guestAdapter)+(originalStudio.includes(cloudAdapter)?'':cloudAdapter)+'</head>');
+  .replace('</head>', (originalStudio.includes(guestAdapter)?'':guestAdapter)+(originalStudio.includes(cloudAdapter)?'':cloudAdapter)+(originalStudio.includes(publishingAdapter)?'':publishingAdapter)+'</head>');
 // /studio.html is also reachable directly and via the Vercel /studio rewrite.
 fs.writeFileSync(path.join(web,'studio.html'),studioDocument,'utf8');
 fs.writeFileSync(path.join(studioDir,'index.html'),studioDocument,'utf8');
 fs.copyFileSync(path.join(repo,'scripts','studio-guest-preview.js'),path.join(web,'studio-guest-preview.js'));
 fs.copyFileSync(path.join(repo,'scripts','ballengine-cloud-saves.js'),path.join(web,'ballengine-cloud-saves.js'));
+fs.copyFileSync(path.join(repo,'scripts','ballengine-guest-publishing.js'),path.join(web,'ballengine-guest-publishing.js'));
 // Keep the existing pricing page and UI, but load the shared adapter there too
 // so the missing private plan API's retry panel is suppressed on direct visits.
 const plansPath=path.join(web,'plans.html');
