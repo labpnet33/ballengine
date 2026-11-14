@@ -86,17 +86,69 @@
     }
     return heading.parentElement?.parentElement||null;
   }
-  function findAutomationHost(){
+  const obsoleteAutomationWarning='Automation is not active on this account, so connecting accounts, scheduling and Autopilot are all switched off. Every plan covers every platform.';
+  function automationMain(){
     if(location.pathname.replace(/\/+$/,'')!=='/automation')return null;
-    const root=document.querySelector('#root');if(!root)return null;
-    const main=root.querySelector('main');if(!main)return null;
-    // Keep original overview cards and tabs; append a guest planner to the
-    // existing Automation main only, never a new page.
-    return main;
+    return document.querySelector('#root main');
+  }
+  function automationWarning(){
+    const main=automationMain();
+    if(!main)return null;
+    const marked=main.querySelector('[data-be-legacy-automation-warning]');
+    if(marked)return marked;
+    const message=[...main.querySelectorAll('div,p,span')]
+      .find(e=>e.children.length===0&&e.textContent?.trim()===obsoleteAutomationWarning);
+    if(!message)return null;
+    // This is the original amber subscription-status card, not the
+    // surrounding page content or the guest planner.
+    const card=message.parentElement?.parentElement?.parentElement;
+    if(!card||!card.classList.contains('border'))return null;
+    card.dataset.beLegacyAutomationWarning='1';
+    return card;
+  }
+  function findAutomationHost(){
+    const main=automationMain();
+    if(!main)return null;
+    // Put working guest controls in the existing dashboard content area next
+    // to the original status message, not outside the page/sidebar layout.
+    return automationWarning()?.parentElement||main;
+  }
+  function clarifyAutomationStatus(){
+    const main=automationMain();
+    if(!main)return;
+    const planner=main.querySelector('[data-be-guest-publisher]');
+    if(!planner)return;
+    // The captured original paid-plan backend doesn't exist on this hosted
+    // guest copy. Don't falsely activate that subscription, social OAuth,
+    // or automatic delivery. Show the real working manual planner instead.
+    const replacements=new Map([
+      [obsoleteAutomationWarning,
+       'Guest draft scheduling is available in the publishing planner. Automatic social posting and Autopilot require separately authorized account connections.'],
+      ['Connect your socials, schedule ahead and let Autopilot post for you. Included with Creator, Pro, Elite and Agency.',
+       'Save publishing drafts and plan when to post videos. Direct social connections and unattended Autopilot posting are not configured in guest mode.'],
+      ['No automation on this account','Guest drafts and reminders are available'],
+      ['Not active','Auto-publishing off']
+    ]);
+    for(const e of main.querySelectorAll('div,p,span')){
+      if(e.children.length!==0||e.closest('[data-be-guest-publisher]'))continue;
+      const updated=replacements.get(e.textContent?.trim());
+      if(updated)e.textContent=updated;
+    }
+    const card=automationWarning();
+    if(card){
+      card.dataset.beGuestStatus='manual';
+      // The old "See plans" action belongs to the original uncaptured
+      // subscription backend. Hide it in the guest-only status banner.
+      for(const control of card.querySelectorAll('a,button')){
+        if(control.textContent?.trim()==='See plans')control.hidden=true;
+      }
+    }
   }
   function mount(){
-    const host=findStudioHost()||findAutomationHost();
-    if(!host||host.querySelector('[data-be-guest-publisher]'))return;
+    const studioHost=findStudioHost();
+    const host=studioHost||findAutomationHost();
+    if(!host){return;}
+    if(host.querySelector('[data-be-guest-publisher]')){clarifyAutomationStatus();return;}
     // An existing form might be in the original Publish composer. This is
     // a DIV with buttons type=button, never a nested HTML form.
     const root=node('section',null,css.box);
@@ -249,7 +301,10 @@
     root.append(heading,notice,form,actions,message,queueHeader,queue);
     // Insert only inside the existing view. React may remount it; remount
     // is detected without mutating its original components.
-    host.appendChild(root);
+    const originalGate=!studioHost?automationWarning():null;
+    if(originalGate?.parentElement===host)host.insertBefore(root,originalGate);
+    else host.appendChild(root);
+    clarifyAutomationStatus();
     refresh();
   }
   // The original simulation modifies the React tree many times per second;
@@ -260,8 +315,10 @@
     document.addEventListener('click',()=>setTimeout(mount,150),{capture:true});
     setInterval(()=>{
       if(document.visibilityState==='visible'&&
-        (location.pathname.startsWith('/studio')||location.pathname==='/automation'))
+        (location.pathname.startsWith('/studio')||location.pathname==='/automation')){
         mount();
+        clarifyAutomationStatus();
+      }
     },1500);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
