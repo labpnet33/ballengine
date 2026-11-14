@@ -5,6 +5,32 @@ const path=require('node:path');
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright-core');
 const root=path.resolve(__dirname,'..','extra','wget','ballengine.app');
+// Verify that the consolidated public captures are served by the ORIGINAL
+// website root. No alternate Studio app or new custom pages are generated.
+const expectedPublicFiles=[
+  'download/index.html',
+  'de/download/index.html',
+  'es/download/index.html',
+  'fr/download/index.html',
+  'ja/download/index.html',
+  'zh-tw/download/index.html',
+  'assets/physics.worker-DRvxAjdb.js',
+  'assets/crush.worker-phV1EFRY.js',
+  'assets/magnetic.worker-QnwGMRP0.js',
+  'sfx/chirp-1-0-0.wav',
+  'how-to-clips/mode-ball-crush.39d4f25a7d.jpg',
+  'models/instruments/mallet_37d60d3c-4dde-4cdf-9847-81186b6afd8a_1786705098540.glb'
+];
+for (const rel of expectedPublicFiles) {
+  const file=path.join(root,rel);
+  assert.ok(fs.existsSync(file)&&fs.statSync(file).size>0,
+    'Missing merged page or static resource: '+rel);
+}
+const originalStudio=fs.readFileSync(path.join(root,'studio','index.html'),'utf8');
+assert.ok(originalStudio.includes('index-3pf76ICO.js')&&originalStudio.includes('id="root"'),
+  'Original captured React Studio replaced or damaged');
+console.log('Original Studio intact; merged public routes and worker/CDN assets verified.');
+
 const mime={
  '.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8',
  '.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8',
