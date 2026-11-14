@@ -38,6 +38,24 @@ const names=['rhythmic','ball-crush','ball-race','glass-tower','domino-3d','jell
        text:document.body.innerText.slice(-8000)
      }))));
    }
+   // Inspect the native In development panel without overriding entitlements.
+   const panel=page.getByRole('button',{name:/In development.*27/i}).first();
+   console.log('SIMULATION_DEVELOPMENT_PANEL_BUTTON '+await panel.count());
+   if(await panel.count()){
+     // Close the top menu before opening the development panel in the sidebar.
+     await page.locator('button[title="Change mode"]').first().click({timeout:8000}).catch(()=>{});
+     await panel.click({timeout:10000}).catch(e=>console.log('SIMULATION_DEVELOPMENT_OPEN_ERR '+String(e).slice(0,500)));
+     await page.waitForTimeout(900);
+     console.log('SIMULATION_DEVELOPMENT_PANEL '+JSON.stringify(await page.evaluate(()=>({
+       text:document.querySelector('#root')?.innerText?.slice(-7000),
+       controls:[...document.querySelectorAll('button,[role="button"],a')].filter(x=>x.getClientRects().length).map(x=>({
+         text:x.innerText?.trim().slice(0,85),disabled:x.disabled,ariaDisabled:x.getAttribute('aria-disabled'),title:x.title,
+         css:x.className?.toString().slice(0,110),testid:x.getAttribute('data-testid')
+       })).filter(x=>x.text).slice(-100),
+       img:[...document.querySelectorAll('img[src*="/mode-thumbs/"]')].filter(x=>x.getClientRects().length)
+         .map(x=>({src:x.getAttribute('src'),parent:x.parentElement?.parentElement?.innerText.slice(0,140)})).slice(-80)
+     }))));
+   }
    const pickers=page.getByText(/All simulation modes/i);
    console.log('SIMULATION_PICKER_COUNT '+await pickers.count());
    if(await pickers.count()){
