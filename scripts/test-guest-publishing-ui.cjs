@@ -9,7 +9,11 @@ const server=http.createServer((req,res)=>{
  try{
    const u=new URL(req.url,'http://localhost');
    let rel=u.pathname==='/studio'?'studio/index.html':decodeURIComponent(u.pathname).replace(/^\/+/,'');
-   if(!rel||rel==='automation'||rel==='automation/')rel='index.html';
+   if(!rel)rel='index.html';
+   // Serve the ORIGINAL Automation HTML through its physical static route.
+   if(rel==='automation'||rel==='automation/')rel='automation/index.html';
+   if(rel==='automation/queue'||rel==='automation/queue/')rel='automation/queue/index.html';
+   if(rel==='automation/brands'||rel==='automation/brands/')rel='automation/brands/index.html';
    const file=path.resolve(web,rel);
    if(!file.startsWith(web+path.sep))return res.writeHead(403).end();
    fs.readFile(file,(err,buf)=>err?res.writeHead(404).end():res.writeHead(200,{'Content-Type':mime[path.extname(file)]||'application/octet-stream'}).end(buf));
@@ -70,7 +74,11 @@ const report={stage:'init',studioPlanner:false,automationPlanner:false,mp4Upload
    assert.ok(job.videoUrl,'MP4 upload not stored in cloud queue');
    report.mp4Upload=true;
    report.stage='automation';
-   await page.goto(base+'/automation',{waitUntil:'domcontentloaded',timeout:45000});
+   const response=await page.goto(base+'/automation',{waitUntil:'domcontentloaded',timeout:45000});
+   assert.equal(response.status(),200,'Original /automation route returned 404');
+   const pageTitle=await page.title();
+   assert.ok(pageTitle.includes('Automation'),'The page served was not the original captured Automation screen');
+   assert.ok((await page.locator('script[src="/ballengine-guest-publishing.js"]').count())===1,'Guest publishing adapter missing from Automation page');
    const second=page.locator('[data-be-guest-publisher]').first();
    await second.waitFor({state:'visible',timeout:20000});
    await second.getByText(job.title,{exact:true}).waitFor({timeout:20000});
