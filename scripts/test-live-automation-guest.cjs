@@ -86,6 +86,20 @@ async function main(){
         console.log('LIVE_AUTOMATION_DEEP_ROUTE_OK '+JSON.stringify({route,status:response.status(),...state}));
       }
     }
+    // Also verify clicking the EXISTING React tab buttons changes the visible
+    // content, which is distinct from a direct URL working on refresh.
+    await page.goto(base+'/automation',{waitUntil:'domcontentloaded',timeout:40000});
+    await page.getByRole('heading',{name:'Automation',exact:true}).first().waitFor({state:'visible',timeout:25000});
+    for(const [name,slug,plannerExpected] of [['Accounts','accounts',false],['Publish','publish',true],['Autopilot','autopilot',false],['Overview','',true]]){
+      await page.locator('nav[aria-label="Automation"]').getByRole('button',{name,exact:true}).click({timeout:15000});
+      const requested=slug?'/automation/'+slug:'/automation';
+      await page.waitForURL(url=>url.pathname===requested,{timeout:15000});
+      await page.waitForFunction(expect=>!!document.querySelector('#root main [data-be-guest-publisher]')===expect,plannerExpected,{timeout:14000});
+      const tab=await page.evaluate(()=>({path:location.pathname,title:document.title,planner:!!document.querySelector('#root main [data-be-guest-publisher]'),text:document.querySelector('#root main')?.innerText.slice(0,700)}));
+      assert.equal(tab.path,requested);
+      assert.equal(tab.planner,plannerExpected,'Unchanged page or stale form after clicking '+name);
+      console.log('LIVE_AUTOMATION_TAB_CLICK_OK '+JSON.stringify({tab:name,path:tab.path,planner:tab.planner}));
+    }
   }finally{await browser.close();}
 }
 main().catch(e=>{console.error('LIVE_AUTOMATION_GUEST_STATUS_FAIL',String(e.stack||e));process.exitCode=1;});
