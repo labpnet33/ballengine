@@ -238,6 +238,33 @@ const standaloneExport='const Wt=null,Xt=!1,Gt={raw:null,tid:"local-"+crypto.ran
 capturedApp=capturedApp.slice(0,exportBegin)+standaloneExport+
   capturedApp.slice(exportFinish+remoteExportEnd.length);
 console.log('Standalone local MP4 export enabled using original frame renderer; upstream ticket not requested.');
+
+// QA-gated release of native experimental simulation controls. The captured
+// engines exist already; do not promote them to live until independently
+// verifying animation, controls, and MP4 export on this exact build.
+const experimentalSlugs=[
+  'phase-bloom','phonk-drop','marble-run','ball-race','target-hit','falling-sand',
+  'plinko','color-match','spin-battle','lava-survival','glass-slice','flood-fill',
+  'eulers-disk','drum-sort','plinko-3d','chladni','voxel','domino-3d',
+  'marble-race-3d','attractor','flow-field','metaballs','galaxy','fireflies',
+  'pendulum-basin','slime','crowd-evacuation'
+];
+if(process.env.BALLENGINE_RELEASE_EXPERIMENTAL==='1'){
+  let released=0;
+  for(const slug of experimentalSlugs){
+    const re=new RegExp('(\{mode:"[A-Z0-9_]+",slug:"'+slug+'",[^{}]{0,800},status:)"development"','g');
+    const matches=[...capturedApp.matchAll(re)];
+    if(matches.length!==1)
+      throw new Error('Expected exactly one experimental mode registry entry for '+slug+'; got '+matches.length);
+    capturedApp=capturedApp.replace(re,'$1"live"');
+    released++;
+  }
+  const remaining=(capturedApp.match(/status:"development"/g)||[]).length;
+  if(released!==27||remaining!==0)
+    throw new Error('Mode release incomplete: '+released+' promoted, '+remaining+' still under development');
+  console.log('QA-gated native release enabled for',released,'simulation engines.');
+}
+
 fs.writeFileSync(originalBundle,capturedApp,'utf8');
 // Vercel's static build would otherwise report READY even if the edited 14MB
 // browser bundle had a JavaScript syntax error.
