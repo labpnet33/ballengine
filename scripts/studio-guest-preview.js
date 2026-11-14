@@ -47,6 +47,17 @@
         headers:{'Content-Type':'application/json','Cache-Control':'no-store'}
       }));
     }
+    // This standalone deployment runs the captured renderer entirely in the
+    // browser. Legacy progress/completion telemetry still POSTs to the missing
+    // original export endpoint; acknowledge those local-only notifications
+    // without pretending to issue tickets, credits or remote entitlements.
+    if(url.origin===window.location.origin &&
+       url.pathname==='/api/studio/video-export' && method==='POST'){
+      return Promise.resolve(new Response('{}',{
+        status:200,
+        headers:{'Content-Type':'application/json','Cache-Control':'no-store'}
+      }));
+    }
     return nativeFetch(input,init);
   };
 
