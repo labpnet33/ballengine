@@ -54,12 +54,16 @@
       url=new URL(typeof input==='string'?input:input.url,window.location.href);
       method=String((init&&init.method)||(input instanceof Request&&input.method)||'GET').toUpperCase();
     }catch{return delegate(input,init);}
-    const isCloudSave=url.origin===location.origin &&
-      (/^\/api\/saves(?:\/|$)/.test(url.pathname)||url.pathname==='/api/storage/usage');
-    if(!isCloudSave)return delegate(input,init);
+    // The original capture has no server-side audio catalog or /api/upload.
+    // Send only these supported endpoints to our independent Worker and keep
+    // all the existing React UI, MIDI parser, audio slicer and file picker.
+    const isCloudApi=url.origin===location.origin &&
+      (/^\/api\/(?:saves|upload|songs|melodies|song-bank|xmidi)(?:\/|$)/.test(url.pathname)||url.pathname==='/api/storage/usage');
+    if(!isCloudApi)return delegate(input,init);
     try{
       const headers=new Headers((init&&init.headers)||(input instanceof Request?input.headers:undefined));
-      headers.set('Authorization','Bearer '+recoveryKey());
+      const isPublicCatalog=/^\/api\/(?:song-bank|xmidi)(?:\/|$)/.test(url.pathname);
+      if(!isPublicCatalog)headers.set('Authorization','Bearer '+recoveryKey());
       // A library is identified only by the capability key; never forward
       // the captured site's cookies or any auth headers to our Worker.
       const requestOptions={...init,method,headers,credentials:'omit',mode:'cors',cache:'no-store'};
@@ -133,5 +137,5 @@
   else attachRecoveryActions();
   // Restore the control after React remounts the existing Saves tab.
   setInterval(()=>{if(document.visibilityState!=='hidden')attachRecoveryActions();},2500);
-  console.info('[BallEngine cloud] Guest project sync is available through a private recovery key.');
+  console.info('[BallEngine cloud] Guest project sync, private MP3/MIDI uploads and original MIDI catalog available.');
 })();
