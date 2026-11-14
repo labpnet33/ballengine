@@ -29,6 +29,7 @@ async function main(){
     await page.locator('#scene').waitFor();
     await page.waitForTimeout(700);
     assert.equal(await page.locator('#exportSummary').innerText(),'720 × 1280 · 30 fps');
+    await page.locator('[data-tab="video"]').click();
     await page.selectOption('#exportAspect','16:9');
     await page.selectOption('#exportQuality','1080');
     await page.selectOption('#exportFps','60');
@@ -37,19 +38,21 @@ async function main(){
     assert.equal(await page.locator('#exportSummary').innerText(),'1080 × 1080 · 60 fps');
     await page.selectOption('#exportAspect','4:3');
     assert.equal(await page.locator('#exportSummary').innerText(),'1440 × 1080 · 60 fps');
+    await page.locator('[data-tab="arts"]').click();
     await page.selectOption('#ballShape','star');
     await page.selectOption('#ballStyle','neon');
-    await page.locator('#arenaSides').fill('9');
+    await page.locator('#arenaSides').evaluate(el=>{el.value='9';el.dispatchEvent(new Event('input',{bubbles:true}))});
     assert.equal(await page.locator('#arenaSidesVal').innerText(),'9');
     await page.locator('#headerSave').click();
     assert.match(await page.locator('#status').innerText(),/saved in this browser/i);
     await page.screenshot({path:'free-studio-smoke.png'});
+    await page.locator('[data-tab="video"]').click();
     await page.selectOption('#exportAspect','9:16');
     await page.selectOption('#exportQuality','720');
     await page.selectOption('#exportFps','30');
     await page.selectOption('#duration','10');
     await page.locator('#record').click();
-    await page.waitForFunction(()=>/Saved WebM/i.test(document.querySelector('#status')?.textContent||''),{timeout:25000});
+    await page.waitForFunction(()=>/Saved WebM/i.test(document.querySelector('#status')?.textContent||''),null,{timeout:25000});
     const result={
       status:await page.locator('#status').innerText(),
       frame:await page.locator('#exportSummary').innerText(),
