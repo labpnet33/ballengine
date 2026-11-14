@@ -9,6 +9,7 @@
 import {isPublicMusic,publicMusic} from './music-bank.mjs';
 import {isPrivateMusic,privateMusic,serveAsset,musicUsage} from './music-media.mjs';
 import {isGuestPublishing,guestPublishing} from './guest-publishing.mjs';
+import {GUEST_PUBLISHING_CLIENT_SCRIPT} from './guest-publishing-client.mjs';
 const MAX_CONFIG_BYTES=250000;
 const MAX_SAVES=50;
 const MAX_LIBRARY_BYTES=10000000;
@@ -96,6 +97,14 @@ export default {
     const url=new URL(req.url),origin=req.headers.get('Origin')||'';
     if(req.method==='OPTIONS')return ALLOW_ORIGIN(origin)?options(origin):fail('Origin is not allowed',403);
     if(origin&&!ALLOW_ORIGIN(origin))return fail('Origin is not allowed',403);
+    // Public script used by the existing BallEngine frontend while Vercel
+    // has no deployment capacity. Serve with a strict JavaScript MIME type.
+    if(url.pathname==='/guest-publishing-client.js'&&req.method==='GET')
+      return new Response(GUEST_PUBLISHING_CLIENT_SCRIPT,{status:200,headers:{
+        'Content-Type':'text/javascript; charset=utf-8',
+        'Cache-Control':'no-store',
+        'X-Content-Type-Options':'nosniff'
+      }});
     if(url.pathname==='/health'&&req.method==='GET')return json({ok:true,service:'ballengine-guest-saves',version:1},200,origin);
     if(isPublicMusic(url.pathname))return publicMusic(req);
     if(url.pathname.startsWith('/api/assets/')&&(req.method==='GET'||req.method==='HEAD'))return env.DB?serveAsset(req,env):fail('Cloud database is not configured',503,origin);
