@@ -182,6 +182,22 @@ const durationToolbarAfter='const Hr=s.jsxs("div",{"data-tour":"capture-duration
 if(capturedApp.split(durationToolbarBefore).length!==2)
   throw new Error('Expected one original duration toolbar. Review the captured bundle before adding reset.');
 capturedApp=capturedApp.replace(durationToolbarBefore,durationToolbarAfter);
+// This is an independently hosted static capture: it has no original private
+// /api/studio/video-export backend to issue the remote signed export ticket.
+// Keep the ORIGINAL in-browser, frame-by-frame MP4 renderer (Gpt) and Record UI,
+// but remove only its initial server-ticket dependency for LOCAL exports.
+// Do not call or imitate the upstream entitlement service.
+const remoteExportStart='let Ot=null,Wt=null,Xt=!1;try{const jt=crypto.randomUUID()';
+const remoteExportEnd='if(!Ot)return;const Gt=Ot;';
+const exportBegin=capturedApp.indexOf(remoteExportStart);
+const exportFinish=exportBegin<0?-1:capturedApp.indexOf(remoteExportEnd,exportBegin);
+if(exportBegin<0||exportFinish<0||
+    capturedApp.indexOf(remoteExportStart,exportBegin+1)!==-1)
+  throw new Error('Original local-export ticket gate changed; review before patching.');
+const standaloneExport='const Wt=null,Xt=!1,Gt={raw:null,tid:"local-"+crypto.randomUUID(),res:uV(Ve,ke),wm:!1,stamp:null};';
+capturedApp=capturedApp.slice(0,exportBegin)+standaloneExport+
+  capturedApp.slice(exportFinish+remoteExportEnd.length);
+console.log('Standalone local MP4 export enabled using original frame renderer; upstream ticket not requested.');
 fs.writeFileSync(originalBundle,capturedApp,'utf8');
 console.log('Local guest fallback enabled in original /home React route.');
 
