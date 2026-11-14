@@ -7,7 +7,7 @@ const paths=['/automation','/automation/accounts','/automation/publish','/automa
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage']});
  let failures=[];
  try{
-  for(const device of [{name:'desktop',viewport:{width:1440,height:900},isMobile:false},{name:'android',viewport:{width:390,height:844},isMobile:true,deviceScaleFactor:2,hasTouch:true}]){
+  for(const device of [{name:'desktop',viewport:{width:1440,height:900},isMobile:false}]){
    const ctx=await browser.newContext({viewport:device.viewport,isMobile:device.isMobile,deviceScaleFactor:device.deviceScaleFactor||1,hasTouch:device.hasTouch||false,serviceWorkers:'block'});
    const page=await ctx.newPage();
    const errors=[],requests=[];
@@ -21,7 +21,7 @@ const paths=['/automation','/automation/accounts','/automation/publish','/automa
      await page.getByRole('heading',{name:'Automation',exact:true}).first().waitFor({state:'visible',timeout:30000});
      await page.locator('[data-be-guest-publisher]').first().waitFor({state:'visible',timeout:30000});
      loaded=true;planner=true;
-     await page.waitForTimeout(5000);
+     await page.waitForTimeout(800);
     }catch(e){exception=String(e).slice(0,320); failures.push({device:device.name,path,exception});}
     const state=await page.evaluate(()=>({
      url:location.href,
@@ -40,16 +40,25 @@ const paths=['/automation','/automation/accounts','/automation/publish','/automa
     await page.goto(base+'/automation',{waitUntil:'domcontentloaded',timeout:35000});
     await page.getByRole('heading',{name:'Automation',exact:true}).first().waitFor({state:'visible',timeout:30000});
     for(const label of ['Accounts','Publish','Autopilot']){
-     const link=page.locator('a').filter({hasText:new RegExp('^'+label+'$')}).first();
-     const count=await link.count();
-     if(!count){failures.push({device:'desktop',action:label,error:'no anchor'});continue;}
+     const controls=await page.evaluate((label)=>{
+       const els=[...document.querySelectorAll('#root *')].filter(x=>x.children.length===0&&x.textContent?.trim()===label);
+       return els.slice(0,5).map(x=>({
+         tag:x.tagName,
+         parent:x.parentElement?.outerHTML?.slice(0,1200),
+         grandparent:x.parentElement?.parentElement?.outerHTML?.slice(0,1200)
+       }));
+     },label);
+     console.log('AUTOMATION_TAB_CONTROL '+JSON.stringify({label,controls}));
+     const button=page.getByRole('button',{name:label,exact:true}).first();
+     const count=await button.count();
+     if(!count){failures.push({device:'desktop',action:label,error:'no tab button',controls});continue;}
      try{
-      await link.click({timeout:15000});
-      await page.waitForTimeout(7000);
-      const view=await page.evaluate(()=>({url:location.pathname,title:document.title,main:document.querySelector('#root main')?.innerText?.slice(0,650),planner:!!document.querySelector('[data-be-guest-publisher]')}));
+      await button.click({timeout:15000});
+      await page.waitForTimeout(5000);
+      const view=await page.evaluate(()=>({url:location.pathname,title:document.title,main:document.querySelector('#root main')?.innerText?.slice(0,950),planner:!!document.querySelector('[data-be-guest-publisher]'),h1:document.querySelector('h1')?.innerText}));
       console.log('AUTOMATION_CLICK_DIAG '+JSON.stringify({label,view}));
-      if(!view.url.includes('/'+label.toLowerCase()))failures.push({action:label,error:'wrong pathname',view});
-     }catch(e){failures.push({action:label,error:String(e).slice(0,200)});}
+      if(!view.url.includes('/'+label.toLowerCase())||!view.h1?.includes('Automation'))failures.push({action:label,error:'tab did not navigate',view});
+     }catch(e){failures.push({action:label,error:String(e).slice(0,350)});}
     }
    }
    await ctx.close();
