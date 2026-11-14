@@ -56,6 +56,11 @@
     ['Slime 3D','slime','slime','3D','A living network finds its food'],
     ['Evacuate 3D','crowd-evacuation','crowd-evacuation','3D','Crowds race for the exits']
   ];
+  const originalLiveModeSlugs=new Set([
+    'rhythmic','escape','drawer','spawner','ghost-escape','breaker','glass-tower',
+    'flag-battle','weapon-battle','merge-evolution','glass-rush','grid-merge',
+    'wave-3d','marble-run-3d','ball-crush','jelly-3d','cut-count','magnet'
+  ]);
   let allModesExpanded=false;
   function homeModeGrid(){
     if(!['/home','/',''].includes(location.pathname.replace(/\/+$/,'')))return null;
@@ -64,15 +69,16 @@
     const title=[...main.querySelectorAll('h2')].find(e=>e.textContent?.trim()==='What do you want to make?');
     const section=title?.closest('section');
     const grid=section?.querySelector('ul.grid');
-    if(!grid||grid.querySelectorAll(':scope > li:not([data-be-extra-mode]) a[href^="/studio?mode="]').length!==18)return null;
-    return {title,section,grid};
+    const nativeCount=grid?.querySelectorAll(':scope > li:not([data-be-extra-mode]) a[href^="/studio?mode="]').length||0;
+    if(nativeCount<18||nativeCount>45)return null;
+    return {title,section,grid,nativeCount};
   }
-  function extraModeCard(entry){
+  function extraModeCard(entry,released){
     const [label,slug,thumb,kind,description]=entry;
     const li=node('li');li.dataset.beExtraMode=slug;
     const a=node('a',null,null,'group block overflow-hidden rounded-2xl border border-border bg-card transition-colors hover:border-white/20');
     a.href='/studio?mode='+encodeURIComponent(slug);
-    a.setAttribute('aria-label',label+' — experimental mode');
+    a.setAttribute('aria-label',label+(released?' — simulation mode':' — experimental mode'));
     const media=node('div',null,'position:relative;overflow:hidden;aspect-ratio:4/5;background:linear-gradient(150deg,#111827,#0f172a 55%,#164e63);');
     if(thumb){
       const img=node('img');img.src='/mode-thumbs/'+thumb+'.webp';
@@ -83,18 +89,37 @@
     }else{
       media.append(node('div',label,'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#e2e8f0;font-size:20px;padding:18px;text-align:center;'));
     }
-    const mark=node('span','Experimental','position:absolute;z-index:2;top:9px;right:9px;background:rgba(9,9,11,.87);border:1px solid rgba(255,255,255,.2);color:#f4f4f5;border-radius:6px;padding:3px 6px;font-size:10px;font-weight:600;');
+    const mark=node('span',released?'New mode':'Experimental','position:absolute;z-index:2;top:9px;right:9px;background:rgba(9,9,11,.87);border:1px solid rgba(255,255,255,.2);color:#f4f4f5;border-radius:6px;padding:3px 6px;font-size:10px;font-weight:600;');
     media.append(mark);
     const details=node('div',null,'padding:12px;');
     details.append(node('h3',label,'font-size:14px;font-weight:700;line-height:1.3;'));
     details.append(node('p',description,'font-size:12px;line-height:1.5;opacity:.72;margin-top:5px;'));
-    details.append(node('p','In development · '+kind,'font-size:11px;opacity:.67;margin-top:6px;'));
+    details.append(node('p',(released?'Available':'In development')+' · '+kind,'font-size:11px;opacity:.67;margin-top:6px;'));
     a.append(media,details);li.append(a);
     return li;
   }
   function enhanceHomeModeCatalog(){
     const view=homeModeGrid();if(!view)return;
-    const {section,grid}=view;
+    const {section,grid,nativeCount}=view;
+    // The QA-gated release promotes the 27 modes in the ORIGINAL registry.
+    // That original homepage automatically includes two new items (20 total).
+    // Hide those 2 only while collapsed and add the 25 remaining entries in
+    // the same original grid, avoiding duplicates or replacing native cards.
+    const released=nativeCount>18;
+    const nativeExtra=new Set();
+    for(const item of grid.querySelectorAll(':scope > li:not([data-be-extra-mode])')){
+      const link=item.querySelector('a[href^="/studio?mode="]');
+      if(!link)continue;
+      const slug=new URL(link.getAttribute('href'),location.origin).searchParams.get('mode');
+      if(!originalLiveModeSlugs.has(slug)){
+        nativeExtra.add(slug);
+        item.hidden=!allModesExpanded;
+        item.dataset.beNativeExperimental=slug||'';
+      }else{
+        item.hidden=false;
+        delete item.dataset.beNativeExperimental;
+      }
+    }
     let controls=section.querySelector('[data-be-all-modes-toggle]');
     if(!controls){
       controls=node('div',null,'display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:-3px 0 16px;');
@@ -105,7 +130,9 @@
       });
       toggle.dataset.beAllModesButton='1';
       toggle.setAttribute('aria-expanded','false');
-      controls.append(toggle,node('span','18 regular modes · 27 in development','font-size:12px;opacity:.7;'));
+      const info=node('span','18 regular modes · 27 in development','font-size:12px;opacity:.7;');
+      info.dataset.beAllModesCount='1';
+      controls.append(toggle,info);
       section.insertBefore(controls,grid);
     }
     const toggle=controls.querySelector('[data-be-all-modes-button]');
@@ -113,13 +140,17 @@
       toggle.textContent=allModesExpanded?'Show only 18 regular modes':'Show all 45 simulation modes';
       toggle.setAttribute('aria-expanded',String(allModesExpanded));
     }
+    const count=controls.querySelector('[data-be-all-modes-count]');
+    if(count)count.textContent=released?'18 original modes · 27 newly available':'18 regular modes · 27 in development';
+    const needed=experimentalModes.filter(e=>!nativeExtra.has(e[1]));
     const extra=grid.querySelectorAll(':scope > li[data-be-extra-mode]');
     if(!allModesExpanded){
       for(const item of extra)item.remove();
-    }else if(extra.length!==experimentalModes.length){
+    }else if(extra.length!==needed.length||
+      [...extra].some(e=>!needed.some(mode=>mode[1]===e.dataset.beExtraMode))){
       for(const item of extra)item.remove();
       const fragment=document.createDocumentFragment();
-      for(const mode of experimentalModes)fragment.append(extraModeCard(mode));
+      for(const mode of needed)fragment.append(extraModeCard(mode,released));
       grid.append(fragment);
     }
   }
