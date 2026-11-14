@@ -58,7 +58,18 @@ async function run(){
     report.buttons=await page.locator('button').evaluateAll(els=>els.map(e=>({text:(e.innerText||'').trim().slice(0,100),title:e.title||'',aria:e.getAttribute('aria-label')||'',disabled:e.disabled,visible:!!e.getClientRects().length})).filter(x=>x.visible).slice(0,100));
     await page.screenshot({path:path.join(artifacts,'studio-before-record.png')});
     const duration=page.locator('select[title="Clip / seed target duration"]');
-    if(await duration.count())await duration.first().selectOption('15');
+    const requestedSeconds=Number(process.env.TEST_DURATION||15);
+    report.requestedSeconds=requestedSeconds;
+    if(await duration.count()){
+      if(requestedSeconds===15||requestedSeconds===30||requestedSeconds===59)
+        await duration.first().selectOption(String(requestedSeconds));
+      else{
+        await duration.first().selectOption('custom');
+        const custom=page.locator('input[title="Custom clip length in seconds"]');
+        await custom.first().fill(String(Math.min(600,Math.max(1,requestedSeconds))));
+        await custom.first().blur();
+      }
+    }
     const candidate=page.locator('button').filter({visible:true}).filter({hasText:/\bRecord\b/i}).first();
     const alternate=page.locator('button[title*="Record" i],button[aria-label*="Record" i]').filter({visible:true}).first();
     const button=(await candidate.count())?candidate:alternate;
