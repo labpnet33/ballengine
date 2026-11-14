@@ -34,7 +34,11 @@ async function upload(req,env,library,origin,json,fail){
   const form=await req.formData(),file=form.get('file');
   if(!(file instanceof File))return fail('No audio file selected',400,origin);
   if(file.size<14||file.size>MAX_FILE)return fail('Upload must be between 14 bytes and 10 MB.',413,origin);
-  const bytes=new Uint8Array(await file.arrayBuffer()),mime=mediaType(file,bytes),checksum=await hash(bytes);
+  const bytes=new Uint8Array(await file.arrayBuffer());
+  let mime;
+  try{mime=mediaType(file,bytes);}
+  catch(invalid){return fail(invalid?.message||'Invalid MP3, WAV or MIDI file',Number(invalid?.status)||415,origin);}
+  const checksum=await hash(bytes);
   const supplied=String(form.get('checksum')||'');
   if(supplied&&supplied.toLowerCase()!==checksum)return fail('File checksum mismatch',422,origin);
   const found=await db.prepare('SELECT * FROM media_uploads WHERE library_id=? AND checksum=?').bind(library,checksum).first();
