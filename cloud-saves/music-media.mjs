@@ -4,7 +4,7 @@ const MAX_FILE=10*1024*1024,MAX_TOTAL=40*1024*1024,CHUNK=192*1024;
 const enc=new TextEncoder;
 const isMediaId=id=>/^[0-9a-f-]{36}$/i.test(id||'');
 const isRecordId=id=>/^[a-zA-Z0-9_-]{3,64}$/.test(id||'');
-export const isPrivateMusic=path=>/^\/api\/(?:upload(?:\/|$)|songs(?:\/|$)|melodies(?:\/|$))/.test(path);
+export const isPrivateMusic=path=>/^\/api\/(?:upload(?:\/|$)|assets\/|songs(?:\/|$)|melodies(?:\/|$))/.test(path);
 const hash=async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
 function base64(bytes){let s='';for(let i=0;i<bytes.length;i+=16384)s+=String.fromCharCode(...bytes.subarray(i,i+16384));return btoa(s);}
 function decode(s){const v=atob(s),b=new Uint8Array(v.length);for(let i=0;i<v.length;i++)b[i]=v.charCodeAt(i);return b;}
@@ -100,7 +100,15 @@ async function songs(req,db,library,origin,json,fail){
   if(!isRecordId(id))return fail('Song not found',404,origin);
   const row=await db.prepare('SELECT * FROM songs WHERE library_id=? AND id=?').bind(library,id).first();
   if(!row)return fail('Song not found',404,origin);
-  if(req.method==='DELETE'){await db.prepare('DELETE FROM songs WHERE library_id=? AND id=?').bind(library,id).run();return json({deleted:true},200,origin);}
+  if(req.method==='DELETE'){
+    await db.prepare('DELETE FROM songs WHERE library_id=? AND id=?').bind(library,id).run();
+    const other=await db.prepare('SELECT id FROM songs WHERE library_id=? AND media_id=? LIMIT 1').bind(library,row.media_id).first();
+    if(!other){
+      await db.prepare('DELETE FROM media_chunks WHERE library_id=? AND asset_id=?').bind(library,row.media_id).run();
+      await db.prepare('DELETE FROM media_uploads WHERE library_id=? AND id=?').bind(library,row.media_id).run();
+    }
+    return json({deleted:true},200,origin);
+  }
   if(req.method==='GET')return json({id:row.id,name:row.name,data:await mediaUrl(req,library,row.media_id)},200,origin);
   return fail('Method not allowed',405,origin);
 }
@@ -138,6 +146,16 @@ export async function privateMusic(req,env,library,origin,json,fail,rateLimit){
   try{
     if(['POST','PUT','DELETE'].includes(req.method))await rateLimit(env.DB,req);
     if(path==='/api/upload/check'||path==='/api/upload')return upload(req,env,library,origin,json,fail);
+    if(path.startsWith('/api/assets/')&&req.method==='DELETE'){
+      const assetId=path.slice('/api/assets/'.length);
+      if(!isMediaId(assetId))return fail('Media not found',404,origin);
+      const row=await env.DB.prepare('SELECT id FROM media_uploads WHERE library_id=? AND id=?').bind(library,assetId).first();
+      if(!row)return fail('Media not found',404,origin);
+      await env.DB.prepare('DELETE FROM songs WHERE library_id=? AND media_id=?').bind(library,assetId).run();
+      await env.DB.prepare('DELETE FROM media_chunks WHERE library_id=? AND asset_id=?').bind(library,assetId).run();
+      await env.DB.prepare('DELETE FROM media_uploads WHERE library_id=? AND id=?').bind(library,assetId).run();
+      return json({deleted:true},200,origin);
+    }
     if(path==='/api/songs'||path.startsWith('/api/songs/'))return songs(req,env.DB,library,origin,json,fail);
     if(path==='/api/melodies'||path.startsWith('/api/melodies/'))return melodies(req,env.DB,library,origin,json,fail);
     return fail('Not found',404,origin);
