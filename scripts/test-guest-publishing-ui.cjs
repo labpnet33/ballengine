@@ -82,6 +82,23 @@ const report={stage:'init',studioPlanner:false,automationPlanner:false,mp4Upload
    const second=page.locator('[data-be-guest-publisher]').first();
    await second.waitFor({state:'visible',timeout:20000});
    await second.getByText(job.title,{exact:true}).waitFor({timeout:20000});
+   await page.getByText('Guest draft scheduling is available in the publishing planner.',{exact:false}).waitFor({state:'visible',timeout:12000});
+   const dashboard=await page.evaluate(()=>{
+     const original='Automation is not active on this account, so connecting accounts, scheduling and Autopilot are all switched off. Every plan covers every platform.';
+     const main=document.querySelector('#root main');
+     const planner=main?.querySelector('[data-be-guest-publisher]');
+     const gate=main?.querySelector('[data-be-legacy-automation-warning]');
+     return {oldWarningVisible:[...main.querySelectorAll('div,p,span')].some(el=>el.children.length===0&&el.textContent?.trim()===original&&!!el.getClientRects().length),
+       plannerInsideOriginalContent:!!planner&&planner.parentElement!==main,
+       guestStatus:gate?.dataset.beGuestStatus,
+       plannerTop:planner?.getBoundingClientRect().top??null,
+       originalGateTop:gate?.getBoundingClientRect().top??null};
+   });
+   assert.equal(dashboard.oldWarningVisible,false,'Original misleading inactive-plan warning still displayed');
+   assert.equal(dashboard.plannerInsideOriginalContent,true,'Planner outside original Automation dashboard layout');
+   assert.equal(dashboard.guestStatus,'manual','Guest manual status not applied');
+   assert.ok(dashboard.plannerTop<=dashboard.originalGateTop,'Planner should be placed above legacy subscription gate');
+   console.log('GUEST_AUTOMATION_STATUS_PASS '+JSON.stringify(dashboard));
 
    console.log('AUTOMATION_LAYOUT_AUDIT '+JSON.stringify(await page.evaluate(()=>{
      const warning='Automation is not active on this account, so connecting accounts, scheduling and Autopilot are all switched off. Every plan covers every platform.';
