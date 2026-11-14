@@ -41,7 +41,7 @@ function json(value,status=200,origin=''){
 function options(origin){
   return new Response(null,{status:204,headers:{
     'Access-Control-Allow-Origin':origin,
-    'Access-Control-Allow-Methods':'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Methods':'GET, POST, PUT, PATCH, DELETE, OPTIONS',
     'Access-Control-Allow-Headers':'Authorization, Content-Type, X-Request-Id',
     'Access-Control-Max-Age':'3600','Vary':'Origin'
   }});
