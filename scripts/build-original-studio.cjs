@@ -139,6 +139,40 @@ fs.mkdirSync(homeDir,{recursive:true});
 fs.writeFileSync(path.join(web,'home.html'),homeDocument,'utf8');
 fs.writeFileSync(path.join(homeDir,'index.html'),homeDocument,'utf8');
 console.log('Homepage route /home prepared from original HTML shell.');
+
+// Expose the EXISTING captured /automation React page on static Vercel.
+// The Vercel project deploys a nested Root Directory, so repository-root
+// rewrites alone do not apply. A physical /automation/index.html is required
+// for direct navigation and browser refresh (just like /studio/index.html).
+// This is not a replacement page; it is the original automation.html document.
+const automationSource=path.join(web,'automation.html');
+if(!fs.existsSync(automationSource))
+  throw new Error('Original automation.html missing. Refusing to invent an Automation page.');
+const automationHTML=fs.readFileSync(automationSource,'utf8');
+if(!automationHTML.includes('id="root"') ||
+   !automationHTML.includes('index-3pf76ICO.js') ||
+   !automationHTML.includes('Automation: publishing, scheduling and Autopilot'))
+  throw new Error('The original Automation page changed; review capture before routing.');
+const automationDocument=automationHTML
+  .replaceAll('<base href="/">','')
+  .replaceAll(guestAdapter,'')
+  .replaceAll(cloudAdapter,'')
+  .replaceAll(publishingAdapter,'')
+  .replaceAll('src="assets/','src="/assets/')
+  .replaceAll('href="assets/','href="/assets/')
+  .replaceAll("src='assets/","src='/assets/")
+  .replaceAll("href='assets/","href='/assets/")
+  .replace('</head>','<base href="/">'+guestAdapter+cloudAdapter+publishingAdapter+'</head>');
+fs.writeFileSync(automationSource,automationDocument,'utf8');
+// All three paths are original React Router routes. These static HTML files
+// only bootstrap the SAME captured React application for deep links.
+for(const route of ['automation','automation/queue','automation/brands']){
+  const folder=path.join(web,route);
+  fs.mkdirSync(folder,{recursive:true});
+  fs.writeFileSync(path.join(folder,'index.html'),automationDocument,'utf8');
+}
+console.log('Original Automation route, Queue and Brands deep links prepared.');
+
 // Absolute asset paths work both at /studio and /studio/.
 // All original Studio URLs must use the same local preview user entitlement.
 // Keep this idempotent when Vercel retries or reuses a build directory.
