@@ -71,18 +71,20 @@ async function main(){
    const body=await page.locator('body').innerText();
    const rootHTML=await page.locator('#root').innerHTML();
    const guest=await page.evaluate(async()=>{
-     const r=await fetch('/api/auth/me');return{status:r.status,id:(await r.json()).user.id};
+     const r=await fetch('/api/auth/me');const u=(await r.json()).user;return{status:r.status,id:u.id,plan:u.plan,allModes:u.can_use_all_modes};
    });
    const locks=await page.evaluate(async()=>{
      const r=await fetch('/api/ui-locks');return{status:r.status,data:await r.json()};
    });
    const stuckOverlay=await page.getByText('Checking your plan and settings.',{exact:true}).count();
+   const creatorLockButtons=await page.getByRole('button',{name:/Unlock Creator/i}).count();
    const report={
      url:currentUrl.pathname+currentUrl.search,
      title:await page.title(),
      guest,
      locks,
      stuckOverlay,
+     creatorLockButtons,
      reactDOMLength:rootHTML.length,
      bodyExcerpt:body.slice(0,900),
      missingAssets:[...new Set(failedAssets)].slice(0,25),
@@ -94,9 +96,12 @@ async function main(){
    fs.writeFileSync(path.resolve(__dirname,'..','test-results','report.json'),JSON.stringify(report,null,2));
    console.log(JSON.stringify(report,null,2));
    assert.equal(guest.id,'local-preview-guest','guest preview adapter did not activate');
+   assert.equal(guest.plan,'ENTERPRISE','local preview guest must have access to tier-gated UI');
+   assert.equal(guest.allModes,true,'all development modes must be selectable in local preview');
    assert.equal(locks.status,200,'local UI-lock configuration was not served');
    assert.deepEqual(locks.data,[],'local UI-lock configuration must contain no remote overrides');
    assert.equal(stuckOverlay,0,'Studio is still blocked on account and plan configuration');
+   assert.equal(creatorLockButtons,0,'Creator paywall button is still visible in local preview');
    assert.ok(currentUrl.pathname.startsWith('/studio'),'original React app redirected to login or another page');
    assert.ok(rootHTML.length>1000,'React app did not render a substantial UI');
    assert.ok(!/(?:^|\/)(?:login|signup)(?:\/|$)/.test(currentUrl.pathname),'login route displayed instead of Studio');
