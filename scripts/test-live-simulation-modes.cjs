@@ -22,6 +22,22 @@ const names=['rhythmic','ball-crush','ball-race','glass-tower','domino-3d','jell
     planNotices:[...document.querySelectorAll('#root *')].filter(e=>e.children.length===0&&/Unlock|locked|plan required|subscribe/i.test(e.textContent?.trim()||'')).filter(e=>e.getClientRects().length).map(e=>e.textContent.trim().slice(0,150)).slice(0,25)
    }));
    console.log('SIMULATION_MODE_INITIAL '+JSON.stringify({init,errors:errors.slice(-12),failed:failed.slice(-20)}));
+   const changeMode=page.locator('button[title="Change mode"]').first();
+   console.log('SIMULATION_CHANGE_BUTTON '+await changeMode.count());
+   if(await changeMode.count()){
+     await changeMode.click({timeout:15000});
+     await page.waitForTimeout(1600);
+     console.log('SIMULATION_CHANGE_MENU '+JSON.stringify(await page.evaluate(()=>({
+       dialogs:[...document.querySelectorAll('[role="dialog"],[role="menu"],[role="listbox"]')].filter(x=>x.getClientRects().length).map(x=>({role:x.getAttribute('role'),text:x.innerText.slice(0,9000)})).slice(0,6),
+       buttons:[...document.querySelectorAll('button')].filter(x=>x.getClientRects().length).map(x=>({
+         text:x.innerText.trim().slice(0,85),title:x.title,disabled:x.disabled,ariaDisabled:x.getAttribute('aria-disabled'),aria:x.getAttribute('aria-label'),
+         parentText:x.parentElement?.innerText.slice(0,160)
+       })).filter(x=>x.text||x.title).slice(-120),
+       modeImages:[...document.querySelectorAll('img[src*="/mode-thumbs/"]')].filter(x=>x.getClientRects().length)
+         .map(x=>({src:x.getAttribute('src'),alt:x.alt,parent:x.parentElement?.parentElement?.innerText.slice(0,200)})).slice(0,75),
+       text:document.body.innerText.slice(-8000)
+     }))));
+   }
    const pickers=page.getByText(/All simulation modes/i);
    console.log('SIMULATION_PICKER_COUNT '+await pickers.count());
    if(await pickers.count()){
