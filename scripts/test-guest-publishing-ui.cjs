@@ -143,6 +143,19 @@ const report={stage:'init',studioPlanner:false,automationPlanner:false,mp4Upload
        const original=await page.locator('#root main').innerText();
        assert.ok(tab==='accounts'?original.includes('Posting as'):original.includes('Automatic posting is not configured.'),
          'Original '+tab+' content did not render');
+       if(tab==='autopilot'){
+         assert.ok(original.includes('Recurring manual posting reminders are available:'),
+           'Autopilot still promotes unavailable paid posting instead of guest recurrence');
+         assert.ok(!original.includes('Growth, Scale and Max include it'),
+           'Original Autopilot paid-plan upsell remains visible');
+         const action=page.locator('[data-be-autopilot-reminder-link]').first();
+         await action.waitFor({state:'visible',timeout:12000});
+         await action.click();
+         await page.waitForURL('**/automation/publish',{timeout:15000});
+         await page.locator('[data-be-guest-publisher]').first().waitFor({state:'visible',timeout:15000});
+         console.log('GUEST_AUTOPILOT_REMINDER_CTA_PASS '+JSON.stringify({url:page.url()}));
+         await page.goto(base+'/automation/autopilot',{waitUntil:'domcontentloaded',timeout:45000});
+       }
      }
      assert.equal(await page.getByText('Automation is not active on this account, so connecting accounts, scheduling and Autopilot are all switched off. Every plan covers every platform.',{exact:true}).count(),0,
        'Obsolete subscription warning is still shown on '+tab);
