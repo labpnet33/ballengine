@@ -155,6 +155,8 @@ const report={stage:'init',studioPlanner:false,automationPlanner:false,mp4Upload
          await page.locator('[data-be-guest-publisher]').first().waitFor({state:'visible',timeout:15000});
          console.log('GUEST_AUTOPILOT_REMINDER_CTA_PASS '+JSON.stringify({url:page.url()}));
          await page.goto(base+'/automation/autopilot',{waitUntil:'domcontentloaded',timeout:45000});
+         await page.getByText('Guest draft scheduling is available in Overview and Publish.',{exact:false})
+           .waitFor({state:'visible',timeout:15000});
        }
      }
      assert.equal(await page.getByText('Automation is not active on this account, so connecting accounts, scheduling and Autopilot are all switched off. Every plan covers every platform.',{exact:true}).count(),0,
