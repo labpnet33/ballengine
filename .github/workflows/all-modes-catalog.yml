@@ -23,3 +23,7 @@ jobs:
         run: node scripts/build-original-studio.cjs
       - name: Test mode catalog on desktop and Android-sized screen
         run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/mode-catalog/node_modules" node scripts/test-all-mode-catalog.cjs
+      - name: Verify production catalog and Flow 3D after Cloudflare live update
+        env:
+          BALLENGINE_BASE: https://ballengine.vercel.app
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/mode-catalog/node_modules" node scripts/test-all-mode-catalog.cjs
