@@ -28,10 +28,15 @@ for (const rel of expectedPublicFiles) {
 }
 // Deep-link /home must reuse the original React homepage shell, not a new UI.
 const rootHome=fs.readFileSync(path.join(root,'index.html'),'utf8');
-for(const route of ['home.html','home/index.html']){
+assert.ok(rootHome.includes('<base href="/">'),'Homepage must use root assets');
+for(const route of ['index.html','home.html','home/index.html']){
   const html=fs.readFileSync(path.join(root,route),'utf8');
   assert.ok(html.includes('<base href="/">'),'Missing root asset base on '+route);
-  assert.equal(html.replace('<base href="/">',''),rootHome,'/home must match the existing homepage');
+  assert.ok(html.includes('<script src="/studio-guest-preview.js"></script>'),
+    'Guest authentication adapter missing on '+route);
+  assert.equal((html.match(/studio-guest-preview\.js/g)||[]).length,1,
+    'Duplicate guest adapter on '+route);
+  assert.equal(html,rootHome,'Homepage routes must use exactly the same original React shell');
 }
 const originalStudio=fs.readFileSync(path.join(root,'studio','index.html'),'utf8');
 assert.ok(originalStudio.includes('index-3pf76ICO.js')&&originalStudio.includes('id="root"'),
@@ -54,8 +59,9 @@ const mime={
 const server=http.createServer((req,res)=>{
  let url;
  try {url=new URL(req.url,'http://localhost');}catch {res.writeHead(400).end();return;}
- let rel=url.pathname==='/studio'||url.pathname==='/studio/'?
-   'studio/index.html':decodeURIComponent(url.pathname).replace(/^\/+/, '');
+ let rel=(url.pathname==='/studio'||url.pathname==='/studio/')?
+   'studio/index.html':(url.pathname==='/home'||url.pathname==='/home/')?
+   'home/index.html':decodeURIComponent(url.pathname).replace(/^\/+/, '');
  if(!rel || rel.endsWith('/'))rel+='index.html';
  const file=path.resolve(root,rel);
  if(!file.startsWith(root+path.sep)) {res.writeHead(403).end();return;}
@@ -113,6 +119,17 @@ async function main(){
    await page.screenshot({path:path.resolve(__dirname,'..','test-results','studio-original.png'),fullPage:false});
    fs.writeFileSync(path.resolve(__dirname,'..','test-results','report.json'),JSON.stringify(report,null,2));
    console.log(JSON.stringify(report,null,2));
+   // Direct loads must retain the local session and avoid /login.
+   await page.goto(base+'/home',{waitUntil:'domcontentloaded',timeout:45000});
+   await page.waitForTimeout(2500);
+   const homeAuth=await page.evaluate(async()=>{
+     const response=await fetch('/api/auth/me');
+     return (await response.json()).user;
+   });
+   assert.equal(homeAuth.plan,'ENTERPRISE','/home did not load the local guest profile');
+   assert.equal(homeAuth.can_use_all_modes,true,'/home lost unrestricted local modes');
+   assert.equal(new URL(page.url()).pathname,'/home','/home redirected to login');
+
    assert.equal(guest.id,'local-preview-guest','guest preview adapter did not activate');
    assert.equal(guest.plan,'ENTERPRISE','local preview guest must have access to tier-gated UI');
    assert.equal(guest.allModes,true,'all development modes must be selectable in local preview');
