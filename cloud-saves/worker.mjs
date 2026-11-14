@@ -8,6 +8,7 @@
  */
 import {isPublicMusic,publicMusic} from './music-bank.mjs';
 import {isPrivateMusic,privateMusic,serveAsset,musicUsage} from './music-media.mjs';
+import {isGuestPublishing,guestPublishing} from './guest-publishing.mjs';
 const MAX_CONFIG_BYTES=250000;
 const MAX_SAVES=50;
 const MAX_LIBRARY_BYTES=10000000;
@@ -103,6 +104,7 @@ export default {
     const key=auth.startsWith('Bearer ')?auth.slice(7):'';
     if(!/^be1_[A-Za-z0-9_-]{43}$/.test(key))return fail('Missing or invalid cloud recovery key',401,origin);
     const library=await sha256(key);
+    if(isGuestPublishing(url.pathname))return guestPublishing(req,env,library,origin,json,fail,rateLimit);
     if(isPrivateMusic(url.pathname))return privateMusic(req,env,library,origin,json,fail,rateLimit);
     const db=env.DB;
     const parts=url.pathname.split('/').filter(Boolean);
