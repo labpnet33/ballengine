@@ -71,7 +71,19 @@ async function run(){
       await button.click({timeout:12000});
     }
     report.started=true;
+    // The original UI normally prompts to generate a seed before a timed
+    // capture. Choose its existing "Record without a seed" action so this
+    // test exercises the real export path rather than waiting on that dialog.
+    const noSeed=page.getByRole('button',{name:/^Record without a seed$/i}).first();
+    if(await noSeed.isVisible({timeout:3000}).catch(()=>false)){
+      report.seedPromptHandled=true;
+      await noSeed.click({timeout:8000});
+    }
     await page.waitForTimeout(5000);
+    if(await noSeed.isVisible().catch(()=>false)){
+      report.seedPromptStillVisible=true;
+      await noSeed.click({timeout:8000});
+    }
     report.after5Seconds=(await page.locator('body').innerText()).slice(-3000);
     await page.screenshot({path:path.join(artifacts,'studio-after-record.png')});
     if(/we couldn't start your export just now|no video frames were recorded|export failed/i.test(report.after5Seconds))
