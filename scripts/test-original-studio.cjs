@@ -85,6 +85,8 @@ async function main(){
    });
    const stuckOverlay=await page.getByText('Checking your plan and settings.',{exact:true}).count();
    const creatorLockButtons=await page.getByRole('button',{name:/Unlock Creator/i}).count();
+   const tourPromptVisible=await page.getByText('Quick tour?',{exact:true}).isVisible();
+   const randomizeTipVisible=await page.getByText('Shuffle just one part',{exact:true}).isVisible();
    const report={
      url:currentUrl.pathname+currentUrl.search,
      title:await page.title(),
@@ -92,6 +94,8 @@ async function main(){
      locks,
      stuckOverlay,
      creatorLockButtons,
+     tourPromptVisible,
+     randomizeTipVisible,
      reactDOMLength:rootHTML.length,
      bodyExcerpt:body.slice(0,900),
      missingAssets:[...new Set(failedAssets)].slice(0,25),
@@ -109,6 +113,8 @@ async function main(){
    assert.deepEqual(locks.data,[],'local UI-lock configuration must contain no remote overrides');
    assert.equal(stuckOverlay,0,'Studio is still blocked on account and plan configuration');
    assert.equal(creatorLockButtons,0,'Creator paywall button is still visible in local preview');
+   assert.equal(tourPromptVisible,false,'Quick tour popup is visible after loading Studio');
+   assert.equal(randomizeTipVisible,false,'Randomization tip is visible after loading Studio');
    assert.ok(currentUrl.pathname.startsWith('/studio'),'original React app redirected to login or another page');
    assert.ok(rootHTML.length>1000,'React app did not render a substantial UI');
    assert.ok(!/(?:^|\/)(?:login|signup)(?:\/|$)/.test(currentUrl.pathname),'login route displayed instead of Studio');
