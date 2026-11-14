@@ -1,26 +1,25 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..','extra','wget','ballengine.app','assets');
-const files=['index-3pf76ICO.js',...fs.readdirSync(root).filter(x=>x.endsWith('.js')&&x!=='index-3pf76ICO.js')];
-const terms=[
-  'Publish (7)','Publish to','Schedule','schedule','automation','Automation','publishing','Publishing','post to',
-  'Scheduled posts','Publish project','Content pipeline','/api/publish','/api/schedule','/api/automation',
-  '/api/social','/api/posts','/api/exports','/api/videos','/api/connections',
-  'TikTok','YouTube','Instagram','Share video','Download MP4','Post now','Calendar','Publishing queue'
-];
-const results={files:files.length,matches:[]};
+const files=['index-3pf76ICO.js'];
+const apiExpr=/\/api\/(?:autopilot|automation|scheduler|brands|social|youtube|tiktok|meta|instagram|facebook|videos|video-export|published|content|jobs|platforms|connections)(?:[a-zA-Z0-9_\-\/?=&.$\x7b\x7d]*)/g;
+const markers=['Publishing to {platforms} now','Publishing and scheduling come','Scheduled posts waiting','Schedule Post','Schedule posts','Publish now','Publish (7)','Publishing','Create draft','Queue a post','Auto post','Set up Autopilot','No scheduled videos'];
 for(const file of files){
- const p=path.join(root,file);if(fs.statSync(p).size>30000000)continue;
- const text=fs.readFileSync(p,'utf8');
- for(const term of terms){
-   let offset=0,n=0;const positions=[];
-   while((offset=text.indexOf(term,offset))!==-1&&positions.length<10){
-     const start=Math.max(0,offset-440),end=Math.min(text.length,offset+650);
-     positions.push({offset,context:text.slice(start,end)});
-     offset+=term.length;
-   }
-   if(positions.length)results.matches.push({file,term,positions});
+ const full=path.join(root,file);
+ const code=fs.readFileSync(full,'utf8');let match;
+ const byEndpoint=new Map();
+ while((match=apiExpr.exec(code))){
+   const endpoint=match[0].slice(0,130),family=endpoint.split('/').slice(0,4).join('/');
+   if(!byEndpoint.has(family))byEndpoint.set(family,[]);
+   const xs=byEndpoint.get(family);
+   if(xs.length<25)xs.push({at:match.index,endpoint,snippet:code.slice(Math.max(0,match.index-410),Math.min(code.length,match.index+980))});
+ }
+ for(const [family,xs] of byEndpoint){
+   console.log('AUDIT_PUBLISH_API '+JSON.stringify({file,family,totalShown:xs.length,
+    examples:xs.slice(0,16).map(x=>({...x,snippet:x.snippet.slice(0,1100)}))}));
+ }
+ for(const term of markers){
+   const start=code.indexOf(term,5500000);if(start<0)continue;
+   console.log('AUDIT_PUBLISH_UI '+JSON.stringify({file,term,at:start,context:code.slice(Math.max(0,start-900),start+1400)}));
  }
 }
-for(const item of results.matches)console.log('PUBLISH_AUDIT '+JSON.stringify(item));
-console.log('PUBLISH_SUMMARY '+JSON.stringify({files:results.files,termCount:results.matches.length}));
