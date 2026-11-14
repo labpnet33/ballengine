@@ -51,6 +51,10 @@ for (const [route,html] of [['/studio',originalStudio],['/studio.html',directStu
 const patchedBundle=fs.readFileSync(path.join(root,'assets','index-3pf76ICO.js'),'utf8');
 assert.ok(patchedBundle.includes('beAuthUser||window.__BALLENGINE_LOCAL_GUEST__||null'),
   'Original /home route is still dependent on a remote login session');
+assert.ok(patchedBundle.includes('children:[s.jsxs("button",{type:"button",onClick:i,title:Xe("Reset to default")'),
+  'Toolbar reset button is missing or no longer wired to original onReset callback');
+assert.ok(patchedBundle.includes('children:Xe("Reset to default")})]}),s.jsxs("select",'),
+  'Toolbar reset should appear directly before the duration selector');
 const adapter=fs.readFileSync(path.join(root,'studio-guest-preview.js'),'utf8');
 assert.ok(adapter.includes('window.__BALLENGINE_LOCAL_GUEST__=guest'),
   'Local guest fallback is missing from the shared homepage/Studio bootstrap');
