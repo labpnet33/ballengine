@@ -51,6 +51,9 @@ async function main(){
         const response=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:40000});
         assert.equal(response.status(),200,route+' returned 404');
         await page.locator('#root main').waitFor({state:'visible',timeout:30000});
+        // /index.html has captured homepage SSR markup; wait for the ORIGINAL
+        // React Router to hydrate and render the requested Automation tab.
+        await page.locator('h1').filter({hasText:/Automation/i}).first().waitFor({state:'visible',timeout:25000});
         const state=await page.evaluate(()=>({
           title:document.title,
           text:document.querySelector('#root main')?.innerText?.slice(0,600)||'',
@@ -60,6 +63,7 @@ async function main(){
         }));
         assert.equal(state.pathname,route,'Navigation unexpectedly redirected');
         assert.ok(state.hasReactRoot&&!state.has404,'React Automation route did not render at '+route);
+        assert.ok(state.text.includes('Automation'),'Original Automation tab not rendered at '+route);
         console.log('LIVE_AUTOMATION_DEEP_ROUTE_OK '+JSON.stringify({route,status:response.status(),...state}));
       }
     }
