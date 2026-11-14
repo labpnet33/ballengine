@@ -2,7 +2,7 @@
 const {chromium}=require('playwright-core');
 const assert=require('node:assert/strict');
 const base=process.env.BALLENGINE_BASE||'https://ballengine.vercel.app';
-const names=['rhythmic','escape','drawer','spawner','ghost-escape','breaker','glass-tower','flag-battle','weapon-battle','merge-evolution','glass-rush','grid-merge','wave-3d','marble-run-3d','ball-crush','jelly-3d','cut-count','magnet'];
+const names=['phase-bloom','phonk-drop','marble-run','ball-race','target-hit','falling-sand','plinko','color-match','spin-battle','lava-survival','glass-slice','flood-fill','eulers-disk','drum-sort','plinko-3d','chladni','voxel','domino-3d','marble-race-3d','attractor','flow-3d','metaballs','galaxy','fireflies','pendulum-basin','slime','crowd-evacuation','illusions'];
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage']});
  const ctx=await browser.newContext({viewport:{width:1440,height:900},serviceWorkers:'block'});
@@ -10,6 +10,14 @@ const names=['rhythmic','escape','drawer','spawner','ghost-escape','breaker','gl
    const page=await ctx.newPage(),errors=[],failed=[];
    page.on('pageerror',e=>errors.push(String(e).slice(0,350)));
    page.on('response',r=>{if(r.status()>=400&&r.url().startsWith(base))failed.push({status:r.status(),path:new URL(r.url()).pathname});});
+   await page.goto(base+'/home',{waitUntil:'domcontentloaded',timeout:45000});
+   await page.waitForTimeout(3300);
+   console.log('SIMULATION_HOME_CATALOG '+JSON.stringify(await page.evaluate(()=>({
+      path:location.pathname,
+      headings:[...document.querySelectorAll('h1,h2,h3,h4')].filter(e=>e.getClientRects().length).map(e=>e.innerText.trim()).slice(0,45),
+      matching:[...document.querySelectorAll('button,a,h1,h2,h3,h4')].filter(e=>e.getClientRects().length&&/All simulation modes|simulation modes|Explore.*modes/i.test(e.textContent||'')).map(e=>({tag:e.tagName,text:e.innerText.trim().slice(0,120),href:e.getAttribute('href'),html:e.outerHTML.slice(0,700)})).slice(0,25),
+      modeLinks:[...document.querySelectorAll('a[href*="mode="]')].filter(e=>e.getClientRects().length).map(e=>({text:e.innerText.trim().slice(0,100),href:e.getAttribute('href')})).slice(0,70)
+   }))));
    await page.goto(base+'/studio?mode=rhythmic',{waitUntil:'domcontentloaded',timeout:45000});
    await page.waitForTimeout(5500);
    const init=await page.evaluate(()=>({
@@ -102,7 +110,7 @@ const names=['rhythmic','escape','drawer','spawner','ghost-escape','breaker','gl
     let status=0;let pageError=null;
     try{
       const res=await page.goto(base+'/studio?mode='+mode,{waitUntil:'domcontentloaded',timeout:45000});status=res.status();
-      await page.waitForTimeout(3400);
+      await page.waitForTimeout(2100);
     }catch(e){pageError=String(e).slice(0,300);}
     const s=await page.evaluate(()=>({
       url:location.pathname+location.search,
@@ -110,6 +118,7 @@ const names=['rhythmic','escape','drawer','spawner','ghost-escape','breaker','gl
       text:document.querySelector('#root')?.innerText?.slice(0,2200),
       visibleCanvases:[...document.querySelectorAll('canvas')].filter(x=>x.getClientRects().length).map(x=>({width:x.width,height:x.height})).slice(0,4),
       selected:[...document.querySelectorAll('button,[role="button"],option')].filter(x=>x.getAttribute('aria-current')==='true'||x.getAttribute('aria-selected')==='true'||x.getAttribute('data-state')==='active').filter(x=>x.getClientRects().length).map(x=>({text:x.textContent.trim().slice(0,50),title:x.title})).slice(0,15),
+      activeMode:document.querySelector('button[title="Change mode"]')?.textContent.trim(),
       lockedText:[...document.querySelectorAll('#root *')].filter(e=>e.children.length===0&&/Unlock|Feature locked|Select a plan|Upgrade|mode unavailable/i.test(e.textContent?.trim()||'')).filter(e=>e.getClientRects().length).map(e=>e.textContent.trim().slice(0,130)).slice(0,8),
       loading:[...document.querySelectorAll('#root *')].filter(e=>e.children.length===0&&/^(Loading|Waiting for|Checking your plan|Connecting to)/i.test(e.textContent?.trim()||'')).filter(e=>e.getClientRects().length).map(e=>e.textContent.trim().slice(0,110)).slice(0,6)
     }));
