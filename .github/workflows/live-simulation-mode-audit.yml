@@ -1,0 +1,22 @@
+name: Audit BallEngine simulation modes
+on:
+  push:
+    branches: [fix/production-home-route]
+    paths:
+      - scripts/test-live-simulation-modes.cjs
+      - .github/workflows/live-simulation-mode-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  studio-modes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install browser driver
+        run: npm install --prefix "$RUNNER_TEMP/mode-audit" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Audit original simulation modes on production
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/mode-audit/node_modules" node scripts/test-live-simulation-modes.cjs
