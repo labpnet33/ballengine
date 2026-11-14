@@ -166,12 +166,12 @@ const automationDocument=automationHTML
 fs.writeFileSync(automationSource,automationDocument,'utf8');
 // All three paths are original React Router routes. These static HTML files
 // only bootstrap the SAME captured React application for deep links.
-for(const route of ['automation','automation/queue','automation/brands']){
+for(const route of ['automation','automation/accounts','automation/publish','automation/autopilot','automation/plan','automation/queue','automation/brands']){
   const folder=path.join(web,route);
   fs.mkdirSync(folder,{recursive:true});
   fs.writeFileSync(path.join(folder,'index.html'),automationDocument,'utf8');
 }
-console.log('Original Automation route, Queue and Brands deep links prepared.');
+console.log('Original Automation dashboard and existing tab deep links prepared.');
 
 // Absolute asset paths work both at /studio and /studio/.
 // All original Studio URLs must use the same local preview user entitlement.
