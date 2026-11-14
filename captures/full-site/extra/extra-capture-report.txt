@@ -1,0 +1,7 @@
+Webcloner optional public capture
+URL: https://ballengine.app/
+Output: /home/ubuntu/ballengine/captures/full-site/extra
+Engines: both
+Depth: 8; Browsertrix page limit: 500
+Per-engine quota: 5000 MB; time: 120 minutes
+

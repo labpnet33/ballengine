@@ -1,0 +1,622 @@
+<!DOCTYPE html><html lang="en" class="dark" data-rh-managed="lang"><head>
+  <!--
+    GOOGLE CONSENT MODE v2 — DEFAULTS. This block must stay ABOVE the gtag.js tag below,
+    and it must stay inline (not bundled): the guarantee it provides is purely one of ORDERING.
+
+    Until now GA4 and GTM loaded on every page with no consent signal at all, which means they set
+    their cookies immediately — while the banner's only button flipped a localStorage string and
+    changed nothing. Anything that arrives after the tags have already stored an identifier is too
+    late; the storage happened.
+
+    So everything non-essential starts DENIED for everyone. In that state the tags still load and
+    still function, but they set no cookies and send no identifiers — and `consent update` (from
+    src/lib/consent.ts, or the replay below) upgrades them in place, with no page reload.
+
+    `security_storage` is granted from the start: it is the anti-fraud/abuse signal, which is
+    strictly necessary and is not something a visitor is asked to opt into.
+
+    The replay is what stops a RETURNING visitor being denied for the second or so it takes React to
+    boot — long enough to lose the pageview they already agreed to send. It reads the same key and
+    honours the same version as src/lib/consent.ts (CONSENT_STORAGE_KEY / CONSENT_VERSION); if you
+    change either there, change it here. It is wrapped in try/catch because localStorage throws
+    outright in some private-mode and embedded-webview contexts, and a throw here would take the
+    tags — and then the app shell — down with it.
+  -->
+  <script>
+    // Admin ▸ Visitor Journeys runs the Studio framed inside /admin to replay a visit. That is not
+    // traffic, so the Google tags below stay off. Same test as src/lib/journeyReplaySandbox.ts.
+    window.__BE_JOURNEY_REPLAY__ = false;
+    try {
+      window.__BE_JOURNEY_REPLAY__ = window.top !== window.self &&
+        /[?&]journeyReplay=1(?:&|$)/.test(location.search) &&
+        window.parent.location.origin === location.origin &&
+        /^\/admin(?:\/|$)/.test(window.parent.location.pathname);
+    } catch (e) { /* cross-origin parent: a normal page */ }
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+      functionality_storage: 'denied',
+      personalization_storage: 'denied',
+      security_storage: 'granted',
+      wait_for_update: 500
+    });
+    try {
+      var beConsent = JSON.parse(localStorage.getItem('be_cookie_consent') || 'null');
+      if (beConsent && beConsent.v === 5 && beConsent.categories) {
+        var c = beConsent.categories;
+        var g = function (on) { return on ? 'granted' : 'denied'; };
+        gtag('consent', 'update', {
+          ad_storage: g(c.marketing),
+          ad_user_data: g(c.marketing),
+          ad_personalization: g(c.marketing),
+          analytics_storage: g(c.analytics),
+          functionality_storage: g(c.preferences),
+          personalization_storage: g(c.preferences),
+          security_storage: 'granted'
+        });
+      }
+    } catch (e) { /* storage unavailable — stay on the denied defaults */ }
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-7BNE2MELD4"></script>
+  <script>
+    if (!window.__BE_JOURNEY_REPLAY__) {
+      gtag('js', new Date());
+
+      gtag('config', 'G-7BNE2MELD4');
+    }
+  </script>
+  <!--
+    No Google Tag Manager. GTM-53MFK2DJ was published EMPTY ("tags": [] in its gtm.js, checked
+    2026-09-26): 113 KB and ~150 ms of main thread per page load that did nothing. GA4 runs from the
+    gtag.js tag above. If a tag is ever needed in GTM, put the loader back and move GA4 into GTM
+    at the same time, so the site never runs GA4 from both.
+  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+  <!--
+    Poisoned-asset self-heal. /assets/* is served with `max-age=1y, immutable`, and
+    Cloudflare applies those headers BY REQUEST PATH — so if an asset request ever
+    transiently returns the SPA-fallback HTML (deploy propagation race), the browser
+    caches that HTML as the asset FOR A YEAR and `immutable` means it never revalidates.
+    Strict MIME checking then refuses the "stylesheet"/"script" on every load, and even
+    reinstalling the desktop app doesn't clear the WebView2 profile cache. This must be
+    INLINE in the document (which always revalidates): when a same-origin /assets/*
+    stylesheet or script fails, re-request it once with a cache-busting query (a new URL
+    bypasses the poisoned cache entry). If the busted URL fails too, the HTML itself is
+    stale — reload the page once (sessionStorage-guarded) to fetch a fresh document.
+  -->
+  <script>
+    (function () {
+      function heal(t, isLink) {
+        var attr = isLink ? 'href' : 'src';
+        var url = t.getAttribute(attr) || '';
+        // Only heal our own hashed assets; external CDNs manage themselves.
+        if (url.indexOf('/assets/') !== 0 &&
+            url.indexOf(location.origin + '/assets/') !== 0) return;
+        if (url.indexOf('cachebust=') === -1) {
+          var busted = url + (url.indexOf('?') > -1 ? '&' : '?') + 'cachebust=' + Date.now();
+          var n;
+          if (isLink) {
+            n = t.cloneNode();
+            n.setAttribute('href', busted);
+          } else {
+            // Cloned <script> elements never execute (the "already started" flag is
+            // copied), so build a fresh element and copy the attributes across.
+            n = document.createElement('script');
+            for (var i = 0; i < t.attributes.length; i++) {
+              n.setAttribute(t.attributes[i].name, t.attributes[i].value);
+            }
+            n.setAttribute('src', busted);
+          }
+          (t.parentNode || document.head).insertBefore(n, t.nextSibling);
+          if (t.parentNode) t.parentNode.removeChild(t);
+        } else if (!sessionStorage.getItem('assetHealReloaded')) {
+          sessionStorage.setItem('assetHealReloaded', '1');
+          location.reload();
+        }
+      }
+      // 404s / network failures fire `error` on the element.
+      window.addEventListener('error', function (e) {
+        var t = e.target;
+        if (!t || !t.tagName || t === window) return;
+        if (t.tagName === 'LINK' && t.rel === 'stylesheet') heal(t, true);
+        else if (t.tagName === 'SCRIPT' && t.src) heal(t, false);
+      }, true);
+      // A stylesheet whose response is HTML fires `load` (not error) and is then
+      // refused by strict MIME checking — the tell is link.sheet === null.
+      window.addEventListener('load', function (e) {
+        var t = e.target;
+        if (!t || t === window || t.tagName !== 'LINK' || t.rel !== 'stylesheet') return;
+        if (!t.sheet) heal(t, true);
+      }, true);
+    })();
+  </script>
+  <meta name="msvalidate.01" content="1AB5EF297A63FC4A7A5FAC0425B89764">
+  <meta name="p:domain_verify" content="0b3a5215135039e9ec98d86539ac5d3a">
+  <title>BallEngine Developer Docs: Website Player, Video API and MCP Server | BallEngine</title>
+  <!--
+    Per-page <meta name="description">, keywords, Open Graph and Twitter tags are injected
+    per-route by src/components/SEO.tsx (react-helmet) and baked into each page at prerender
+    time. They were intentionally REMOVED from this static shell: hardcoding the homepage's
+    values here made every prerendered sub-page inherit the homepage description / og:title /
+    og:url (react-helmet's meta tags carry no marker, so the prerender dedup kept these static
+    ones and dropped the per-page ones). The <title> above is kept only as a no-JS fallback;
+    react-helmet overrides it per route.
+  -->
+
+  <!-- Favicons & Brand Icons -->
+  <link rel="icon" type="image/x-icon" href="../favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="../favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="../apple-touch-icon-167x167.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="../apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="../apple-touch-icon-120x120.png">
+  <link rel="mask-icon" href="../safari-pinned-tab.svg" color="#0891b2">
+  <meta name="msapplication-TileColor" content="#0891b2">
+  <meta name="msapplication-config" content="/browserconfig.xml">
+  <meta name="msapplication-TileImage" content="/mstile-150x150.png">
+
+  <!--
+    Structured Data — brand entity graph.
+
+    These three nodes are what Google reads for BRAND queries, and they are joined by
+    `@id` so Search resolves them to ONE entity instead of three loose objects. Keep the
+    `@id` values stable; changing them re-starts entity consolidation from scratch.
+
+    `alternateName` must carry every string a user might type for us — critically the
+    TWO-WORD "Ball Engine", which is a contested generic term (an automotive machine shop
+    and a historic steam-engine maker both own strong signals for it). A previous
+    find-and-replace flattened this list to three copies of the domain and dropped the
+    real alternates; that is why the two-word query surfaced nothing. Do not let a bulk
+    rename touch these values again.
+  -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://ballengine.app/#organization",
+      "name": "BallEngine",
+      "legalName": "Ball Engine Studios",
+      "alternateName": [
+        "Ball Engine",
+        "BallEngine.app",
+        "ballengine.app",
+        "BallEngine Creator Studio"
+      ],
+      "url": "https://ballengine.app/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://ballengine.app/logo.png"
+      },
+      "description": "BallEngine (also written Ball Engine) is the #1 browser-based bouncing ball simulator and creator studio for creating satisfying ball simulations and viral content for TikTok, Reels, and YouTube Shorts.",
+      "sameAs": [
+        "https://youtube.com/@funcirclegames",
+        "https://www.instagram.com/funcirclegames",
+        "https://www.tiktok.com/@funcirclegames",
+        "https://x.com/funcirclegames",
+        "https://www.threads.com/@funcirclegames"
+      ]
+    }
+    </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "@id": "https://ballengine.app/#software",
+      "name": "BallEngine",
+      "alternateName": ["Ball Engine", "BallEngine Simulator", "BallEngine Creator Studio"],
+      "publisher": { "@id": "https://ballengine.app/#organization" },
+      "image": "https://ballengine.app/logo.png",
+      "operatingSystem": "Web",
+      "applicationCategory": "MultimediaApplication",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Starter Studio",
+          "price": "0.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Lite",
+          "price": "19.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Creator",
+          "price": "29.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Pro",
+          "price": "49.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Elite",
+          "price": "99.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Agency",
+          "price": "199.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        }
+      ]
+    }
+    </script>
+  <!--
+    Pricing tiers (Starter / Lite / Creator / Pro / Elite / Agency) are SaaS subscription plans and are already
+    represented as `offers` on the SoftwareApplication schema above. The standalone Product
+    schema was REMOVED: marking subscription plans as Product made Google's Rich Results test
+    flag "missing field review / aggregateRating" on every page, and we have no genuine
+    customer ratings to supply. Fabricating review/aggregateRating to clear the warning would
+    violate Google's structured-data policy (self-serving / fake reviews → manual action).
+    Re-introduce Product + aggregateRating ONLY when real, on-page user reviews exist.
+  -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://ballengine.app/#website",
+      "name": "BallEngine",
+      "alternateName": ["Ball Engine", "ballengine.app"],
+      "url": "https://ballengine.app/",
+      "image": "https://ballengine.app/logo.png",
+      "publisher": { "@id": "https://ballengine.app/#organization" }
+    }
+    </script>
+  <!--
+    BRAND FONTS are self-hosted (src/styles/fonts.css, files in public/fonts/). They used to come
+    from a render-blocking fonts.googleapis.com stylesheet, which put two extra connections
+    (googleapis for the CSS, gstatic for the files) ahead of first paint. Preloading the one face
+    every page paints with (Figtree, latin, upright) starts it in parallel with index.css instead
+    of after it. `crossorigin` is required: fonts are fetched in CORS mode, and a preload without
+    it is a separate request the font load cannot reuse.
+
+    The ~30 text-overlay picker families are NOT here. They load on demand inside the studio;
+    see src/lib/overlayFonts.ts.
+  -->
+  <link rel="preload" href="../fonts/figtree/v9/_Xms-HUzqDCFdgfMm4S9DQ.woff2" as="font" type="font/woff2" crossorigin="">
+  <link rel="preconnect" href="https://cdn.ballengine.app">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#06b6d4">
+  <script>
+    if ('serviceWorker' in navigator) {
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Unregister existing service workers on localhost to prevent caching issues in development
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          for (const registration of registrations) {
+            registration.unregister().then((success) => {
+              if (success) console.log('SW: Unregistered active service worker on localhost.');
+            });
+          }
+        });
+      } else {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+        });
+      }
+    }
+  </script>
+  <!--
+    /studio is served with an empty #root, so until the entry script runs a phone showed a white
+    page and then the Studio's dark outline (src/components/ui/StudioSkeleton.tsx). This paints the
+    empty root in the Studio's own colour instead. `:empty` stops matching the moment React renders,
+    so it never touches another page. Dark unless the saved Studio config says otherwise, the same
+    test as StudioSkeleton (STORAGE_KEY hypnotic_ball_config_v25).
+  -->
+  <script>
+    try {
+      if (/^\/(?:[a-z]{2}(?:-[a-z]{2,4})?\/)?studio\/?$/i.test(location.pathname)) {
+        document.documentElement.setAttribute('data-boot-studio',
+          /"darkMode"\s*:\s*false/.test(localStorage.getItem('hypnotic_ball_config_v25') || '') ? 'light' : 'dark');
+      }
+    } catch (e) { /* storage blocked: the plain white shell, as before */ }
+  </script>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    html[data-boot-studio] #root:empty { min-height: 100vh; }
+    html[data-boot-studio="dark"] #root:empty { background: #09090b; }
+    html[data-boot-studio="light"] #root:empty { background: #e4e4e7; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.25);
+      background-clip: content-box;
+    }
+
+    /* Dark Mode Scrollbar */
+    .dark ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      background-clip: content-box;
+    }
+
+    .dark ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.25);
+      background-clip: content-box;
+    }
+
+    /* Custom scrollbar class for specific containers */
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(139, 92, 246, 0.4);
+      /* Purple-500 with opacity */
+      background-clip: content-box;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(139, 92, 246, 0.6);
+      background-clip: content-box;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(167, 139, 250, 0.5);
+      /* Purple-400 */
+      background-clip: content-box;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(167, 139, 250, 0.7);
+      background-clip: content-box;
+    }
+  </style>
+  <!--
+    Kick the hero reels request off before the bundle exists.
+
+    The homepage's first visual comes from /api/hero-reels, and that call lives in a React
+    effect — so it could not start until 2.4MB of JavaScript had downloaded, parsed and
+    mounted. Measured cold, the request began at ~2.76s and the thumbnails it names only
+    started downloading at ~4.1s. The response is 3.3KB and `public, max-age=60`, so
+    firing it here puts it in the HTTP cache long before the app asks, and the app's own
+    fetch is then served from cache instead of crossing the network.
+
+    The parsed body is parked on window.__heroReelsPrefetch and home.tsx CONSUMES it, so this is
+    the only /api/hero-reels request of the page load. It used to be a bare warm-up that the app
+    then repeated, which still put a second (sometimes third) request on the wire. The promise
+    resolves null on any failure and never rejects; home.tsx falls back to its own fetch then.
+  -->
+  <script>
+    try {
+      window.__heroReelsPrefetch = fetch('/api/hero-reels')
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; });
+    } catch (e) { /* no fetch: the app's own call still runs */ }
+  </script>
+  <!--
+    REMOVED: the esm.sh importmap (react / react-dom / vite) and the synchronous paddle.js tag.
+
+    The importmap was scaffold residue. Nothing resolved through it — the bundle is
+    self-contained and Vite rewrites every bare specifier at build time — so it only
+    advertised a set of CDN origins we do not use.
+
+    paddle.js was loaded here as a BLOCKING script on every page, including pages with no
+    checkout. It was also redundant: ensurePaddleLoaded() in src/components/PaddleCheckout.tsx
+    already injects the script on demand, with a 5s timeout and adblocker handling — and it
+    even removes any pre-existing paddle.js tag first. Having the tag here meant window.Paddle
+    was always present, so that lazy path short-circuited and was effectively dead code on the
+    web. Checkout now loads Paddle at the moment a plan is clicked, which is what that helper
+    was written for.
+  -->
+  <script type="module" crossorigin="" src="../assets/index-3pf76ICO.js"></script>
+  <link rel="modulepreload" crossorigin="" href="../assets/vendor-react-kqrIXDwM.js">
+  <link rel="modulepreload" crossorigin="" href="../assets/vendor-motion-EOl-odwX.js">
+  <link rel="stylesheet" crossorigin="" href="../assets/index-DoMKM56W.css">
+<style type="text/css">[data-sonner-toaster][dir=ltr],html[dir=ltr]{--toast-icon-margin-start:-3px;--toast-icon-margin-end:4px;--toast-svg-margin-start:-1px;--toast-svg-margin-end:0px;--toast-button-margin-start:auto;--toast-button-margin-end:0;--toast-close-button-start:0;--toast-close-button-end:unset;--toast-close-button-transform:translate(-35%, -35%)}[data-sonner-toaster][dir=rtl],html[dir=rtl]{--toast-icon-margin-start:4px;--toast-icon-margin-end:-3px;--toast-svg-margin-start:0px;--toast-svg-margin-end:-1px;--toast-button-margin-start:0;--toast-button-margin-end:auto;--toast-close-button-start:unset;--toast-close-button-end:0;--toast-close-button-transform:translate(35%, -35%)}[data-sonner-toaster]{position:fixed;width:var(--width);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;--gray1:hsl(0, 0%, 99%);--gray2:hsl(0, 0%, 97.3%);--gray3:hsl(0, 0%, 95.1%);--gray4:hsl(0, 0%, 93%);--gray5:hsl(0, 0%, 90.9%);--gray6:hsl(0, 0%, 88.7%);--gray7:hsl(0, 0%, 85.8%);--gray8:hsl(0, 0%, 78%);--gray9:hsl(0, 0%, 56.1%);--gray10:hsl(0, 0%, 52.3%);--gray11:hsl(0, 0%, 43.5%);--gray12:hsl(0, 0%, 9%);--border-radius:8px;box-sizing:border-box;padding:0;margin:0;list-style:none;outline:0;z-index:999999999;transition:transform .4s ease}@media (hover:none) and (pointer:coarse){[data-sonner-toaster][data-lifted=true]{transform:none}}[data-sonner-toaster][data-x-position=right]{right:var(--offset-right)}[data-sonner-toaster][data-x-position=left]{left:var(--offset-left)}[data-sonner-toaster][data-x-position=center]{left:50%;transform:translateX(-50%)}[data-sonner-toaster][data-y-position=top]{top:var(--offset-top)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--offset-bottom)}[data-sonner-toast]{--y:translateY(100%);--lift-amount:calc(var(--lift) * var(--gap));z-index:var(--z-index);position:absolute;opacity:0;transform:var(--y);touch-action:none;transition:transform .4s,opacity .4s,height .4s,box-shadow .2s;box-sizing:border-box;outline:0;overflow-wrap:anywhere}[data-sonner-toast][data-styled=true]{padding:16px;background:var(--normal-bg);border:1px solid var(--normal-border);color:var(--normal-text);border-radius:var(--border-radius);box-shadow:0 4px 12px rgba(0,0,0,.1);width:var(--width);font-size:13px;display:flex;align-items:center;gap:6px}[data-sonner-toast]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-y-position=top]{top:0;--y:translateY(-100%);--lift:1;--lift-amount:calc(1 * var(--gap))}[data-sonner-toast][data-y-position=bottom]{bottom:0;--y:translateY(100%);--lift:-1;--lift-amount:calc(var(--lift) * var(--gap))}[data-sonner-toast][data-styled=true] [data-description]{font-weight:400;line-height:1.4;color:#3f3f3f}[data-rich-colors=true][data-sonner-toast][data-styled=true] [data-description]{color:inherit}[data-sonner-toaster][data-sonner-theme=dark] [data-description]{color:#e8e8e8}[data-sonner-toast][data-styled=true] [data-title]{font-weight:500;line-height:1.5;color:inherit}[data-sonner-toast][data-styled=true] [data-icon]{display:flex;height:16px;width:16px;position:relative;justify-content:flex-start;align-items:center;flex-shrink:0;margin-left:var(--toast-icon-margin-start);margin-right:var(--toast-icon-margin-end)}[data-sonner-toast][data-promise=true] [data-icon]>svg{opacity:0;transform:scale(.8);transform-origin:center;animation:sonner-fade-in .3s ease forwards}[data-sonner-toast][data-styled=true] [data-icon]>*{flex-shrink:0}[data-sonner-toast][data-styled=true] [data-icon] svg{margin-left:var(--toast-svg-margin-start);margin-right:var(--toast-svg-margin-end)}[data-sonner-toast][data-styled=true] [data-content]{display:flex;flex-direction:column;gap:2px}[data-sonner-toast][data-styled=true] [data-button]{border-radius:4px;padding-left:8px;padding-right:8px;height:24px;font-size:12px;color:var(--normal-bg);background:var(--normal-text);margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end);border:none;font-weight:500;cursor:pointer;outline:0;display:flex;align-items:center;flex-shrink:0;transition:opacity .4s,box-shadow .2s}[data-sonner-toast][data-styled=true] [data-button]:focus-visible{box-shadow:0 0 0 2px rgba(0,0,0,.4)}[data-sonner-toast][data-styled=true] [data-button]:first-of-type{margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end)}[data-sonner-toast][data-styled=true] [data-cancel]{color:var(--normal-text);background:rgba(0,0,0,.08)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-styled=true] [data-cancel]{background:rgba(255,255,255,.3)}[data-sonner-toast][data-styled=true] [data-close-button]{position:absolute;left:var(--toast-close-button-start);right:var(--toast-close-button-end);top:0;height:20px;width:20px;display:flex;justify-content:center;align-items:center;padding:0;color:var(--gray12);background:var(--normal-bg);border:1px solid var(--gray4);transform:var(--toast-close-button-transform);border-radius:50%;cursor:pointer;z-index:1;transition:opacity .1s,background .2s,border-color .2s}[data-sonner-toast][data-styled=true] [data-close-button]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-styled=true] [data-disabled=true]{cursor:not-allowed}[data-sonner-toast][data-styled=true]:hover [data-close-button]:hover{background:var(--gray2);border-color:var(--gray5)}[data-sonner-toast][data-swiping=true]::before{content:'';position:absolute;left:-100%;right:-100%;height:100%;z-index:-1}[data-sonner-toast][data-y-position=top][data-swiping=true]::before{bottom:50%;transform:scaleY(3) translateY(50%)}[data-sonner-toast][data-y-position=bottom][data-swiping=true]::before{top:50%;transform:scaleY(3) translateY(-50%)}[data-sonner-toast][data-swiping=false][data-removed=true]::before{content:'';position:absolute;inset:0;transform:scaleY(2)}[data-sonner-toast][data-expanded=true]::after{content:'';position:absolute;left:0;height:calc(var(--gap) + 1px);bottom:100%;width:100%}[data-sonner-toast][data-mounted=true]{--y:translateY(0);opacity:1}[data-sonner-toast][data-expanded=false][data-front=false]{--scale:var(--toasts-before) * 0.05 + 1;--y:translateY(calc(var(--lift-amount) * var(--toasts-before))) scale(calc(-1 * var(--scale)));height:var(--front-toast-height)}[data-sonner-toast]>*{transition:opacity .4s}[data-sonner-toast][data-x-position=right]{right:0}[data-sonner-toast][data-x-position=left]{left:0}[data-sonner-toast][data-expanded=false][data-front=false][data-styled=true]>*{opacity:0}[data-sonner-toast][data-visible=false]{opacity:0;pointer-events:none}[data-sonner-toast][data-mounted=true][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset)));height:var(--initial-height)}[data-sonner-toast][data-removed=true][data-front=true][data-swipe-out=false]{--y:translateY(calc(var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=false]{--y:translateY(40%);opacity:0;transition:transform .5s,opacity .2s}[data-sonner-toast][data-removed=true][data-front=false]::before{height:calc(var(--initial-height) + 20%)}[data-sonner-toast][data-swiping=true]{transform:var(--y) translateY(var(--swipe-amount-y,0)) translateX(var(--swipe-amount-x,0));transition:none}[data-sonner-toast][data-swiped=true]{user-select:none}[data-sonner-toast][data-swipe-out=true][data-y-position=bottom],[data-sonner-toast][data-swipe-out=true][data-y-position=top]{animation-duration:.2s;animation-timing-function:ease-out;animation-fill-mode:forwards}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=left]{animation-name:swipe-out-left}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=right]{animation-name:swipe-out-right}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=up]{animation-name:swipe-out-up}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=down]{animation-name:swipe-out-down}@keyframes swipe-out-left{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) - 100%));opacity:0}}@keyframes swipe-out-right{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) + 100%));opacity:0}}@keyframes swipe-out-up{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) - 100%));opacity:0}}@keyframes swipe-out-down{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) + 100%));opacity:0}}@media (max-width:600px){[data-sonner-toaster]{position:fixed;right:var(--mobile-offset-right);left:var(--mobile-offset-left);width:100%}[data-sonner-toaster][dir=rtl]{left:calc(var(--mobile-offset-left) * -1)}[data-sonner-toaster] [data-sonner-toast]{left:0;right:0;width:calc(100% - var(--mobile-offset-left) * 2)}[data-sonner-toaster][data-x-position=left]{left:var(--mobile-offset-left)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--mobile-offset-bottom)}[data-sonner-toaster][data-y-position=top]{top:var(--mobile-offset-top)}[data-sonner-toaster][data-x-position=center]{left:var(--mobile-offset-left);right:var(--mobile-offset-right);transform:none}}[data-sonner-toaster][data-sonner-theme=light]{--normal-bg:#fff;--normal-border:var(--gray4);--normal-text:var(--gray12);--success-bg:hsl(143, 85%, 96%);--success-border:hsl(145, 92%, 87%);--success-text:hsl(140, 100%, 27%);--info-bg:hsl(208, 100%, 97%);--info-border:hsl(221, 91%, 93%);--info-text:hsl(210, 92%, 45%);--warning-bg:hsl(49, 100%, 97%);--warning-border:hsl(49, 91%, 84%);--warning-text:hsl(31, 92%, 45%);--error-bg:hsl(359, 100%, 97%);--error-border:hsl(359, 100%, 94%);--error-text:hsl(360, 100%, 45%)}[data-sonner-toaster][data-sonner-theme=light] [data-sonner-toast][data-invert=true]{--normal-bg:#000;--normal-border:hsl(0, 0%, 20%);--normal-text:var(--gray1)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-invert=true]{--normal-bg:#fff;--normal-border:var(--gray3);--normal-text:var(--gray12)}[data-sonner-toaster][data-sonner-theme=dark]{--normal-bg:#000;--normal-bg-hover:hsl(0, 0%, 12%);--normal-border:hsl(0, 0%, 20%);--normal-border-hover:hsl(0, 0%, 25%);--normal-text:var(--gray1);--success-bg:hsl(150, 100%, 6%);--success-border:hsl(147, 100%, 12%);--success-text:hsl(150, 86%, 65%);--info-bg:hsl(215, 100%, 6%);--info-border:hsl(223, 43%, 17%);--info-text:hsl(216, 87%, 65%);--warning-bg:hsl(64, 100%, 6%);--warning-border:hsl(60, 100%, 9%);--warning-text:hsl(46, 87%, 65%);--error-bg:hsl(358, 76%, 10%);--error-border:hsl(357, 89%, 16%);--error-text:hsl(358, 100%, 81%)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]{background:var(--normal-bg);border-color:var(--normal-border);color:var(--normal-text)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]:hover{background:var(--normal-bg-hover);border-color:var(--normal-border-hover)}[data-rich-colors=true][data-sonner-toast][data-type=success]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=success] [data-close-button]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=info]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=info] [data-close-button]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning] [data-close-button]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=error]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}[data-rich-colors=true][data-sonner-toast][data-type=error] [data-close-button]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}.sonner-loading-wrapper{--size:16px;height:var(--size);width:var(--size);position:absolute;inset:0;z-index:10}.sonner-loading-wrapper[data-visible=false]{transform-origin:center;animation:sonner-fade-out .2s ease forwards}.sonner-spinner{position:relative;top:50%;left:50%;height:var(--size);width:var(--size)}.sonner-loading-bar{animation:sonner-spin 1.2s linear infinite;background:var(--gray11);border-radius:6px;height:8%;left:-10%;position:absolute;top:-3.9%;width:24%}.sonner-loading-bar:first-child{animation-delay:-1.2s;transform:rotate(.0001deg) translate(146%)}.sonner-loading-bar:nth-child(2){animation-delay:-1.1s;transform:rotate(30deg) translate(146%)}.sonner-loading-bar:nth-child(3){animation-delay:-1s;transform:rotate(60deg) translate(146%)}.sonner-loading-bar:nth-child(4){animation-delay:-.9s;transform:rotate(90deg) translate(146%)}.sonner-loading-bar:nth-child(5){animation-delay:-.8s;transform:rotate(120deg) translate(146%)}.sonner-loading-bar:nth-child(6){animation-delay:-.7s;transform:rotate(150deg) translate(146%)}.sonner-loading-bar:nth-child(7){animation-delay:-.6s;transform:rotate(180deg) translate(146%)}.sonner-loading-bar:nth-child(8){animation-delay:-.5s;transform:rotate(210deg) translate(146%)}.sonner-loading-bar:nth-child(9){animation-delay:-.4s;transform:rotate(240deg) translate(146%)}.sonner-loading-bar:nth-child(10){animation-delay:-.3s;transform:rotate(270deg) translate(146%)}.sonner-loading-bar:nth-child(11){animation-delay:-.2s;transform:rotate(300deg) translate(146%)}.sonner-loading-bar:nth-child(12){animation-delay:-.1s;transform:rotate(330deg) translate(146%)}@keyframes sonner-fade-in{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}@keyframes sonner-fade-out{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}@keyframes sonner-spin{0%{opacity:1}100%{opacity:.15}}@media (prefers-reduced-motion){.sonner-loading-bar,[data-sonner-toast],[data-sonner-toast]>*{transition:none!important;animation:none!important}}.sonner-loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transform-origin:center;transition:opacity .2s,transform .2s}.sonner-loader[data-visible=false]{opacity:0;transform:scale(.8) translate(-50%,-50%)}</style><meta name="description" content="One reference for the BallEngine developer platform: embed the website player, render physics simulation videos with one API call, or connect Claude and other AI agents through our MCP server. One set of settings for all three."><meta name="keywords" content="BallEngine, Ball Engine, ballengine.app, BallEngine Creator Studio, ball simulation, physics simulator, ASMR physics videos, satisfying ball simulation, physics video generator, faceless video generator, TikTok shorts creator, YouTube shorts generator"><meta property="og:type" content="website"><meta property="og:site_name" content="BallEngine"><meta property="og:title" content="BallEngine Developer Docs: Website Player, Video API and MCP Server | BallEngine"><meta property="og:description" content="One reference for the BallEngine developer platform: embed the website player, render physics simulation videos with one API call, or connect Claude and other AI agents through our MCP server. One set of settings for all three."><meta property="og:image" content="https://ballengine.app/og-card.jpg"><meta property="og:url" content="https://ballengine.app/developer/docs"><meta property="og:locale" content="en_US"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@Ballengine_app"><meta name="twitter:title" content="BallEngine Developer Docs: Website Player, Video API and MCP Server | BallEngine"><meta name="twitter:description" content="One reference for the BallEngine developer platform: embed the website player, render physics simulation videos with one API call, or connect Claude and other AI agents through our MCP server. One set of settings for all three."><meta name="twitter:image" content="https://ballengine.app/og-card.jpg"><meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"><link rel="canonical" href="docs.html"><link rel="alternate" hreflang="x-default" href="docs.html"><link rel="alternate" hreflang="en" href="docs.html"><link rel="icon" type="image/x-icon" href="../favicon.ico"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png"><link rel="icon" type="image/png" sizes="48x48" href="../favicon-48x48.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png"><link rel="mask-icon" href="../safari-pinned-tab.svg" color="#0891b2"></head>
+
+<body style="overflow: auto;">
+  <div id="root"><div class="flex flex-col min-h-screen bg-background text-foreground overflow-x-clip selection:bg-primary selection:text-primary-foreground transition-colors duration-500"><header class="fixed left-0 right-0 z-50 w-full border-b border-border bg-card top-0"><div class="container-page"><div class="flex h-16 items-center justify-between gap-4"><a class="flex shrink-0 items-center gap-2.5" href="../index.html" data-discover="true"><picture class="flex h-9 w-9 items-center justify-center"><source srcset="/logo.webp" type="image/webp"><source srcset="/logo.png" type="image/png"><img alt="" width="36" height="36" class="h-9 w-9 object-contain" src="../logo.png"></picture><span class="font-display text-lg font-bold tracking-tight text-foreground">BallEngine</span></a><nav class="hidden items-center gap-1 lg:flex"><div class="relative"><button type="button" aria-expanded="false" class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground"><span>Features</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 opacity-60 transition-transform" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div class="relative"><button type="button" aria-expanded="false" class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors bg-muted text-foreground font-semibold"><span>Developer</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 opacity-60 transition-transform" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div class="relative"><button type="button" aria-expanded="false" class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground"><span>Resources</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 opacity-60 transition-transform" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><a class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground" href="../plans.html" data-discover="true">Pricing</a><a class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground" href="../studio.html" data-discover="true">Studio</a></nav><div class="hidden items-center gap-2 md:flex"><button type="button" tabindex="0" aria-haspopup="menu" id="base-ui-_r_4_" data-slot="dropdown-menu-trigger" title="Change language" aria-label="Language" class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe be-i be-h-blue be-loop be-wiggle size-4" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><g transform="rotate(-20 12 12)"><ellipse cx="12" cy="12" rx="4" ry="9"></ellipse><path d="M3.5 9h17M3.5 15h17"></path></g></svg></button><div class="h-5 w-px bg-border"></div><div class="flex items-center gap-2"><a class="btn btn-ghost" href="../login.html" data-discover="true">Log in</a><a class="btn btn-primary" href="../start.html" data-discover="true">Start free</a></div></div><div class="flex items-center gap-2 lg:hidden"><a class="btn btn-primary btn-sm md:hidden" href="../start.html" data-discover="true">Start free</a><button type="button" tabindex="0" aria-haspopup="menu" id="base-ui-_r_a_" data-slot="dropdown-menu-trigger" title="Change language" aria-label="Language" class="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted md:hidden" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe be-i be-h-blue be-loop be-wiggle size-4" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><g transform="rotate(-20 12 12)"><ellipse cx="12" cy="12" rx="4" ry="9"></ellipse><path d="M3.5 9h17M3.5 15h17"></path></g></svg></button><button type="button" aria-expanded="false" class="flex h-11 w-11 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted"><span class="sr-only">Toggle main menu</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu be-i size-5" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg></button></div></div></div></header><main class="flex-grow relative pt-28"><div class="min-h-screen pb-16 md:pb-24"><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","name":"BallEngine Developer REST API Documentation & MCP Server Guide","headline":"Generate Cloud-Rendered Physics Simulation Videos Programmatically","description":"BallEngine Developer API & MCP Server reference: custom duration (5s-300s), aspect ratios (9:16, 16:9, 1:1, 4:5, 3:4), the public simulation modes, visual themes, original music you compose or upload, and Claude integration.","articleSection":"Developer Documentation","dependencies":"REST API, JSON, Bearer Token Auth, Model Context Protocol (MCP)","publisher":{"@type":"Organization","name":"BallEngine","url":"https://ballengine.app"}}</script><header class="container-page pt-28 pb-10 md:pt-32 md:pb-14 max-w-3xl"><div class="max-w-3xl space-y-5"><h1 class="t-h1">Developer docs</h1><div class="t-lead max-w-2xl">The reference for the BallEngine developer platform: the website player on your own site, cloud-rendered MP4s from one API call, and Claude or any AI agent making videos through our MCP server. All three use one engine, one account and one set of settings.</div><div class="flex flex-wrap items-center gap-3 pt-1"><a class="btn btn-secondary" href="../developer.html" data-discover="true">Developer platform</a></div></div></header><div class="container-prose"><dl class="surface-card divide-y divide-border"><div class="p-4 sm:flex sm:gap-6"><dt class="t-h4 sm:w-40 sm:shrink-0">Aspect ratios</dt><dd class="t-small mt-1 sm:mt-0">9:16 (Shorts/Reels/TikTok), 16:9 (YouTube), 1:1 (Square), 4:5, and 3:4.</dd></div><div class="p-4 sm:flex sm:gap-6"><dt class="t-h4 sm:w-40 sm:shrink-0">Your own music</dt><dd class="t-small mt-1 sm:mt-0">Compose to a mood such as dark phonk, synthwave or chill lofi, or use a track from your own library.</dd></div><div class="p-4 sm:flex sm:gap-6"><dt class="t-h4 sm:w-40 sm:shrink-0">MCP server</dt><dd class="t-small mt-1 sm:mt-0">A Model Context Protocol server for Claude Desktop, Cursor and other AI agents.</dd></div></dl><h2 id="start" class="t-h3 mt-12 mb-4 scroll-mt-24">Three ways in, one set of settings</h2><ul class="t-body text-foreground/80 list-disc pl-5 space-y-2"><li><a href="docs.html#player" class="link">Website player</a>: the live simulator on your site with one iframe and a public key. Videos are made on your visitors' devices.</li><li><a href="docs.html#create" class="link">Cloud render API</a>: POST /api/v1/videos with a secret key, get an MP4. Paid with render credits.</li><li><a href="docs.html#ai-agents" class="link">Claude and AI agents</a>: the hosted MCP server, the OpenAPI spec or a ready prompt. Agents call the same API on your credits.</li></ul><p class="t-body text-foreground/80 mt-4">The player and the API read the same look settings with the same names: <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">theme</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">palette</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">title_text</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">watermark_text</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">speed</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">ball_count</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">gravity</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">sound_effect</code> and <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">config_overrides</code>. They go in the JSON body of a cloud render, in the player's URL, or in its <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">set-settings</code> message, and the same code applies them, so a look you design on your site renders the same in the cloud.</p><h2 id="auth" class="t-h3 mt-12 mb-4 scroll-mt-24">Authentication</h2><p class="t-body text-foreground/80 mb-4">Create a secret key on your <a class="link" href="../developer.html" data-discover="true">Developer page</a> and send it as a bearer token on every request. Keys are shown once at creation and can be revoked at any time. Keep them server-side: never ship a key inside a browser or mobile app.</p><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">Authorization: Bearer be_sk_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</pre><p class="t-body text-foreground/80 mt-4">API access is invite-only for now: our team switches it on for each account. Buying render credits does not turn it on.</p><h2 id="credits" class="t-h3 mt-12 mb-4 scroll-mt-24">Pricing</h2><p class="t-body text-foreground/80 mb-4">Rendering is billed with prepaid credits using linear pricing: <strong>1 credit = 30 seconds of 720p 30 fps video, 2 credits = 30 seconds of 1080p 60 fps</strong> (at 720p 30 fps: 15s = 0.5 credits, 45s = 1.5 credits, 60s = 2.0 credits, 300s = 10.0 credits; double each at 1080p 60 fps). You can generate any clip length from 5 seconds up to 5 minutes (300 seconds). Clips shorter than 10 seconds are billed as 10 seconds.</p><h2 id="create" class="t-h3 mt-12 mb-4 scroll-mt-24">Create a video</h2><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">POST https://ballengine.app/api/v1/videos
+Content-Type: application/json
+Authorization: Bearer be_sk_...
+
+{
+  "duration": 30,
+  "quality": "1080p60",
+  "aspect_ratio": "9:16",
+  "mode": "GHOST_ESCAPE",
+  "theme": "cyberpunk_neon",
+  "music_mood": "dark phonk",
+  "title_text": "Wait for the end!",
+  "watermark_text": "@MyChannel",
+  "speed": 1.2
+}</pre><h3 class="t-h4 mt-8 mb-3">Parameters</h3><div class="surface-card overflow-x-auto mb-6"><table class="w-full text-sm text-left"><thead class="bg-secondary border-b border-border text-xs font-medium uppercase tracking-wide text-muted-foreground"><tr><th class="p-3">Field</th><th class="p-3">Type</th><th class="p-3">Description</th></tr></thead><tbody class="divide-y divide-border text-foreground/80"><tr><td class="p-3 font-mono font-semibold text-foreground">duration</td><td class="p-3 font-mono text-muted-foreground">number</td><td class="p-3">Duration in seconds (5 to 300, default: 30). Linear billing by quality: 1 credit per 30s at 720p30, 2 credits per 30s at 1080p60.</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">quality</td><td class="p-3 font-mono text-muted-foreground">string</td><td class="p-3">"720p30" (720p at 30 fps, 1 credit per 30s, default) or "1080p60" (1080p at 60 fps, 2 credits per 30s).</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">aspect_ratio</td><td class="p-3 font-mono text-muted-foreground">string</td><td class="p-3">"9:16", "16:9", "1:1", "4:5" or "3:4". The short edge is 720 at 720p30 and 1080 at 1080p60, so "9:16" is 720x1280 or 1080x1920.</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">mode</td><td class="p-3 font-mono text-muted-foreground">string</td><td class="p-3">"GHOST_ESCAPE", "SPACE_SPIRAL", "RHYTHMIC", "ESCAPE", "DRAWER", "SPAWNER", "WAVE_GRID", "FLAG_BATTLE", "MARBLE_RUN_3D", or "RANDOM".</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">theme</td><td class="p-3 font-mono text-muted-foreground">string</td><td class="p-3">"cyberpunk_neon", "dark_minimal", "retro_synthwave", "matrix_code", "gold_luxury", "fire_and_ice", "pastel_dream", "deep_space".</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">music_mood</td><td class="p-3 font-mono text-muted-foreground">string</td><td class="p-3">Mood to compose in when no track is named (e.g. "dark phonk", "synthwave", "chill lofi", "epic battle").</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">song</td><td class="p-3 font-mono text-muted-foreground">string</td><td class="p-3">Name of a track in your own library, one you composed in the studio or uploaded yourself.</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">xmidi_token</td><td class="p-3 font-mono text-muted-foreground">string</td><td class="p-3">Legacy catalogue token, kept so existing projects keep rendering. Not available for new work. Compose a track or upload your own instead.</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">title_text</td><td class="p-3 font-mono text-muted-foreground">string</td><td class="p-3">On-screen header text overlay.</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">watermark_text</td><td class="p-3 font-mono text-muted-foreground">string</td><td class="p-3">Custom creator watermark / social handle.</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">speed</td><td class="p-3 font-mono text-muted-foreground">number</td><td class="p-3">Simulation speed multiplier (0.5 to 3.0, default: 1.0).</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">randomize_depth</td><td class="p-3 font-mono text-muted-foreground">string</td><td class="p-3">Randomization depth: "LIGHT", "MODERATE", "DEEP" (default), "TOTAL", or "CUSTOM".</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">randomize_groups</td><td class="p-3 font-mono text-muted-foreground">string[]</td><td class="p-3">Groups to randomize when depth is CUSTOM (e.g. ["ARENA", "TRAILS", "BALL_COLOR"]).</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">seed</td><td class="p-3 font-mono text-muted-foreground">string</td><td class="p-3">1-64 characters of [a-zA-Z0-9_-] for deterministic reproduction.</td></tr><tr><td class="p-3 font-mono font-semibold text-foreground">metadata</td><td class="p-3 font-mono text-muted-foreground">object</td><td class="p-3">Up to 20 keys of your own (strings up to 500 characters, numbers or booleans). Returned on every read of the job and in its webhooks, so you can match a video to your records.</td></tr></tbody></table></div><h2 id="response" class="t-h3 mt-12 mb-4 scroll-mt-24">Job response</h2><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">HTTP 201 Created
+{
+  "id": "job-k3x92ab1c",
+  "status": "queued",
+  "duration": 30,
+  "aspect_ratio": "9:16",
+  "quality": "1080p60",
+  "fps": 60,
+  "resolution": "1080x1920",
+  "mode": "GHOST_ESCAPE",
+  "seed": "f81kq2z9",
+  "credits_charged": 2,
+  "credits_remaining": 8.5,
+  "metadata": { "order_id": "A-1042" },
+  "created_at": 1753159000
+}</pre><h2 id="status" class="t-h3 mt-12 mb-4 scroll-mt-24">Poll for the result</h2><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">GET https://ballengine.app/api/v1/videos/job-k3x92ab1c
+Authorization: Bearer be_sk_...</pre><p class="t-body text-foreground/80 my-4">Poll every 10 to 15 seconds until status is "done". When ready, download_url provides a direct 15-minute presigned MP4 link.</p><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">HTTP 200 OK
+{
+  "id": "job-k3x92ab1c",
+  "status": "done",
+  "duration": 30,
+  "resolution": "1080x1920",
+  "format": "mp4",
+  "download_url": "https://pub-...r2.dev/renders/job-k3x92ab1c.mp4?...",
+  "created_at": 1753159000
+}</pre><p class="t-body text-foreground/80 my-4">Need a fresh link later? <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">GET /api/v1/videos/:id/download</code> answers with a redirect to a new 15-minute link for as long as the video is kept (7 days).</p><h2 id="list" class="t-h3 mt-12 mb-4 scroll-mt-24">List, page and cancel</h2><p class="t-body text-foreground/80 mb-4">GET /api/v1/videos lists the jobs created with your key, newest first, 20 per page by default (up to 100 with limit). When has_more is true, pass next_starting_after as starting_after to get the next page. Filter with status (queued, rendering, done, failed), created_after and created_before (Unix seconds).</p><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">GET https://ballengine.app/api/v1/videos?limit=50&amp;status=done&amp;starting_after=job-k3x92ab1c
+
+HTTP 200 OK
+{ "jobs": [ ... ], "has_more": true, "next_starting_after": "job-p0q8m2x4a" }</pre><p class="t-body text-foreground/80 my-4">DELETE /api/v1/videos/:id cancels a queued job and refunds its credits in full. A job that has started rendering cannot be canceled (409 already_rendering); delete it once it has finished. Deleting a finished job removes the video file and the job.</p><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">DELETE https://ballengine.app/api/v1/videos/job-k3x92ab1c
+
+HTTP 200 OK
+{ "id": "job-k3x92ab1c", "deleted": true, "canceled": true, "credits_refunded": 1 }</pre><h2 id="webhooks" class="t-h3 mt-12 mb-4 scroll-mt-24">Webhooks: get notified instead of polling</h2><p class="t-body text-foreground/80 mb-4">Register an https URL on your Developer page or through the API. When a render finishes we send it a signed POST with the result. Any 2xx answer within 10 seconds counts as delivered. Anything else is retried after 1 minute, 5 minutes, 30 minutes, 2 hours, 6 hours and 24 hours. An endpoint that fails 20 times in a row is switched off until you turn it back on.</p><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">POST https://ballengine.app/api/v1/webhooks
+Authorization: Bearer be_sk_...
+
+{ "url": "https://your-server.com/ballengine/webhook", "events": ["video.completed", "video.failed"] }
+
+HTTP 201 Created
+{ "id": "we_3f9c...", "url": "...", "events": [...], "status": "active", "secret": "whsec_..." }</pre><p class="t-body text-foreground/80 my-4">The secret is returned once. Other calls: <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">GET /api/v1/webhooks</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">DELETE /api/v1/webhooks/:id</code>, and <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">POST /api/v1/webhooks/:id/test</code> to send a test event.</p><p class="t-h4 mt-6 mb-2">Limits and automatic switch-off</p><ul class="t-body text-foreground/80 list-disc pl-5 mb-4 space-y-1"><li>Test events: 3 per minute and 15 per hour per account. Resends: 5 per minute and 30 per hour. Adding endpoints: 5 per minute and 20 per hour. Going over answers 429 with retry_after.</li><li>An endpoint is switched off after 20 failed deliveries in a row, or after more than 200 deliveries in one hour.</li><li>If test or resend calls keep coming after the limit (10 refused calls in an hour), every endpoint on the account is switched off.</li><li>A switched-off endpoint receives nothing, test events included. Only you can turn it back on, by signing in to your Developer page. There is no API call for it, so a runaway script cannot undo its own switch-off.</li></ul><p class="t-h4 mt-6 mb-2">What we send</p><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">POST https://your-server.com/ballengine/webhook
+BallEngine-Event-Id: evt_job-k3x92ab1c_completed
+BallEngine-Event-Type: video.completed
+BallEngine-Signature: t=1753159120,v1=5d41402abc4b2a76b9719d911017c592...
+
+{
+  "id": "evt_job-k3x92ab1c_completed",
+  "type": "video.completed",
+  "api_version": "v1",
+  "created_at": 1753159120,
+  "data": {
+    "video": {
+      "id": "job-k3x92ab1c",
+      "status": "done",
+      "duration": 30,
+      "resolution": "1080x1920",
+      "format": "mp4",
+      "seed": "f81kq2z9",
+      "metadata": { "order_id": "A-1042" },
+      "download_url": "https://ballengine.app/api/v1/videos/job-k3x92ab1c/download",
+      "created_at": 1753159000,
+      "finished_at": 1753159118
+    }
+  }
+}</pre><p class="t-body text-foreground/80 my-4">A video.failed event carries "status": "failed", an "error" message and "credits_refunded" instead of a download link. The same event can arrive more than once, so use its id to ignore repeats. In the rare case a render reported as failed later finishes, you get a video.completed after the video.failed, and the later one is correct.</p><p class="t-h4 mt-6 mb-2">Check the signature (Node.js)</p><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">import crypto from 'node:crypto';
+
+// rawBody: the request body exactly as received, before JSON parsing.
+function verify(rawBody, header, secret) {
+  const parts = Object.fromEntries(header.split(',').map((p) =&gt; p.split('=')));
+  const expected = crypto.createHmac('sha256', secret)
+    .update(`${parts.t}.${rawBody}`)
+    .digest('hex');
+  const fresh = Math.abs(Date.now() / 1000 - Number(parts.t)) &lt; 300;
+  const a = Buffer.from(expected);
+  const b = Buffer.from(parts.v1 || '');
+  return fresh &amp;&amp; a.length === b.length &amp;&amp; crypto.timingSafeEqual(a, b);
+}</pre><h2 id="ai-agents" class="t-h3 mt-12 mb-4 scroll-mt-24">Connect Claude, ChatGPT or your own agent</h2><p class="t-body text-foreground/80 mb-6">Claude, ChatGPT, Cursor or your own agent can create videos for you. There are three ways to connect them:</p><ol class="surface-card divide-y divide-border mb-6"><li class="flex items-start gap-4 p-4 sm:p-6"><span class="t-h4 w-6 shrink-0 tabular-nums text-cyan-700 dark:text-cyan-300">1.</span><div><h3 class="t-h4">Copy and paste a prompt</h3><p class="t-small mt-1.5 break-words">Nothing to install. Copy the prompt from your Developer dashboard into Claude.ai or ChatGPT.</p></div></li><li class="flex items-start gap-4 p-4 sm:p-6"><span class="t-h4 w-6 shrink-0 tabular-nums text-cyan-700 dark:text-cyan-300">2.</span><div><h3 class="t-h4">OpenAPI 3.1 spec</h3><p class="t-small mt-1.5 break-words">Paste https://ballengine.app/api/v1/openapi.json into Custom GPTs, Make.com, Zapier, or LangChain.</p></div></li><li class="flex items-start gap-4 p-4 sm:p-6"><span class="t-h4 w-6 shrink-0 tabular-nums text-cyan-700 dark:text-cyan-300">3.</span><div><h3 class="t-h4">Hosted remote MCP</h3><p class="t-small mt-1.5 break-words">Point Claude Desktop or Cursor at https://ballengine.app/api/v1/mcp. Nothing to install locally.</p></div></li></ol><p class="t-body text-foreground/80 mb-4">The hosted MCP server has the whole platform as tools: <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">generate_video</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">get_video_status</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">list_videos</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">cancel_video</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">estimate_video_cost</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">list_simulation_modes</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">list_visual_themes</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">list_look_settings</code>, and for the website player <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">get_embed_integration_guide</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">list_website_players</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">update_website_player</code> (cloud video limits and websites) and <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">create_cloud_render_token</code>. Send your secret key as a bearer token.</p><p class="t-label mb-2">Claude Desktop (claude_desktop_config.json), through the mcp-remote bridge:</p><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">{
+  "mcpServers": {
+    "ballengine": {
+      "command": "npx",
+      "args": [
+        "-y", "mcp-remote", "https://ballengine.app/api/v1/mcp",
+        "--header", "Authorization: Bearer ${BALLENGINE_API_KEY}"
+      ],
+      "env": { "BALLENGINE_API_KEY": "be_sk_YOUR_API_KEY" }
+    }
+  }
+}</pre><p class="t-label mt-6 mb-2">Claude Code, Cursor or any client that speaks MCP over HTTP:</p><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">claude mcp add --transport http ballengine https://ballengine.app/api/v1/mcp \
+  --header "Authorization: Bearer be_sk_YOUR_API_KEY"</pre><p class="t-label mt-6 mb-2">Example prompts:</p><ul class="t-body text-foreground/80 list-disc pl-5 space-y-1"><li>"Claude, create a 30s 9:16 TikTok video with a neon cyberpunk theme, dark phonk music, and Ghost Escape mode."</li><li>"Generate a 15s square video for Instagram with Space Spiral mode and a gold luxury theme."</li><li>"Check the render status of job-k3x92ab1c."</li><li>"Add the BallEngine player to my website, with a Cloud video button capped at 20 credits a month."</li></ul><h2 id="player" class="t-h3 mt-12 mb-4 scroll-mt-24">Website player</h2><p class="t-body text-foreground/80 mb-4">Show a BallEngine mode on your own website with one iframe. Visitors randomize it and download the video, made on their own device, counted against your site's monthly videos. The player runs in our frame, so your page's styles never reach it. The public key (be_pk_) only works on the websites we register for it. Invite-only: confirm interest on the <a class="link" href="../developer.html#access" data-discover="true">developer platform</a> page.</p><p class="t-body text-foreground/80 mb-4">URL options: <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">mode</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">duration</code> (5 to 60 seconds), <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">visitor</code> (your user's id, for a per-user limit), and every look setting a cloud render takes (<a href="docs.html#start" class="link">the shared settings</a>), with <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">config_overrides</code> as URL-encoded JSON. The look stays on through every Randomize. Change it live with a <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">set-settings</code> message; the player answers <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">settings-changed</code> with the settings it applied and drops any it does not know.</p><h3 id="player-cloud" class="t-h4 mt-8 mb-3 scroll-mt-24">Cloud videos from the player</h3><p class="t-body text-foreground/80 mb-4">Like the Studio, the player can offer an HD video made on our GPUs: switch on Cloud videos for the site in your console and the player shows a Cloud video button, or your page starts one with <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">{ type: 'cloud-render', quality?, duration? }</code>. It renders the scene on screen and bills YOUR cloud credits (your plan's monthly credits, then bought ones; a paid plan is required), at the API's prices. You set the spend: credits a month for the site, videos a month per visitor (counted by <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">visitor</code>) and the longest length. The player answers <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">cloud-queued</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">cloud-progress</code>, <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">cloud-done</code> (with <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">url</code>, a signed MP4 link valid 15 minutes, for your server to keep) and <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">cloud-failed</code> (with a <code class="text-xs bg-muted rounded px-1.5 py-0.5 font-mono text-foreground">code</code>; a failed render is refunded).</p><p class="t-body text-foreground/80 mb-4">To give cloud videos only to the users you choose, such as your paying customers, switch on Only with a token from your server. The built-in button then hides, and each render needs a one-time token (10 minutes) your server mints with your secret key:</p><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">POST https://ballengine.app/api/v1/embed/cloud-tokens
+Authorization: Bearer be_sk_...
+
+{ "site_key": "be_pk_your_key", "visitor": "USER_ID" }
+
+→ 201 { "token": "be_ct_...", "expires_at": 1761700000, "visitor": "USER_ID" }
+
+// then, on your page:
+player.contentWindow.postMessage(
+  { target: 'ballengine', type: 'cloud-render', token, quality: '1080p60' },
+  'https://ballengine.app');</pre><p class="t-body text-foreground/80 my-4">For a longer or 16:9 video, render the same look from your server with POST /api/v1/videos. Never put a secret key in the page.</p><p class="t-body text-foreground/80 mb-4">Let your AI do it: once invited, press Copy AI prompt on your Developer page and paste it into Claude, ChatGPT or Cursor in your website project. The same guide is at <a href="../byobe-guide.txt" target="_blank" rel="noopener noreferrer" class="font-medium text-cyan-700 hover:text-cyan-800 dark:text-cyan-400 dark:hover:text-cyan-300">ballengine.app/byobe-guide.txt</a>, and assistants connected to our MCP server get it from the get_embed_integration_guide tool.</p><pre class="overflow-x-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs leading-relaxed text-zinc-100 sm:p-6">&lt;iframe
+  src="https://ballengine.app/embed?key=be_pk_your_key&amp;mode=FLAG_BATTLE&amp;visitor=USER_ID&amp;duration=15&amp;theme=cyberpunk_neon&amp;title_text=Who%20escapes%20first%3F"
+  style="width: 100%; aspect-ratio: 9 / 16; border: 0"
+&gt;&lt;/iframe&gt;
+
+&lt;script&gt;
+  const player = document.querySelector('iframe');
+  window.addEventListener('message', (e) =&gt; {
+    if (e.origin !== 'https://ballengine.app' || e.data?.source !== 'ballengine') return;
+    // ready (with e.data.modes for a mode picker) | randomized | mode-changed | settings-changed
+    // cloud-queued | cloud-progress | cloud-done (e.data.url) | cloud-failed
+    // export-progress | export-done | export-failed | limit-reached
+    if (e.data.type === 'export-done') upload(e.data.video); // the MP4 as a Blob
+  });
+  // Drive the player from your own buttons:
+  player.contentWindow.postMessage({ target: 'ballengine', type: 'randomize' }, 'https://ballengine.app');
+  // also { type: 'export' }, { type: 'set-mode', mode: 'RHYTHMIC' } and
+  // { type: 'set-settings', settings: { theme: 'gold_luxury', speed: 1.5 } }
+&lt;/script&gt;</pre><h2 id="errors" class="t-h3 mt-12 mb-4 scroll-mt-24">Error codes</h2><div class="surface-card overflow-x-auto mt-4 mb-8"><table class="w-full text-sm text-left"><thead class="bg-secondary border-b border-border text-xs font-medium uppercase tracking-wide text-muted-foreground"><tr><th class="p-3">HTTP</th><th class="p-3">Code</th><th class="p-3">Meaning</th></tr></thead><tbody class="divide-y divide-border text-foreground/80"><tr><td class="p-3 font-mono font-bold text-foreground">400</td><td class="p-3 font-mono text-foreground/80">invalid_request</td><td class="p-3">Invalid duration, aspect ratio, mode, or JSON schema.</td></tr><tr><td class="p-3 font-mono font-bold text-foreground">401</td><td class="p-3 font-mono text-foreground/80">invalid_api_key</td><td class="p-3">Missing, malformed, unknown, or revoked key.</td></tr><tr><td class="p-3 font-mono font-bold text-foreground">402</td><td class="p-3 font-mono text-foreground/80">insufficient_credits</td><td class="p-3">Balance too low. Buy credits on your Developer page.</td></tr><tr><td class="p-3 font-mono font-bold text-foreground">403</td><td class="p-3 font-mono text-foreground/80">api_access_disabled</td><td class="p-3">Your account does not have API access enabled.</td></tr><tr><td class="p-3 font-mono font-bold text-foreground">404</td><td class="p-3 font-mono text-foreground/80">not_found</td><td class="p-3">No such job or webhook endpoint for this account.</td></tr><tr><td class="p-3 font-mono font-bold text-foreground">409</td><td class="p-3 font-mono text-foreground/80">not_ready</td><td class="p-3">The video has no file to download yet. Check its status first.</td></tr><tr><td class="p-3 font-mono font-bold text-foreground">409</td><td class="p-3 font-mono text-foreground/80">already_rendering</td><td class="p-3">The video is rendering and cannot be canceled. Delete it once it has finished.</td></tr><tr><td class="p-3 font-mono font-bold text-foreground">409</td><td class="p-3 font-mono text-foreground/80">endpoint_disabled</td><td class="p-3">The webhook endpoint is switched off. Turn it back on from your Developer page.</td></tr><tr><td class="p-3 font-mono font-bold text-foreground">429</td><td class="p-3 font-mono text-foreground/80">rate_limited / concurrency_limit</td><td class="p-3">Too many requests (max 5 in-flight per key).</td></tr><tr><td class="p-3 font-mono font-bold text-foreground">503</td><td class="p-3 font-mono text-foreground/80">capacity / unavailable</td><td class="p-3">Queue temporarily saturated, retry with exponential backoff.</td></tr></tbody></table></div></div></div></main><footer class="border-t border-border bg-background pt-12 pb-8"><div class="container-page"><div class="mb-10 grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-3 lg:grid-cols-7"><div class="col-span-2 space-y-4 md:col-span-3 lg:col-span-2"><a class="inline-flex items-center gap-3" href="../index.html" data-discover="true"><picture class="flex h-10 w-10 shrink-0 items-center justify-center"><source srcset="/logo.webp" type="image/webp"><source srcset="/logo.png" type="image/png"><img alt="" width="40" height="40" class="h-10 w-10 object-contain" src="../logo.png"></picture><span class="flex min-w-0 flex-col"><span class="t-h4 leading-none">BallEngine</span><span class="t-caption mt-1">by Ball Engine Studios</span></span></a><p class="t-small max-w-xs">Create satisfying physics videos and synced bouncing ball simulations.</p><div class="flex gap-2"><a href="https://youtube.com/@ballengine_app" target="_blank" rel="noreferrer" aria-label="YouTube" class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card transition-colors hover:border-foreground/25"><svg class="h-4" viewBox="0 0 28 20" role="img" aria-label="YouTube" xmlns="http://www.w3.org/2000/svg" style="min-height: 20px; width: auto;"><title>YouTube</title><path fill="#FF0000" d="M27.4 3.1c-.3-1.2-1.3-2.1-2.5-2.4C22.7 0 14 0 14 0S5.3 0 3.1.7C1.9 1 .9 1.9.6 3.1 0 5.3 0 10 0 10s0 4.7.6 6.9c.3 1.2 1.3 2.1 2.5 2.4C5.3 20 14 20 14 20s8.7 0 10.9-.7c1.2-.3 2.2-1.2 2.5-2.4.6-2.2.6-6.9.6-6.9s0-4.7-.6-6.9z"></path><path fill="#FFFFFF" d="M11.2 14.3l7.3-4.3-7.3-4.3v8.6z"></path></svg></a><a href="https://x.com/Ballengine_app" target="_blank" rel="noreferrer" aria-label="X" class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card transition-colors hover:border-foreground/25"><svg class="h-4 text-foreground" viewBox="0 0 24 24" role="img" aria-label="X" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="min-height: 20px; width: auto;"><title>X</title><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg></a></div></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Product</h2><nav aria-label="Product"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../index.html" data-discover="true">Home</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../start.html" data-discover="true">Start free</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../studio.html" data-discover="true">Studio</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../plans.html" data-discover="true">Pricing</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../automation.html" data-discover="true">Automation</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../developer.html" data-discover="true">Developer platform</a></li><li><a href="https://cdn.ballengine.app/download/BallEngine-Setup.exe?cb=1794215246351" class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1">Download for Windows</a></li></ul></nav></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Learn</h2><nav aria-label="Learn"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../how-it-works.html" data-discover="true">How it works</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../modes.html" data-discover="true">Simulation modes</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../play.html" data-discover="true">Games</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../tutorials.html" data-discover="true">Tutorials</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../blog.html" data-discover="true">Blog</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../roadmap.html" data-discover="true">Roadmap</a></li></ul></nav></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Support</h2><nav aria-label="Support"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../help.html" data-discover="true">Help</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../support.html" data-discover="true">Support center</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../faq.html" data-discover="true">FAQ</a></li></ul></nav></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Company</h2><nav aria-label="Company"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../about.html" data-discover="true">About us</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../affiliate.html" data-discover="true">Affiliate program</a></li></ul></nav></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Legal</h2><nav aria-label="Legal"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../terms-of-service.html" data-discover="true">Terms of service</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../privacy-policy.html" data-discover="true">Privacy policy</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../refund-policy.html" data-discover="true">Refund policy</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../cookie-policy.html" data-discover="true">Cookie policy</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../acceptable-use.html" data-discover="true">Acceptable use</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../copyright-policy.html" data-discover="true">Copyright policy</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../data-deletion.html" data-discover="true">Data deletion</a></li><li><button type="button" class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1 text-left">Cookie preferences</button></li></ul></nav></div></div><div class="flex flex-wrap gap-x-4 gap-y-1 border-t border-border pt-6"><a aria-current="true" class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 font-semibold text-foreground" href="../index.html" data-discover="true">English</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../es.html" data-discover="true">Español</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../fr.html" data-discover="true">Français</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../de.html" data-discover="true">Deutsch</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../ja.html" data-discover="true">日本語</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../zh-tw.html" data-discover="true">繁體中文</a></div><p class="t-caption mt-4 font-normal text-muted-foreground">© 2026 Ball Engine Studios. All rights reserved.</p></div></footer><section aria-label="Notifications alt+T" tabindex="-1" aria-live="polite" aria-relevant="additions text" aria-atomic="false"></section></div></div>
+  <noscript>
+    <div style="padding: 20px; font-family: sans-serif;">
+      <!-- No heading elements in here. This block is copied into EVERY prerendered page, so a
+           heading here gave all 1,400 URLs a second, homepage-worded H1 next to the page's own. -->
+      <p><strong>BallEngine</strong> (also written <strong>Ball Engine</strong>, at
+        <strong>ballengine.app</strong>) is a browser-based bouncing ball simulator
+        and creator studio for music-synced 2D and 3D physics videos.</p>
+
+      <p><strong>Plans</strong></p>
+      <ul>
+        <!-- Keep in sync with src/constants/pricing.ts and the SoftwareApplication offers above.
+             These drifted to a stale $29/$159, then $99, and contradicted the JSON-LD on the same page. -->
+        <li><strong>Starter Studio:</strong> Free. The full Studio with a live preview; exporting a video needs a plan.</li>
+        <li><strong>Lite:</strong> $19/mo. No watermark, 1080p, commercial license, 15 exports per month (one video every other day).</li>
+        <li><strong>Creator:</strong> $29/mo. Every 2D setting, commercial license, no watermark, 30 exports per month, Automation Lite included (60 posts a month). The recommended plan.</li>
+        <li><strong>Pro:</strong> $49/mo. Everything in Creator, 3D settings, 4K rendering, your own watermark text, 60 exports per month, Automation Growth included (240 posts a month).</li>
+        <li><strong>Elite:</strong> $99/mo. Everything in Pro, 150 exports per month, Automation Scale included (600 posts a month), 200 GB storage.</li>
+        <li><strong>Agency:</strong> $199/mo. Everything in Elite, 500 exports per month, Automation Max included (2,000 posts a month), 500 GB storage.</li>
+      </ul>
+
+      <nav>
+        <a href="../index.html">Home</a> |
+        <a href="../modes.html">All modes</a> |
+        <a href="../play.html">Games</a> |
+        <a href="../plans.html">Pricing</a> |
+        <a href="../support.html">Support</a>
+      </nav>
+
+      <p>BallEngine, ballengine.app</p>
+      <p>Follow BallEngine:</p>
+      <nav>
+        <a href="https://youtube.com/@funcirclegames">YouTube</a> |
+        <a href="https://www.instagram.com/funcirclegames">Instagram</a> |
+        <a href="https://www.tiktok.com/@funcirclegames">TikTok</a> |
+        <a href="https://x.com/funcirclegames">Twitter / X</a> |
+        <a href="https://www.threads.com/@funcirclegames">Threads</a>
+      </nav>
+    </div>
+  </noscript>
+
+
+
+<!-- Cloudflare Pages Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "61906db637f044638bdee99f6e5c9222"}'></script><!-- Cloudflare Pages Analytics --><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5a0e75e6cda4043',t:'MTc5NDYwNTcwMA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5a0e75e6cda4043',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body></html>

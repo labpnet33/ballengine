@@ -1,0 +1,8 @@
+Webcloner three-engine summary
+Target: https://ballengine.app/
+Capture folder: /home/ubuntu/ballengine/captures/full-site
+Mode: resume
+Playwright exit: 0
+Wget / Browsertrix: preserved (not rerun)
+Details: playwright/report.txt and extra/extra-capture-report.txt
+These tools do not produce private source code or a working backend.

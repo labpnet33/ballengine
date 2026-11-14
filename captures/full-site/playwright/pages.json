@@ -1,0 +1,5450 @@
+[
+  {
+    "url": "https://ballengine.app/",
+    "depth": 0,
+    "status": 200,
+    "title": "BallEngine | Bouncing Ball Simulator",
+    "links": 114,
+    "finalUrl": "https://ballengine.app/"
+  },
+  {
+    "url": "https://ballengine.app/es",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine | Simulador de Bolas Rebotando",
+    "links": 114,
+    "finalUrl": "https://ballengine.app/es"
+  },
+  {
+    "url": "https://ballengine.app/fr",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine | Simulateur de Balles Rebondissantes",
+    "links": 114,
+    "finalUrl": "https://ballengine.app/fr"
+  },
+  {
+    "url": "https://ballengine.app/de",
+    "depth": 1,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/de\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine | バウンドボール シミュレーター",
+    "links": 114,
+    "finalUrl": "https://ballengine.app/ja"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine | 彈跳球模擬器",
+    "links": 114,
+    "finalUrl": "https://ballengine.app/zh-tw"
+  },
+  {
+    "url": "https://ballengine.app/plans",
+    "depth": 1,
+    "status": 200,
+    "title": "會員方案 | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/plans"
+  },
+  {
+    "url": "https://ballengine.app/es/plans",
+    "depth": 1,
+    "status": 200,
+    "title": "Planes de suscripción | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/es/plans"
+  },
+  {
+    "url": "https://ballengine.app/fr/plans",
+    "depth": 1,
+    "status": 200,
+    "title": "Membership Plans | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/fr/plans"
+  },
+  {
+    "url": "https://ballengine.app/de/plans",
+    "depth": 1,
+    "status": 200,
+    "title": "Mitgliedschaftstarife | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/de/plans"
+  },
+  {
+    "url": "https://ballengine.app/ja/plans",
+    "depth": 1,
+    "status": 200,
+    "title": "メンバーシッププラン | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/ja/plans"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/plans",
+    "depth": 1,
+    "status": 200,
+    "title": "會員方案 | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/zh-tw/plans"
+  },
+  {
+    "url": "https://ballengine.app/faq",
+    "depth": 1,
+    "status": 200,
+    "title": "FAQ - Bouncing Ball Simulator | BallEngine",
+    "links": 46,
+    "finalUrl": "https://ballengine.app/faq"
+  },
+  {
+    "url": "https://ballengine.app/support",
+    "depth": 1,
+    "status": 200,
+    "title": "支援中心 | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/support"
+  },
+  {
+    "url": "https://ballengine.app/es/support",
+    "depth": 1,
+    "status": 200,
+    "title": "Centro de Soporte | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/es/support"
+  },
+  {
+    "url": "https://ballengine.app/fr/support",
+    "depth": 1,
+    "status": 200,
+    "title": "Centre d'assistance | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/fr/support"
+  },
+  {
+    "url": "https://ballengine.app/de/support",
+    "depth": 1,
+    "status": 200,
+    "title": "Support-Center | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/de/support"
+  },
+  {
+    "url": "https://ballengine.app/ja/support",
+    "depth": 1,
+    "status": 200,
+    "title": "サポートセンター | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/ja/support"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/support",
+    "depth": 1,
+    "status": 200,
+    "title": "支援中心 | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/zh-tw/support"
+  },
+  {
+    "url": "https://ballengine.app/about",
+    "depth": 1,
+    "status": 200,
+    "title": "About The Studio: BallEngine | BallEngine",
+    "links": 70,
+    "finalUrl": "https://ballengine.app/about"
+  },
+  {
+    "url": "https://ballengine.app/how-it-works",
+    "depth": 1,
+    "status": 200,
+    "title": "How It Works | BallEngine Bouncing Ball Simulator | BallEngine",
+    "links": 65,
+    "finalUrl": "https://ballengine.app/how-it-works"
+  },
+  {
+    "url": "https://ballengine.app/blog",
+    "depth": 1,
+    "status": 200,
+    "title": "Blog | BallEngine",
+    "links": 50,
+    "finalUrl": "https://ballengine.app/blog"
+  },
+  {
+    "url": "https://ballengine.app/tutorials",
+    "depth": 1,
+    "status": 200,
+    "title": "Creator Tutorials | How to Make Satisfying Physics Videos | BallEngine",
+    "links": 53,
+    "finalUrl": "https://ballengine.app/tutorials"
+  },
+  {
+    "url": "https://ballengine.app/help",
+    "depth": 1,
+    "status": 200,
+    "title": "Help | BallEngine",
+    "links": 119,
+    "finalUrl": "https://ballengine.app/help"
+  },
+  {
+    "url": "https://ballengine.app/login",
+    "depth": 1,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/login"
+  },
+  {
+    "url": "https://ballengine.app/es/login",
+    "depth": 1,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login"
+  },
+  {
+    "url": "https://ballengine.app/fr/login",
+    "depth": 1,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login"
+  },
+  {
+    "url": "https://ballengine.app/de/login",
+    "depth": 1,
+    "status": 200,
+    "title": "Einloggen | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/de/login"
+  },
+  {
+    "url": "https://ballengine.app/ja/login",
+    "depth": 1,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login",
+    "depth": 1,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login"
+  },
+  {
+    "url": "https://ballengine.app/signup",
+    "depth": 1,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/signup"
+  },
+  {
+    "url": "https://ballengine.app/es/signup",
+    "depth": 1,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup",
+    "depth": 1,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup"
+  },
+  {
+    "url": "https://ballengine.app/de/signup",
+    "depth": 1,
+    "status": 200,
+    "title": "Registrieren | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/de/signup"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup",
+    "depth": 1,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup",
+    "depth": 1,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup"
+  },
+  {
+    "url": "https://ballengine.app/modes",
+    "depth": 1,
+    "status": 200,
+    "title": "All 45 Bouncing Ball Simulator Modes | BallEngine",
+    "links": 226,
+    "finalUrl": "https://ballengine.app/modes"
+  },
+  {
+    "url": "https://ballengine.app/automation",
+    "depth": 1,
+    "status": 200,
+    "title": "自動化：發布、排程與 Autopilot | BallEngine",
+    "links": 42,
+    "finalUrl": "https://ballengine.app/automation"
+  },
+  {
+    "url": "https://ballengine.app/es/automation",
+    "depth": 1,
+    "status": 200,
+    "title": "Automatización: publicación, programación y Autopilot | BallEngine",
+    "links": 42,
+    "finalUrl": "https://ballengine.app/es/automation"
+  },
+  {
+    "url": "https://ballengine.app/fr/automation",
+    "depth": 1,
+    "status": 200,
+    "title": "Automatisation : publication, programmation et Autopilot | BallEngine",
+    "links": 42,
+    "finalUrl": "https://ballengine.app/fr/automation"
+  },
+  {
+    "url": "https://ballengine.app/de/automation",
+    "depth": 1,
+    "status": 200,
+    "title": "Automatisierung: Veröffentlichen, Planen und Autopilot | BallEngine",
+    "links": 42,
+    "finalUrl": "https://ballengine.app/de/automation"
+  },
+  {
+    "url": "https://ballengine.app/ja/automation",
+    "depth": 1,
+    "status": 200,
+    "title": "オートメーション：公開・予約投稿・Autopilot | BallEngine",
+    "links": 42,
+    "finalUrl": "https://ballengine.app/ja/automation"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/automation",
+    "depth": 1,
+    "status": 200,
+    "title": "自動化：發布、排程與 Autopilot | BallEngine",
+    "links": 42,
+    "finalUrl": "https://ballengine.app/zh-tw/automation"
+  },
+  {
+    "url": "https://ballengine.app/play",
+    "depth": 1,
+    "status": 200,
+    "title": "免費彈跳球遊戲 | BallEngine",
+    "links": 4,
+    "finalUrl": "https://ballengine.app/play"
+  },
+  {
+    "url": "https://ballengine.app/es/play",
+    "depth": 1,
+    "status": 200,
+    "title": "Juegos gratis de pelotas que rebotan | BallEngine",
+    "links": 4,
+    "finalUrl": "https://ballengine.app/es/play"
+  },
+  {
+    "url": "https://ballengine.app/fr/play",
+    "depth": 1,
+    "status": 200,
+    "title": "Jeux gratuits de balles rebondissantes | BallEngine",
+    "links": 4,
+    "finalUrl": "https://ballengine.app/fr/play"
+  },
+  {
+    "url": "https://ballengine.app/de/play",
+    "depth": 1,
+    "status": 200,
+    "title": "Kostenlose Bouncing-Ball-Spiele | BallEngine",
+    "links": 4,
+    "finalUrl": "https://ballengine.app/de/play"
+  },
+  {
+    "url": "https://ballengine.app/ja/play",
+    "depth": 1,
+    "status": 200,
+    "title": "無料のバウンドボールゲーム | BallEngine",
+    "links": 4,
+    "finalUrl": "https://ballengine.app/ja/play"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/play",
+    "depth": 1,
+    "status": 200,
+    "title": "免費彈跳球遊戲 | BallEngine",
+    "links": 4,
+    "finalUrl": "https://ballengine.app/zh-tw/play"
+  },
+  {
+    "url": "https://ballengine.app/play/brick-breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "打磚塊 | BallEngine",
+    "links": 0,
+    "finalUrl": "https://ballengine.app/play/brick-breaker"
+  },
+  {
+    "url": "https://ballengine.app/es/play/brick-breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "Rompeladrillos | BallEngine",
+    "links": 0,
+    "finalUrl": "https://ballengine.app/es/play/brick-breaker"
+  },
+  {
+    "url": "https://ballengine.app/fr/play/brick-breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "Casse-briques | BallEngine",
+    "links": 0,
+    "finalUrl": "https://ballengine.app/fr/play/brick-breaker"
+  },
+  {
+    "url": "https://ballengine.app/de/play/brick-breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "Brick Breaker | BallEngine",
+    "links": 0,
+    "finalUrl": "https://ballengine.app/de/play/brick-breaker"
+  },
+  {
+    "url": "https://ballengine.app/ja/play/brick-breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "ブロック崩し | BallEngine",
+    "links": 0,
+    "finalUrl": "https://ballengine.app/ja/play/brick-breaker"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/play/brick-breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "打磚塊 | BallEngine",
+    "links": 0,
+    "finalUrl": "https://ballengine.app/zh-tw/play/brick-breaker"
+  },
+  {
+    "url": "https://ballengine.app/developer/docs",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine Developer Docs: Website Player, Video API and MCP Server | BallEngine",
+    "links": 49,
+    "finalUrl": "https://ballengine.app/developer/docs"
+  },
+  {
+    "url": "https://ballengine.app/developer",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine Developer Platform: Website Player, Video API and Claude | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/developer"
+  },
+  {
+    "url": "https://ballengine.app/download",
+    "depth": 1,
+    "status": 200,
+    "title": "下載 BallEngine for Windows | BallEngine",
+    "links": 41,
+    "finalUrl": "https://ballengine.app/download"
+  },
+  {
+    "url": "https://ballengine.app/es/download",
+    "depth": 1,
+    "status": 200,
+    "title": "Descargar BallEngine para Windows | BallEngine",
+    "links": 41,
+    "finalUrl": "https://ballengine.app/es/download"
+  },
+  {
+    "url": "https://ballengine.app/fr/download",
+    "depth": 1,
+    "status": 200,
+    "title": "Télécharger BallEngine pour Windows | BallEngine",
+    "links": 41,
+    "finalUrl": "https://ballengine.app/fr/download"
+  },
+  {
+    "url": "https://ballengine.app/de/download",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine für Windows herunterladen | BallEngine",
+    "links": 41,
+    "finalUrl": "https://ballengine.app/de/download"
+  },
+  {
+    "url": "https://ballengine.app/ja/download",
+    "depth": 1,
+    "status": 200,
+    "title": "BallEngine for Windows をダウンロード | BallEngine",
+    "links": 41,
+    "finalUrl": "https://ballengine.app/ja/download"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/download",
+    "depth": 1,
+    "status": 200,
+    "title": "下載 BallEngine for Windows | BallEngine",
+    "links": 41,
+    "finalUrl": "https://ballengine.app/zh-tw/download"
+  },
+  {
+    "url": "https://ballengine.app/affiliate",
+    "depth": 1,
+    "status": 200,
+    "title": "推薦計畫 | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/es/affiliate",
+    "depth": 1,
+    "status": 200,
+    "title": "Programa de afiliados | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/es/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/fr/affiliate",
+    "depth": 1,
+    "status": 200,
+    "title": "Programme d'affiliation | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/fr/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/de/affiliate",
+    "depth": 1,
+    "status": 200,
+    "title": "Partnerprogramm | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/de/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/ja/affiliate",
+    "depth": 1,
+    "status": 200,
+    "title": "アフィリエイトプログラム | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/ja/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/affiliate",
+    "depth": 1,
+    "status": 200,
+    "title": "推薦計畫 | BallEngine",
+    "links": 44,
+    "finalUrl": "https://ballengine.app/zh-tw/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/affiliate-terms",
+    "depth": 1,
+    "status": 200,
+    "title": "Affiliate Program Terms | BallEngine",
+    "links": 54,
+    "finalUrl": "https://ballengine.app/affiliate-terms"
+  },
+  {
+    "url": "https://ballengine.app/ball-simulator",
+    "depth": 1,
+    "status": 200,
+    "title": "Bouncing Ball Simulator Online: Grow Your Channel | BallEngine",
+    "links": 230,
+    "finalUrl": "https://ballengine.app/ball-simulator"
+  },
+  {
+    "url": "https://ballengine.app/music-ball-simulator",
+    "depth": 1,
+    "status": 200,
+    "title": "Music Ball Simulator | Play Any Song In Sync | BallEngine",
+    "links": 62,
+    "finalUrl": "https://ballengine.app/music-ball-simulator"
+  },
+  {
+    "url": "https://ballengine.app/ball-simulator-alternatives",
+    "depth": 1,
+    "status": 200,
+    "title": "Ball Simulator Alternatives | How To Choose One | BallEngine",
+    "links": 62,
+    "finalUrl": "https://ballengine.app/ball-simulator-alternatives"
+  },
+  {
+    "url": "https://ballengine.app/modes/rhythmic",
+    "depth": 1,
+    "status": 200,
+    "title": "Rhythmic Mode: Music-Synced Bouncing Ball Video Maker | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/rhythmic"
+  },
+  {
+    "url": "https://ballengine.app/modes/escape",
+    "depth": 1,
+    "status": 200,
+    "title": "Escape Mode: Concentric Rotating Ring Breakout Challenge | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/escape"
+  },
+  {
+    "url": "https://ballengine.app/modes/drawer",
+    "depth": 1,
+    "status": 200,
+    "title": "Drawer Mode: Bouncing Ball Drawing Trails Simulator | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/drawer"
+  },
+  {
+    "url": "https://ballengine.app/modes/spawner",
+    "depth": 1,
+    "status": 200,
+    "title": "Accumulate Mode: Bouncing Balls That Fill the Screen | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/spawner"
+  },
+  {
+    "url": "https://ballengine.app/modes/ghost-escape",
+    "depth": 1,
+    "status": 200,
+    "title": "Ghost Escape: Bouncing Ball Self-Trapping Maze Simulator | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/ghost-escape"
+  },
+  {
+    "url": "https://ballengine.app/modes/breaker",
+    "depth": 1,
+    "status": 200,
+    "title": "Breaker Mode: Satisfying Glass Breaking Physics Simulator | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/breaker"
+  },
+  {
+    "url": "https://ballengine.app/modes/glass-tower",
+    "depth": 1,
+    "status": 200,
+    "title": "Glass Tower Mode: Doubling Glass Breaking Ball Videos | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/glass-tower"
+  },
+  {
+    "url": "https://ballengine.app/modes/flag-battle",
+    "depth": 1,
+    "status": 200,
+    "title": "Flag Battle Mode: Country Flag Battle Royale Videos | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/flag-battle"
+  },
+  {
+    "url": "https://ballengine.app/modes/weapon-battle",
+    "depth": 1,
+    "status": 200,
+    "title": "Weapon Ball Battle: Armed Bouncing Ball Fight Videos | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/weapon-battle"
+  },
+  {
+    "url": "https://ballengine.app/modes/merge-evolution",
+    "depth": 1,
+    "status": 200,
+    "title": "Merge Evolution: Satisfying Merge Chain Videos | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/merge-evolution"
+  },
+  {
+    "url": "https://ballengine.app/modes/glass-rush",
+    "depth": 1,
+    "status": 200,
+    "title": "Glass Rush Mode: Can the Ball Multiply and Break the Glass? | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/glass-rush"
+  },
+  {
+    "url": "https://ballengine.app/modes/wave-3d",
+    "depth": 1,
+    "status": 200,
+    "title": "Wave 3D Mode: 3D Kinetic Wave Grid Simulator | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/wave-3d"
+  },
+  {
+    "url": "https://ballengine.app/modes/marble-run-3d",
+    "depth": 1,
+    "status": 200,
+    "title": "Marble Run 3D: A Marble That Plays A Real Instrument | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/marble-run-3d"
+  },
+  {
+    "url": "https://ballengine.app/modes/ball-crush",
+    "depth": 1,
+    "status": 200,
+    "title": "Ball Crush 3D: Metal Ball Drop On Cubes Videos | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/ball-crush"
+  },
+  {
+    "url": "https://ballengine.app/modes/jelly-3d",
+    "depth": 1,
+    "status": 200,
+    "title": "Jelly 3D Mode: Soft Body Squeeze Challenge Videos | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/jelly-3d"
+  },
+  {
+    "url": "https://ballengine.app/modes/cut-count",
+    "depth": 1,
+    "status": 200,
+    "title": "Cut Count 3D: 1 Cut vs 40 Cuts Videos | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/cut-count"
+  },
+  {
+    "url": "https://ballengine.app/modes/magnet",
+    "depth": 1,
+    "status": 200,
+    "title": "Magnet 3D: Magnet Power Ramp Over A Bed Of Iron | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/magnet"
+  },
+  {
+    "url": "https://ballengine.app/modes/grid-merge",
+    "depth": 1,
+    "status": 200,
+    "title": "Grid Merge: Satisfying Picture Merge Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/grid-merge"
+  },
+  {
+    "url": "https://ballengine.app/modes/phase-bloom",
+    "depth": 1,
+    "status": 200,
+    "title": "Phase Bloom Mode: Polyrhythm Ball Videos That Line Up | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/phase-bloom"
+  },
+  {
+    "url": "https://ballengine.app/modes/phonk-drop",
+    "depth": 1,
+    "status": 200,
+    "title": "Phonk Drop Mode: Build-to-Drop Bouncing Ball Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/phonk-drop"
+  },
+  {
+    "url": "https://ballengine.app/modes/marble-run",
+    "depth": 1,
+    "status": 200,
+    "title": "Marble Run Mode: Music-Synced Marble Course Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/marble-run"
+  },
+  {
+    "url": "https://ballengine.app/modes/ball-race",
+    "depth": 1,
+    "status": 200,
+    "title": "Ball Race Mode: Marble Race Videos Where The Leader Plays The Song | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/ball-race"
+  },
+  {
+    "url": "https://ballengine.app/modes/target-hit",
+    "depth": 1,
+    "status": 200,
+    "title": "Target Hit Mode: Can The Ball Hit Every Target Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/target-hit"
+  },
+  {
+    "url": "https://ballengine.app/modes/falling-sand",
+    "depth": 1,
+    "status": 200,
+    "title": "Falling Sand Mode: Reacting Element Simulation Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/falling-sand"
+  },
+  {
+    "url": "https://ballengine.app/modes/plinko",
+    "depth": 1,
+    "status": 200,
+    "title": "Plinko Mode: Peg Drop Race and Satisfying Plinko Rain Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/plinko"
+  },
+  {
+    "url": "https://ballengine.app/modes/color-match",
+    "depth": 1,
+    "status": 200,
+    "title": "Color Match Mode: Colour-Matching Brick Breaking Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/color-match"
+  },
+  {
+    "url": "https://ballengine.app/modes/spin-battle",
+    "depth": 1,
+    "status": 200,
+    "title": "Spin Battle Mode: Prize Wheel Team Battle Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/spin-battle"
+  },
+  {
+    "url": "https://ballengine.app/modes/lava-survival",
+    "depth": 1,
+    "status": 200,
+    "title": "Lava Survival Mode: Rising Lava Marble Survival Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/lava-survival"
+  },
+  {
+    "url": "https://ballengine.app/modes/glass-slice",
+    "depth": 1,
+    "status": 200,
+    "title": "Glass Slice 3D: Satisfying Knife Slicing Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/glass-slice"
+  },
+  {
+    "url": "https://ballengine.app/modes/flood-fill",
+    "depth": 1,
+    "status": 200,
+    "title": "Flood Fill 3D: Fill A Glass Room Until It Bursts | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/flood-fill"
+  },
+  {
+    "url": "https://ballengine.app/modes/eulers-disk",
+    "depth": 1,
+    "status": 200,
+    "title": "Eulers Disk 3D: Spinning Coin Riser Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/eulers-disk"
+  },
+  {
+    "url": "https://ballengine.app/modes/drum-sort",
+    "depth": 1,
+    "status": 200,
+    "title": "Drum Sort 3D: Colour Sorting Tumbling Drum Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/drum-sort"
+  },
+  {
+    "url": "https://ballengine.app/modes/plinko-3d",
+    "depth": 1,
+    "status": 200,
+    "title": "Plinko 3D: Tilted Peg Board Videos That Play Your Melody | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/plinko-3d"
+  },
+  {
+    "url": "https://ballengine.app/modes/chladni",
+    "depth": 1,
+    "status": 200,
+    "title": "Chladni 3D: Cymatics Plate Videos Where Sound Draws | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/chladni"
+  },
+  {
+    "url": "https://ballengine.app/modes/voxel",
+    "depth": 1,
+    "status": 200,
+    "title": "Voxel 3D: Cube Art Assembly And Bloom Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/voxel"
+  },
+  {
+    "url": "https://ballengine.app/modes/domino-3d",
+    "depth": 1,
+    "status": 200,
+    "title": "Domino 3D: Chain Reaction Domino Videos That Draw Shapes | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/domino-3d"
+  },
+  {
+    "url": "https://ballengine.app/modes/marble-race-3d",
+    "depth": 1,
+    "status": 200,
+    "title": "Marble Race 3D: 3D Marble Race Videos With A Podium Finish | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/marble-race-3d"
+  },
+  {
+    "url": "https://ballengine.app/modes/attractor",
+    "depth": 1,
+    "status": 200,
+    "title": "Attractor 3D: Strange Attractor Particle Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/attractor"
+  },
+  {
+    "url": "https://ballengine.app/modes/flow-field",
+    "depth": 1,
+    "status": 200,
+    "title": "Flow Field 3D: Curl Noise Particle Smoke Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/flow-field"
+  },
+  {
+    "url": "https://ballengine.app/modes/metaballs",
+    "depth": 1,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/modes/metaballs\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/modes/galaxy",
+    "depth": 1,
+    "status": 200,
+    "title": "Galaxy 3D: Galaxy Formation Particle Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/galaxy"
+  },
+  {
+    "url": "https://ballengine.app/modes/fireflies",
+    "depth": 1,
+    "status": 200,
+    "title": "Fireflies 3D: Firefly Synchronisation Videos On The Beat | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/fireflies"
+  },
+  {
+    "url": "https://ballengine.app/modes/pendulum-basin",
+    "depth": 1,
+    "status": 200,
+    "title": "Pendulum Basin 3D: Magnetic Pendulum Fractal Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/pendulum-basin"
+  },
+  {
+    "url": "https://ballengine.app/modes/slime",
+    "depth": 1,
+    "status": 200,
+    "title": "Slime 3D: Physarum Network Growth Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/slime"
+  },
+  {
+    "url": "https://ballengine.app/modes/crowd-evacuation",
+    "depth": 1,
+    "status": 200,
+    "title": "Crowd Evacuation 3D: Crowd Simulation Escape Videos | BallEngine",
+    "links": 51,
+    "finalUrl": "https://ballengine.app/modes/crowd-evacuation"
+  },
+  {
+    "url": "https://ballengine.app/privacy-policy",
+    "depth": 1,
+    "status": 200,
+    "title": "Security & Privacy Policy | BallEngine",
+    "links": 108,
+    "finalUrl": "https://ballengine.app/privacy-policy"
+  },
+  {
+    "url": "https://ballengine.app/terms-of-service",
+    "depth": 1,
+    "status": 200,
+    "title": "Terms of Service | BallEngine",
+    "links": 88,
+    "finalUrl": "https://ballengine.app/terms-of-service"
+  },
+  {
+    "url": "https://ballengine.app/cookie-policy",
+    "depth": 1,
+    "status": 200,
+    "title": "Cookie Policy | BallEngine",
+    "links": 46,
+    "finalUrl": "https://ballengine.app/cookie-policy"
+  },
+  {
+    "url": "https://ballengine.app/refund-policy",
+    "depth": 1,
+    "status": 200,
+    "title": "Refund Policy | BallEngine",
+    "links": 47,
+    "finalUrl": "https://ballengine.app/refund-policy"
+  },
+  {
+    "url": "https://ballengine.app/copyright-policy",
+    "depth": 1,
+    "status": 200,
+    "title": "DMCA & Copyright Policy | BallEngine",
+    "links": 47,
+    "finalUrl": "https://ballengine.app/copyright-policy"
+  },
+  {
+    "url": "https://ballengine.app/acceptable-use",
+    "depth": 1,
+    "status": 200,
+    "title": "Acceptable Use Policy | BallEngine",
+    "links": 46,
+    "finalUrl": "https://ballengine.app/acceptable-use"
+  },
+  {
+    "url": "https://ballengine.app/data-deletion",
+    "depth": 1,
+    "status": 200,
+    "title": "Data Deletion Instructions | BallEngine",
+    "links": 54,
+    "finalUrl": "https://ballengine.app/data-deletion"
+  },
+  {
+    "url": "https://ballengine.app/blog/best-ball-simulation-software-2026",
+    "depth": 1,
+    "status": 200,
+    "title": "The Best Bouncing Ball Simulators in 2026 (Tested & Compared) | BallEngine",
+    "links": 76,
+    "finalUrl": "https://ballengine.app/blog/best-ball-simulation-software-2026"
+  },
+  {
+    "url": "https://ballengine.app/blog/faceless-youtube-channel-physics-simulation",
+    "depth": 1,
+    "status": 200,
+    "title": "How to Build a Faceless YouTube & TikTok Channel With Physics Simulations (2026 Money Playbook) | BallEngine",
+    "links": 73,
+    "finalUrl": "https://ballengine.app/blog/faceless-youtube-channel-physics-simulation"
+  },
+  {
+    "url": "https://ballengine.app/blog/getting-started-creator-studio-guide",
+    "depth": 1,
+    "status": 200,
+    "title": "Getting Started With BallEngine Creator Studio: The Complete Beginner's Guide | BallEngine",
+    "links": 84,
+    "finalUrl": "https://ballengine.app/blog/getting-started-creator-studio-guide"
+  },
+  {
+    "url": "https://ballengine.app/blog/how-to-make-bouncing-ball-synced-to-music",
+    "depth": 1,
+    "status": 200,
+    "title": "How to Make a Bouncing Ball Video Synced to Music (Complete 2026 Guide) | BallEngine",
+    "links": 79,
+    "finalUrl": "https://ballengine.app/blog/how-to-make-bouncing-ball-synced-to-music"
+  },
+  {
+    "url": "https://ballengine.app/blog/viral-growth-blueprint-tiktok-satisfying-content",
+    "depth": 1,
+    "status": 200,
+    "title": "The Viral Physics Video Blueprint: How Satisfying Simulations Get Millions of Views | BallEngine",
+    "links": 73,
+    "finalUrl": "https://ballengine.app/blog/viral-growth-blueprint-tiktok-satisfying-content"
+  },
+  {
+    "url": "https://ballengine.app/tutorials/arena-shapes-and-morphing",
+    "depth": 1,
+    "status": 200,
+    "title": "Arena Shapes, Rotation and Shape Shifting | Creator Tutorials | BallEngine",
+    "links": 53,
+    "finalUrl": "https://ballengine.app/tutorials/arena-shapes-and-morphing"
+  },
+  {
+    "url": "https://ballengine.app/tutorials/building-faceless-content-brand",
+    "depth": 1,
+    "status": 200,
+    "title": "Building a Faceless Physics Content Channel | Creator Tutorials | BallEngine",
+    "links": 53,
+    "finalUrl": "https://ballengine.app/tutorials/building-faceless-content-brand"
+  },
+  {
+    "url": "https://ballengine.app/tutorials/creating-custom-asmr-environments",
+    "depth": 1,
+    "status": 200,
+    "title": "Building Calm, ASMR-Style Physics Clips | Creator Tutorials | BallEngine",
+    "links": 55,
+    "finalUrl": "https://ballengine.app/tutorials/creating-custom-asmr-environments"
+  },
+  {
+    "url": "https://ballengine.app/tutorials/how-to-make-ball-bounce-to-any-song",
+    "depth": 1,
+    "status": 200,
+    "title": "How to Make a Ball Bounce to Any Song | Creator Tutorials | BallEngine",
+    "links": 55,
+    "finalUrl": "https://ballengine.app/tutorials/how-to-make-ball-bounce-to-any-song"
+  },
+  {
+    "url": "https://ballengine.app/tutorials/optimizing-for-tiktok-youtube-shorts",
+    "depth": 1,
+    "status": 200,
+    "title": "Optimising Clips for TikTok, Reels and YouTube Shorts | Creator Tutorials | BallEngine",
+    "links": 55,
+    "finalUrl": "https://ballengine.app/tutorials/optimizing-for-tiktok-youtube-shorts"
+  },
+  {
+    "url": "https://ballengine.app/tutorials/physics-settings-deep-dive",
+    "depth": 1,
+    "status": 200,
+    "title": "Physics Settings Deep Dive | Creator Tutorials | BallEngine",
+    "links": 55,
+    "finalUrl": "https://ballengine.app/tutorials/physics-settings-deep-dive"
+  },
+  {
+    "url": "https://ballengine.app/help/audio-integration/audio-effects",
+    "depth": 1,
+    "status": 200,
+    "title": "Audio Effects and Audio Presets | Help | BallEngine",
+    "links": 67,
+    "finalUrl": "https://ballengine.app/help/audio-integration/audio-effects"
+  },
+  {
+    "url": "https://ballengine.app/help/audio-integration/audio-in-exported-video",
+    "depth": 1,
+    "status": 200,
+    "title": "Audio in Your Exported Video, Timing and Sync | Help | BallEngine",
+    "links": 65,
+    "finalUrl": "https://ballengine.app/help/audio-integration/audio-in-exported-video"
+  },
+  {
+    "url": "https://ballengine.app/help/audio-integration/audio-library",
+    "depth": 1,
+    "status": 200,
+    "title": "The Audio Tab: Volumes and the Active Track | Help | BallEngine",
+    "links": 68,
+    "finalUrl": "https://ballengine.app/help/audio-integration/audio-library"
+  },
+  {
+    "url": "https://ballengine.app/help/audio-integration/bounce-and-break-sounds",
+    "depth": 1,
+    "status": 200,
+    "title": "Bounce and Break Sounds | Help | BallEngine",
+    "links": 66,
+    "finalUrl": "https://ballengine.app/help/audio-integration/bounce-and-break-sounds"
+  },
+  {
+    "url": "https://ballengine.app/help/audio-integration/custom-audio",
+    "depth": 1,
+    "status": 200,
+    "title": "Uploading MIDI and Songs (Media Library) | Help | BallEngine",
+    "links": 67,
+    "finalUrl": "https://ballengine.app/help/audio-integration/custom-audio"
+  },
+  {
+    "url": "https://ballengine.app/help/audio-integration/midi-and-song-conversion",
+    "depth": 1,
+    "status": 200,
+    "title": "Converting Songs, Slicing and MIDI Tools | Help | BallEngine",
+    "links": 70,
+    "finalUrl": "https://ballengine.app/help/audio-integration/midi-and-song-conversion"
+  },
+  {
+    "url": "https://ballengine.app/help/audio-integration/midi-editor",
+    "depth": 1,
+    "status": 200,
+    "title": "The MIDI Editor and AI Songs | Help | BallEngine",
+    "links": 67,
+    "finalUrl": "https://ballengine.app/help/audio-integration/midi-editor"
+  },
+  {
+    "url": "https://ballengine.app/help/audio-integration/music-copyright",
+    "depth": 1,
+    "status": 200,
+    "title": "Music Rights and Copyright | Help | BallEngine",
+    "links": 65,
+    "finalUrl": "https://ballengine.app/help/audio-integration/music-copyright"
+  },
+  {
+    "url": "https://ballengine.app/help/audio-integration/song-library-and-built-in-tunes",
+    "depth": 1,
+    "status": 200,
+    "title": "Song Library, Built-in Tunes and Writing New Songs | Help | BallEngine",
+    "links": 66,
+    "finalUrl": "https://ballengine.app/help/audio-integration/song-library-and-built-in-tunes"
+  },
+  {
+    "url": "https://ballengine.app/help/audio-integration/visualizer-bars",
+    "depth": 1,
+    "status": 200,
+    "title": "Visualizer Bars | Help | BallEngine",
+    "links": 62,
+    "finalUrl": "https://ballengine.app/help/audio-integration/visualizer-bars"
+  },
+  {
+    "url": "https://ballengine.app/help/developer-api/api-auto-recharge",
+    "depth": 1,
+    "status": 200,
+    "title": "Auto-Recharge | Help | BallEngine",
+    "links": 64,
+    "finalUrl": "https://ballengine.app/help/developer-api/api-auto-recharge"
+  },
+  {
+    "url": "https://ballengine.app/help/developer-api/api-errors-and-limits",
+    "depth": 1,
+    "status": 200,
+    "title": "Errors, Limits and Troubleshooting | Help | BallEngine",
+    "links": 64,
+    "finalUrl": "https://ballengine.app/help/developer-api/api-errors-and-limits"
+  },
+  {
+    "url": "https://ballengine.app/help/developer-api/api-keys",
+    "depth": 1,
+    "status": 200,
+    "title": "API Keys: Create, Protect, Rotate and Revoke | Help | BallEngine",
+    "links": 65,
+    "finalUrl": "https://ballengine.app/help/developer-api/api-keys"
+  },
+  {
+    "url": "https://ballengine.app/help/developer-api/api-webhooks",
+    "depth": 1,
+    "status": 200,
+    "title": "Webhooks: Get Told When a Render Finishes | Help | BallEngine",
+    "links": 67,
+    "finalUrl": "https://ballengine.app/help/developer-api/api-webhooks"
+  },
+  {
+    "url": "https://ballengine.app/help/developer-api/buying-api-credits",
+    "depth": 1,
+    "status": 200,
+    "title": "Buying Render Credits | Help | BallEngine",
+    "links": 65,
+    "finalUrl": "https://ballengine.app/help/developer-api/buying-api-credits"
+  },
+  {
+    "url": "https://ballengine.app/help/developer-api/developer-api-overview",
+    "depth": 1,
+    "status": 200,
+    "title": "What the Developer API Does | Help | BallEngine",
+    "links": 66,
+    "finalUrl": "https://ballengine.app/help/developer-api/developer-api-overview"
+  },
+  {
+    "url": "https://ballengine.app/help/developer-api/how-credits-are-charged",
+    "depth": 1,
+    "status": 200,
+    "title": "How Renders Are Charged | Help | BallEngine",
+    "links": 65,
+    "finalUrl": "https://ballengine.app/help/developer-api/how-credits-are-charged"
+  },
+  {
+    "url": "https://ballengine.app/help/developer-api/render-lifecycle",
+    "depth": 1,
+    "status": 200,
+    "title": "The Life of an API Render | Help | BallEngine",
+    "links": 67,
+    "finalUrl": "https://ballengine.app/help/developer-api/render-lifecycle"
+  },
+  {
+    "url": "https://ballengine.app/help/getting-started/account-management",
+    "depth": 1,
+    "status": 200,
+    "title": "My Account & Profile | Help | BallEngine",
+    "links": 68,
+    "finalUrl": "https://ballengine.app/help/getting-started/account-management"
+  },
+  {
+    "url": "https://ballengine.app/help/getting-started/account-security-mfa",
+    "depth": 1,
+    "status": 200,
+    "title": "Securing Your Account with MFA | Help | BallEngine",
+    "links": 66,
+    "finalUrl": "https://ballengine.app/help/getting-started/account-security-mfa"
+  },
+  {
+    "url": "https://ballengine.app/help/getting-started/changing-the-language",
+    "depth": 1,
+    "status": 200,
+    "title": "Changing the Language | Help | BallEngine",
+    "links": 63,
+    "finalUrl": "https://ballengine.app/help/getting-started/changing-the-language"
+  },
+  {
+    "url": "https://ballengine.app/help/getting-started/contacting-support",
+    "depth": 1,
+    "status": 200,
+    "title": "Contacting Support | Help | BallEngine",
+    "links": 64,
+    "finalUrl": "https://ballengine.app/help/getting-started/contacting-support"
+  },
+  {
+    "url": "https://ballengine.app/help/getting-started/creating-your-first-video",
+    "depth": 1,
+    "status": 200,
+    "title": "Creating Your First Video | Help | BallEngine",
+    "links": 69,
+    "finalUrl": "https://ballengine.app/help/getting-started/creating-your-first-video"
+  },
+  {
+    "url": "https://ballengine.app/help/getting-started/desktop-and-mobile-apps",
+    "depth": 1,
+    "status": 200,
+    "title": "Desktop and Mobile Apps | Help | BallEngine",
+    "links": 64,
+    "finalUrl": "https://ballengine.app/help/getting-started/desktop-and-mobile-apps"
+  },
+  {
+    "url": "https://ballengine.app/help/getting-started/first-visit-to-the-studio",
+    "depth": 1,
+    "status": 200,
+    "title": "Tutorials, Help and the Studio Handbook | Help | BallEngine",
+    "links": 67,
+    "finalUrl": "https://ballengine.app/help/getting-started/first-visit-to-the-studio"
+  },
+  {
+    "url": "https://ballengine.app/help/getting-started/login-and-password-recovery",
+    "depth": 1,
+    "status": 200,
+    "title": "Logging In & Password Recovery | Help | BallEngine",
+    "links": 67,
+    "finalUrl": "https://ballengine.app/help/getting-started/login-and-password-recovery"
+  },
+  {
+    "url": "https://ballengine.app/help/getting-started/platform-overview",
+    "depth": 1,
+    "status": 200,
+    "title": "Platform Overview | Help | BallEngine",
+    "links": 67,
+    "finalUrl": "https://ballengine.app/help/getting-started/platform-overview"
+  },
+  {
+    "url": "https://ballengine.app/help/plans-and-billing/affiliate-program",
+    "depth": 1,
+    "status": 200,
+    "title": "Affiliate Program | Help | BallEngine",
+    "links": 66,
+    "finalUrl": "https://ballengine.app/help/plans-and-billing/affiliate-program"
+  },
+  {
+    "url": "https://ballengine.app/help/plans-and-billing/automation-and-api-credits",
+    "depth": 1,
+    "status": 200,
+    "title": "Automation and API Credits | Help | BallEngine",
+    "links": 64,
+    "finalUrl": "https://ballengine.app/help/plans-and-billing/automation-and-api-credits"
+  },
+  {
+    "url": "https://ballengine.app/help/plans-and-billing/billing-faq",
+    "depth": 1,
+    "status": 200,
+    "title": "Billing FAQ | Help | BallEngine",
+    "links": 73,
+    "finalUrl": "https://ballengine.app/help/plans-and-billing/billing-faq"
+  },
+  {
+    "url": "https://ballengine.app/help/plans-and-billing/changing-plans",
+    "depth": 1,
+    "status": 200,
+    "title": "Switching Plans: Upgrades and Downgrades | Help | BallEngine",
+    "links": 66,
+    "finalUrl": "https://ballengine.app/help/plans-and-billing/changing-plans"
+  },
+  {
+    "url": "https://ballengine.app/help/plans-and-billing/exports-and-render-credits",
+    "depth": 1,
+    "status": 200,
+    "title": "Export Limits and Cloud Render Credits | Help | BallEngine",
+    "links": 69,
+    "finalUrl": "https://ballengine.app/help/plans-and-billing/exports-and-render-credits"
+  },
+  {
+    "url": "https://ballengine.app/help/plans-and-billing/failed-payments-and-lapsed-plans",
+    "depth": 1,
+    "status": 200,
+    "title": "Failed Payments and Lapsed Plans | Help | BallEngine",
+    "links": 64,
+    "finalUrl": "https://ballengine.app/help/plans-and-billing/failed-payments-and-lapsed-plans"
+  },
+  {
+    "url": "https://ballengine.app/help/plans-and-billing/free-vs-pro-limits",
+    "depth": 1,
+    "status": 200,
+    "title": "What Each Plan Unlocks | Help | BallEngine",
+    "links": 68,
+    "finalUrl": "https://ballengine.app/help/plans-and-billing/free-vs-pro-limits"
+  },
+  {
+    "url": "https://ballengine.app/help/plans-and-billing/managing-your-subscription",
+    "depth": 1,
+    "status": 200,
+    "title": "Managing Your Subscription | Help | BallEngine",
+    "links": 66,
+    "finalUrl": "https://ballengine.app/help/plans-and-billing/managing-your-subscription"
+  },
+  {
+    "url": "https://ballengine.app/help/plans-and-billing/subscription-tiers",
+    "depth": 1,
+    "status": 200,
+    "title": "Choosing a Plan | Help | BallEngine",
+    "links": 71,
+    "finalUrl": "https://ballengine.app/help/plans-and-billing/subscription-tiers"
+  },
+  {
+    "url": "https://ballengine.app/help/plans-and-billing/upgrading-and-checkout",
+    "depth": 1,
+    "status": 200,
+    "title": "Upgrading & Checkout | Help | BallEngine",
+    "links": 67,
+    "finalUrl": "https://ballengine.app/help/plans-and-billing/upgrading-and-checkout"
+  },
+  {
+    "url": "https://ballengine.app/help/play-and-community/feature-requests-and-roadmap",
+    "depth": 1,
+    "status": 200,
+    "title": "Feature Requests and the Roadmap | Help | BallEngine",
+    "links": 60,
+    "finalUrl": "https://ballengine.app/help/play-and-community/feature-requests-and-roadmap"
+  },
+  {
+    "url": "https://ballengine.app/help/play-and-community/how-to-play",
+    "depth": 1,
+    "status": 200,
+    "title": "How to Play Each Game | Help | BallEngine",
+    "links": 56,
+    "finalUrl": "https://ballengine.app/help/play-and-community/how-to-play"
+  },
+  {
+    "url": "https://ballengine.app/help/play-and-community/leaderboard",
+    "depth": 1,
+    "status": 200,
+    "title": "The Leaderboard | Help | BallEngine",
+    "links": 59,
+    "finalUrl": "https://ballengine.app/help/play-and-community/leaderboard"
+  },
+  {
+    "url": "https://ballengine.app/help/play-and-community/play-hub",
+    "depth": 1,
+    "status": 200,
+    "title": "The Games Hub (/play) | Help | BallEngine",
+    "links": 60,
+    "finalUrl": "https://ballengine.app/help/play-and-community/play-hub"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/autopilot",
+    "depth": 1,
+    "status": 200,
+    "title": "Autopilot: Set-and-Forget Publishing | Help | BallEngine",
+    "links": 77,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/autopilot"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/connecting-your-accounts",
+    "depth": 1,
+    "status": 200,
+    "title": "Connecting Your Social Accounts | Help | BallEngine",
+    "links": 76,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/connecting-your-accounts"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/disconnecting-accounts",
+    "depth": 1,
+    "status": 200,
+    "title": "Disconnecting and Reconnecting an Account | Help | BallEngine",
+    "links": 73,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/disconnecting-accounts"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/fixing-publishing-problems",
+    "depth": 1,
+    "status": 200,
+    "title": "Fixing Publishing Problems | Help | BallEngine",
+    "links": 75,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/fixing-publishing-problems"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/how-publishing-works",
+    "depth": 1,
+    "status": 200,
+    "title": "How Publishing Works | Help | BallEngine",
+    "links": 74,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/how-publishing-works"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/multi-brand-accounts",
+    "depth": 1,
+    "status": 200,
+    "title": "Managing Multiple Brands | Help | BallEngine",
+    "links": 75,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/multi-brand-accounts"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/post-queue-and-statuses",
+    "depth": 1,
+    "status": 200,
+    "title": "The Queue: Post Statuses, Retry and Cancel | Help | BallEngine",
+    "links": 75,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/post-queue-and-statuses"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/publish-to-facebook",
+    "depth": 1,
+    "status": 200,
+    "title": "Publishing to Facebook | Help | BallEngine",
+    "links": 72,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/publish-to-facebook"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/publish-to-instagram",
+    "depth": 1,
+    "status": 200,
+    "title": "Publishing to Instagram | Help | BallEngine",
+    "links": 72,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/publish-to-instagram"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/publish-to-pinterest",
+    "depth": 1,
+    "status": 200,
+    "title": "Publishing to Pinterest | Help | BallEngine",
+    "links": 72,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/publish-to-pinterest"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/publish-to-snapchat",
+    "depth": 1,
+    "status": 200,
+    "title": "Publishing to Snapchat Spotlight | Help | BallEngine",
+    "links": 72,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/publish-to-snapchat"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/publish-to-threads",
+    "depth": 1,
+    "status": 200,
+    "title": "Publishing to Threads | Help | BallEngine",
+    "links": 72,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/publish-to-threads"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/publish-to-tiktok",
+    "depth": 1,
+    "status": 200,
+    "title": "Publishing to TikTok | Help | BallEngine",
+    "links": 74,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/publish-to-tiktok"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/publish-to-x",
+    "depth": 1,
+    "status": 200,
+    "title": "Publishing to X (Twitter) | Help | BallEngine",
+    "links": 72,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/publish-to-x"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/publish-to-youtube",
+    "depth": 1,
+    "status": 200,
+    "title": "Publishing to YouTube | Help | BallEngine",
+    "links": 73,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/publish-to-youtube"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/publishing-limits-and-quotas",
+    "depth": 1,
+    "status": 200,
+    "title": "Automation and Publishing Limits | Help | BallEngine",
+    "links": 75,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/publishing-limits-and-quotas"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/scheduling-posts",
+    "depth": 1,
+    "status": 200,
+    "title": "The Automation Workspace | Help | BallEngine",
+    "links": 73,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/scheduling-posts"
+  },
+  {
+    "url": "https://ballengine.app/help/publishing-and-distribution/studio-publish-tab",
+    "depth": 1,
+    "status": 200,
+    "title": "The Studio Publish Tab, Control by Control | Help | BallEngine",
+    "links": 75,
+    "finalUrl": "https://ballengine.app/help/publishing-and-distribution/studio-publish-tab"
+  },
+  {
+    "url": "https://ballengine.app/help/rendering-export/cloud-rendering",
+    "depth": 1,
+    "status": 200,
+    "title": "Cloud Rendering | Help | BallEngine",
+    "links": 64,
+    "finalUrl": "https://ballengine.app/help/rendering-export/cloud-rendering"
+  },
+  {
+    "url": "https://ballengine.app/help/rendering-export/export-device-support",
+    "depth": 1,
+    "status": 200,
+    "title": "Devices & Browsers for Exporting | Help | BallEngine",
+    "links": 61,
+    "finalUrl": "https://ballengine.app/help/rendering-export/export-device-support"
+  },
+  {
+    "url": "https://ballengine.app/help/rendering-export/exporting-videos",
+    "depth": 1,
+    "status": 200,
+    "title": "Recording & Exporting Videos | Help | BallEngine",
+    "links": 63,
+    "finalUrl": "https://ballengine.app/help/rendering-export/exporting-videos"
+  },
+  {
+    "url": "https://ballengine.app/help/rendering-export/saving-and-sharing-your-video",
+    "depth": 1,
+    "status": 200,
+    "title": "Saving & Sharing Your Video | Help | BallEngine",
+    "links": 61,
+    "finalUrl": "https://ballengine.app/help/rendering-export/saving-and-sharing-your-video"
+  },
+  {
+    "url": "https://ballengine.app/help/rendering-export/video-settings-reference",
+    "depth": 1,
+    "status": 200,
+    "title": "Video Settings Reference | Help | BallEngine",
+    "links": 62,
+    "finalUrl": "https://ballengine.app/help/rendering-export/video-settings-reference"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/ball-crush-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Ball Crush 3D Mode | Help | BallEngine",
+    "links": 81,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/ball-crush-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/breaker-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Breaker Mode | Help | BallEngine",
+    "links": 86,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/breaker-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/choosing-a-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Choosing a Mode | Help | BallEngine",
+    "links": 79,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/choosing-a-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/cut-count-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Cut Count 3D Mode | Help | BallEngine",
+    "links": 79,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/cut-count-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/drawer-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Drawer Mode | Help | BallEngine",
+    "links": 84,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/drawer-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/escape-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Escape Mode | Help | BallEngine",
+    "links": 88,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/escape-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/flag-battle-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Flag Battle Mode | Help | BallEngine",
+    "links": 83,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/flag-battle-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/ghost-escape-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Ghost Escape Mode | Help | BallEngine",
+    "links": 85,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/ghost-escape-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/glass-rush-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Glass Rush Mode | Help | BallEngine",
+    "links": 80,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/glass-rush-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/glass-tower-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Glass Tower Mode | Help | BallEngine",
+    "links": 82,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/glass-tower-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/grid-merge-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Grid Merge Mode | Help | BallEngine",
+    "links": 81,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/grid-merge-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/hybrid-modes-and-add-ons",
+    "depth": 1,
+    "status": 200,
+    "title": "Hybrid Modes & Add-Ons | Help | BallEngine",
+    "links": 80,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/hybrid-modes-and-add-ons"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/jelly-3d-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Jelly 3D Mode | Help | BallEngine",
+    "links": 80,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/jelly-3d-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/magnet-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Magnet 3D Mode | Help | BallEngine",
+    "links": 82,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/magnet-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/marble-run-3d-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Marble Run 3D Mode | Help | BallEngine",
+    "links": 88,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/marble-run-3d-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/merge-evolution-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Merge Evolution Mode | Help | BallEngine",
+    "links": 80,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/merge-evolution-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/modes-in-development-and-voting",
+    "depth": 1,
+    "status": 200,
+    "title": "Modes in Development & Voting | Help | BallEngine",
+    "links": 77,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/modes-in-development-and-voting"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/rhythmic-escape-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Rhythmic Escape | Help | BallEngine",
+    "links": 80,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/rhythmic-escape-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/rhythmic-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Rhythmic Mode | Help | BallEngine",
+    "links": 89,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/rhythmic-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/spawner-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Accumulate Mode | Help | BallEngine",
+    "links": 82,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/spawner-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/wave-3d-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Wave 3D Mode | Help | BallEngine",
+    "links": 85,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/wave-3d-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/simulation-modes/weapon-battle-mode",
+    "depth": 1,
+    "status": 200,
+    "title": "Weapon Ball Battle Mode | Help | BallEngine",
+    "links": 80,
+    "finalUrl": "https://ballengine.app/help/simulation-modes/weapon-battle-mode"
+  },
+  {
+    "url": "https://ballengine.app/help/social-and-sharing/captions-titles-and-hashtags",
+    "depth": 1,
+    "status": 200,
+    "title": "Captions, Titles and Hashtags | Help | BallEngine",
+    "links": 60,
+    "finalUrl": "https://ballengine.app/help/social-and-sharing/captions-titles-and-hashtags"
+  },
+  {
+    "url": "https://ballengine.app/help/social-and-sharing/posting-consistently-at-scale",
+    "depth": 1,
+    "status": 200,
+    "title": "Posting Consistently at Scale | Help | BallEngine",
+    "links": 62,
+    "finalUrl": "https://ballengine.app/help/social-and-sharing/posting-consistently-at-scale"
+  },
+  {
+    "url": "https://ballengine.app/help/social-and-sharing/the-first-frame-and-retention",
+    "depth": 1,
+    "status": 200,
+    "title": "The First Frame and Retention | Help | BallEngine",
+    "links": 60,
+    "finalUrl": "https://ballengine.app/help/social-and-sharing/the-first-frame-and-retention"
+  },
+  {
+    "url": "https://ballengine.app/help/social-and-sharing/viral-sharing-tips",
+    "depth": 1,
+    "status": 200,
+    "title": "Making Clips That Perform on Short-Form | Help | BallEngine",
+    "links": 62,
+    "finalUrl": "https://ballengine.app/help/social-and-sharing/viral-sharing-tips"
+  },
+  {
+    "url": "https://ballengine.app/help/studio-interface/keyboard-shortcuts-and-controls",
+    "depth": 1,
+    "status": 200,
+    "title": "Keyboard Shortcuts | Help | BallEngine",
+    "links": 66,
+    "finalUrl": "https://ballengine.app/help/studio-interface/keyboard-shortcuts-and-controls"
+  },
+  {
+    "url": "https://ballengine.app/help/studio-interface/navigating-studio",
+    "depth": 1,
+    "status": 200,
+    "title": "Navigating the Studio: Basics and the Rail | Help | BallEngine",
+    "links": 68,
+    "finalUrl": "https://ballengine.app/help/studio-interface/navigating-studio"
+  },
+  {
+    "url": "https://ballengine.app/help/studio-interface/playback-and-interface",
+    "depth": 1,
+    "status": 200,
+    "title": "Playback, Shuffle One Part and Hiding the Interface | Help | BallEngine",
+    "links": 65,
+    "finalUrl": "https://ballengine.app/help/studio-interface/playback-and-interface"
+  },
+  {
+    "url": "https://ballengine.app/help/studio-interface/presets-and-plan-locks",
+    "depth": 1,
+    "status": 200,
+    "title": "Plan Locks, Greyed-Out Controls and Preset Pickers | Help | BallEngine",
+    "links": 65,
+    "finalUrl": "https://ballengine.app/help/studio-interface/presets-and-plan-locks"
+  },
+  {
+    "url": "https://ballengine.app/help/studio-interface/project-workflow",
+    "depth": 1,
+    "status": 200,
+    "title": "Saving and Managing Your Projects | Help | BallEngine",
+    "links": 68,
+    "finalUrl": "https://ballengine.app/help/studio-interface/project-workflow"
+  },
+  {
+    "url": "https://ballengine.app/help/studio-interface/randomize-and-seeds",
+    "depth": 1,
+    "status": 200,
+    "title": "Randomize and Seeds | Help | BallEngine",
+    "links": 67,
+    "finalUrl": "https://ballengine.app/help/studio-interface/randomize-and-seeds"
+  },
+  {
+    "url": "https://ballengine.app/help/studio-interface/studio-on-mobile",
+    "depth": 1,
+    "status": 200,
+    "title": "Using the Studio on a Phone | Help | BallEngine",
+    "links": 65,
+    "finalUrl": "https://ballengine.app/help/studio-interface/studio-on-mobile"
+  },
+  {
+    "url": "https://ballengine.app/help/studio-interface/undo-reset-and-recovery",
+    "depth": 1,
+    "status": 200,
+    "title": "Undo, Reset and Recovery | Help | BallEngine",
+    "links": 65,
+    "finalUrl": "https://ballengine.app/help/studio-interface/undo-reset-and-recovery"
+  },
+  {
+    "url": "https://ballengine.app/help/troubleshooting/account-and-login-problems",
+    "depth": 1,
+    "status": 200,
+    "title": "Account & Login Problems | Help | BallEngine",
+    "links": 65,
+    "finalUrl": "https://ballengine.app/help/troubleshooting/account-and-login-problems"
+  },
+  {
+    "url": "https://ballengine.app/help/troubleshooting/audio-problems",
+    "depth": 1,
+    "status": 200,
+    "title": "Audio Problems | Help | BallEngine",
+    "links": 63,
+    "finalUrl": "https://ballengine.app/help/troubleshooting/audio-problems"
+  },
+  {
+    "url": "https://ballengine.app/help/troubleshooting/billing-problems",
+    "depth": 1,
+    "status": 200,
+    "title": "Billing Problems | Help | BallEngine",
+    "links": 63,
+    "finalUrl": "https://ballengine.app/help/troubleshooting/billing-problems"
+  },
+  {
+    "url": "https://ballengine.app/help/troubleshooting/export-and-render-problems",
+    "depth": 1,
+    "status": 200,
+    "title": "Export & Render Problems | Help | BallEngine",
+    "links": 67,
+    "finalUrl": "https://ballengine.app/help/troubleshooting/export-and-render-problems"
+  },
+  {
+    "url": "https://ballengine.app/help/troubleshooting/frequently-asked-questions",
+    "depth": 1,
+    "status": 200,
+    "title": "Common Questions | Help | BallEngine",
+    "links": 63,
+    "finalUrl": "https://ballengine.app/help/troubleshooting/frequently-asked-questions"
+  },
+  {
+    "url": "https://ballengine.app/help/troubleshooting/performance-tips",
+    "depth": 1,
+    "status": 200,
+    "title": "Performance & Optimization | Help | BallEngine",
+    "links": 68,
+    "finalUrl": "https://ballengine.app/help/troubleshooting/performance-tips"
+  },
+  {
+    "url": "https://ballengine.app/help/troubleshooting/studio-problems",
+    "depth": 1,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/help/troubleshooting/studio-problems\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/help/visual-customization/3d-scene-and-lighting",
+    "depth": 1,
+    "status": 200,
+    "title": "3D Scene, Lighting & Materials | Help | BallEngine",
+    "links": 68,
+    "finalUrl": "https://ballengine.app/help/visual-customization/3d-scene-and-lighting"
+  },
+  {
+    "url": "https://ballengine.app/help/visual-customization/backgrounds-parallax",
+    "depth": 1,
+    "status": 200,
+    "title": "Backgrounds & Parallax | Help | BallEngine",
+    "links": 68,
+    "finalUrl": "https://ballengine.app/help/visual-customization/backgrounds-parallax"
+  },
+  {
+    "url": "https://ballengine.app/help/visual-customization/ball-look-and-effects",
+    "depth": 1,
+    "status": 200,
+    "title": "Ball Look & Effects | Help | BallEngine",
+    "links": 68,
+    "finalUrl": "https://ballengine.app/help/visual-customization/ball-look-and-effects"
+  },
+  {
+    "url": "https://ballengine.app/help/visual-customization/ball-trails",
+    "depth": 1,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/help/visual-customization/ball-trails\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/help/visual-customization/branding-titles-and-counters",
+    "depth": 1,
+    "status": 200,
+    "title": "Titles, Counters, HUD & Branding | Help | BallEngine",
+    "links": 68,
+    "finalUrl": "https://ballengine.app/help/visual-customization/branding-titles-and-counters"
+  },
+  {
+    "url": "https://ballengine.app/help/visual-customization/camera-and-framing",
+    "depth": 1,
+    "status": 200,
+    "title": "Camera, Zoom & Framing | Help | BallEngine",
+    "links": 67,
+    "finalUrl": "https://ballengine.app/help/visual-customization/camera-and-framing"
+  },
+  {
+    "url": "https://ballengine.app/help/visual-customization/rainbow-global-visuals-and-layers",
+    "depth": 1,
+    "status": 200,
+    "title": "Rainbow Lights, Global Visuals & Layer Order | Help | BallEngine",
+    "links": 64,
+    "finalUrl": "https://ballengine.app/help/visual-customization/rainbow-global-visuals-and-layers"
+  },
+  {
+    "url": "https://ballengine.app/help/visual-customization/visual-fx",
+    "depth": 1,
+    "status": 200,
+    "title": "Impact & Collision Effects | Help | BallEngine",
+    "links": 67,
+    "finalUrl": "https://ballengine.app/help/visual-customization/visual-fx"
+  },
+  {
+    "url": "https://ballengine.app/start",
+    "depth": 1,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/start\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/roadmap",
+    "depth": 1,
+    "status": 200,
+    "title": "產品藍圖與功能需求 | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/roadmap"
+  },
+  {
+    "url": "https://ballengine.app/es/studio",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/start",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/start\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=glass-rush",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=glass-rush\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=wave-3d",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=wave-3d\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=merge-evolution",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=merge-evolution\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=escape",
+    "depth": 2,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/studio?mode=escape"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=jelly-3d",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=jelly-3d\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=ghost-escape",
+    "depth": 2,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/studio?mode=ghost-escape"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=magnet",
+    "depth": 2,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/studio?mode=magnet"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=rhythmic",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=rhythmic\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=ball-crush",
+    "depth": 2,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/studio?mode=ball-crush"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=drawer",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=drawer\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=cut-count",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=cut-count\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=breaker",
+    "depth": 2,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/studio?mode=breaker"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=weapon-battle",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=weapon-battle\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=marble-run-3d",
+    "depth": 2,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/studio?mode=marble-run-3d"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=spawner",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=spawner\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=flag-battle",
+    "depth": 2,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/studio?mode=flag-battle"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=glass-tower",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=glass-tower\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=grid-merge",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=grid-merge\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=rhythmic&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=rhythmic&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=escape&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=escape&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=drawer&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=drawer&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=spawner&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=spawner&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=ghost-escape&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=ghost-escape&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=breaker&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=breaker&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=glass-tower&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/studio?mode=glass-tower&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=flag-battle&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=flag-battle&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=weapon-battle&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/studio?mode=weapon-battle&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=merge-evolution&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=merge-evolution&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=glass-rush&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=glass-rush&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=wave-3d&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=wave-3d&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=marble-run-3d&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=marble-run-3d&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=ball-crush&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=ball-crush&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=jelly-3d&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=jelly-3d&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=cut-count&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=cut-count&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=magnet&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/studio?mode=magnet&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/studio?mode=grid-merge&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/studio?mode=grid-merge&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/es/roadmap",
+    "depth": 2,
+    "status": 200,
+    "title": "Hoja de ruta y sugerencias de funciones | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/es/roadmap"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/start",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/start\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=glass-rush",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=glass-rush\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=wave-3d",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=wave-3d\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=merge-evolution",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=merge-evolution\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=escape",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=escape\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=jelly-3d",
+    "depth": 2,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/studio?mode=jelly-3d"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=ghost-escape",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=ghost-escape\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=magnet",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=magnet\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=rhythmic",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=rhythmic\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=ball-crush",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=ball-crush\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=drawer",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=drawer\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=cut-count",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=cut-count\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=breaker",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=breaker\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=weapon-battle",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=weapon-battle\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=marble-run-3d",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=marble-run-3d\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=spawner",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=spawner\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=flag-battle",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=flag-battle\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=glass-tower",
+    "depth": 2,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/studio?mode=glass-tower"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=grid-merge",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=grid-merge\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=rhythmic&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/studio?mode=rhythmic&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=escape&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=escape&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=drawer&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/studio?mode=drawer&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=spawner&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=spawner&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=ghost-escape&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/studio?mode=ghost-escape&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=breaker&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=breaker&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=glass-tower&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=glass-tower&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=flag-battle&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=flag-battle&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=weapon-battle&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/studio?mode=weapon-battle&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=merge-evolution&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=merge-evolution&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=glass-rush&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=glass-rush&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=wave-3d&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=wave-3d&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=marble-run-3d&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/studio?mode=marble-run-3d&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=ball-crush&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=ball-crush&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=jelly-3d&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/studio?mode=jelly-3d&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=cut-count&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=cut-count&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=magnet&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/studio?mode=magnet&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/studio?mode=grid-merge&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/studio?mode=grid-merge&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/fr/roadmap",
+    "depth": 2,
+    "status": 200,
+    "title": "Feuille de route et demandes de fonctionnalités | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/fr/roadmap"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/start",
+    "depth": 2,
+    "status": 200,
+    "title": "はじめる | BallEngine",
+    "links": 2,
+    "finalUrl": "https://ballengine.app/ja/start"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=glass-rush",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=glass-rush\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=wave-3d",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=wave-3d\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=merge-evolution",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=merge-evolution\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=escape",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=escape\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=jelly-3d",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=jelly-3d\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=ghost-escape",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=ghost-escape\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=magnet",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=magnet\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=rhythmic",
+    "depth": 2,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/studio?mode=rhythmic"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=ball-crush",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=ball-crush\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=drawer",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=drawer\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=cut-count",
+    "depth": 2,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/studio?mode=cut-count"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=breaker",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=breaker\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=weapon-battle",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=weapon-battle\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=marble-run-3d",
+    "depth": 2,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/studio?mode=marble-run-3d"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=spawner",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=spawner\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=flag-battle",
+    "depth": 2,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/studio?mode=flag-battle"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=glass-tower",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=glass-tower\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=grid-merge",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=grid-merge\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=rhythmic&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/studio?mode=rhythmic&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=escape&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/studio?mode=escape&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=drawer&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=drawer&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=spawner&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=spawner&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=ghost-escape&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=ghost-escape&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=breaker&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/studio?mode=breaker&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=glass-tower&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=glass-tower&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=flag-battle&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/studio?mode=flag-battle&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=weapon-battle&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/studio?mode=weapon-battle&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=merge-evolution&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=merge-evolution&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=glass-rush&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/studio?mode=glass-rush&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=wave-3d&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=wave-3d&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=marble-run-3d&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=marble-run-3d&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=ball-crush&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/studio?mode=ball-crush&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=jelly-3d&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/studio?mode=jelly-3d&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=cut-count&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=cut-count&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=magnet&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=magnet&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/studio?mode=grid-merge&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/studio?mode=grid-merge&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/roadmap",
+    "depth": 2,
+    "status": 200,
+    "title": "ロードマップと機能リクエスト | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/ja/roadmap"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio",
+    "depth": 2,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/studio"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/start",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/start\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=glass-rush",
+    "depth": 2,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/studio?mode=glass-rush"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=wave-3d",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=wave-3d\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=merge-evolution",
+    "depth": 2,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/studio?mode=merge-evolution"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=escape",
+    "depth": 2,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/studio?mode=escape"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=jelly-3d",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=jelly-3d\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=ghost-escape",
+    "depth": 2,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/studio?mode=ghost-escape"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=magnet",
+    "depth": 2,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/studio?mode=magnet"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=rhythmic",
+    "depth": 2,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/studio?mode=rhythmic"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=ball-crush",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=ball-crush\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=drawer",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=drawer\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=cut-count",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=cut-count\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=breaker",
+    "depth": 2,
+    "status": 200,
+    "title": "Sign Up | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/studio?mode=breaker"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=weapon-battle",
+    "depth": 2,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/studio?mode=weapon-battle"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=marble-run-3d",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=marble-run-3d\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=spawner",
+    "depth": 2,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/studio?mode=spawner"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=flag-battle",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=flag-battle\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=glass-tower",
+    "depth": 2,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/studio?mode=glass-tower"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=grid-merge",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=grid-merge\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=rhythmic&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=rhythmic&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=escape&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/studio?mode=escape&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=drawer&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=drawer&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=spawner&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=spawner&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=ghost-escape&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=ghost-escape&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=breaker&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=breaker&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=glass-tower&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=glass-tower&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=flag-battle&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=flag-battle&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=weapon-battle&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=weapon-battle&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=merge-evolution&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=merge-evolution&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=glass-rush&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=glass-rush&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=wave-3d&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=wave-3d&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=marble-run-3d&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=marble-run-3d&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=ball-crush&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=ball-crush&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=jelly-3d&tutorial=1",
+    "depth": 2,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/studio?mode=jelly-3d&tutorial=1"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=cut-count&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=cut-count&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=magnet&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=magnet&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/studio?mode=grid-merge&tutorial=1",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/studio?mode=grid-merge&tutorial=1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/roadmap",
+    "depth": 2,
+    "status": 200,
+    "title": "產品藍圖與功能需求 | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/zh-tw/roadmap"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/support?topic=billing&subject=Enterprise%20plan%20enquiry",
+    "depth": 2,
+    "status": 200,
+    "title": "支援中心 | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/zh-tw/support?topic=billing&subject=Enterprise%20plan%20enquiry"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/support?topic=billing",
+    "depth": 2,
+    "status": 200,
+    "title": "支援中心 | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/zh-tw/support?topic=billing"
+  },
+  {
+    "url": "https://ballengine.app/es/support?topic=billing&subject=Enterprise%20plan%20enquiry",
+    "depth": 2,
+    "status": 200,
+    "title": "Centro de Soporte | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/es/support?topic=billing&subject=Enterprise%20plan%20enquiry"
+  },
+  {
+    "url": "https://ballengine.app/es/support?topic=billing",
+    "depth": 2,
+    "status": 200,
+    "title": "Centro de Soporte | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/es/support?topic=billing"
+  },
+  {
+    "url": "https://ballengine.app/fr/support?topic=billing&subject=Enterprise%20plan%20enquiry",
+    "depth": 2,
+    "status": 200,
+    "title": "Centre d'assistance | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/fr/support?topic=billing&subject=Enterprise%20plan%20enquiry"
+  },
+  {
+    "url": "https://ballengine.app/fr/support?topic=billing",
+    "depth": 2,
+    "status": 200,
+    "title": "Centre d'assistance | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/fr/support?topic=billing"
+  },
+  {
+    "url": "https://ballengine.app/de/studio",
+    "depth": 2,
+    "status": 200,
+    "title": "Registrieren | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/de/studio"
+  },
+  {
+    "url": "https://ballengine.app/de/start",
+    "depth": 2,
+    "status": 200,
+    "title": "Loslegen | BallEngine",
+    "links": 2,
+    "finalUrl": "https://ballengine.app/de/start"
+  },
+  {
+    "url": "https://ballengine.app/de/support?topic=billing&subject=Enterprise%20plan%20enquiry",
+    "depth": 2,
+    "status": 200,
+    "title": "Support-Center | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/de/support?topic=billing&subject=Enterprise%20plan%20enquiry"
+  },
+  {
+    "url": "https://ballengine.app/de/support?topic=billing",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/de/support?topic=billing\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/de/roadmap",
+    "depth": 2,
+    "status": 200,
+    "title": "Roadmap und Funktionswünsche | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/de/roadmap"
+  },
+  {
+    "url": "https://ballengine.app/ja/support?topic=billing&subject=Enterprise%20plan%20enquiry",
+    "depth": 2,
+    "status": 200,
+    "title": "サポートセンター | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/ja/support?topic=billing&subject=Enterprise%20plan%20enquiry"
+  },
+  {
+    "url": "https://ballengine.app/ja/support?topic=billing",
+    "depth": 2,
+    "status": 200,
+    "title": "サポートセンター | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/ja/support?topic=billing"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/support/tickets",
+    "depth": 2,
+    "status": 200,
+    "title": "我的支援工單 | BallEngine",
+    "links": 45,
+    "finalUrl": "https://ballengine.app/zh-tw/support/tickets"
+  },
+  {
+    "url": "https://ballengine.app/es/support/tickets",
+    "depth": 2,
+    "status": 200,
+    "title": "Mis tickets de soporte | BallEngine",
+    "links": 45,
+    "finalUrl": "https://ballengine.app/es/support/tickets"
+  },
+  {
+    "url": "https://ballengine.app/fr/support/tickets",
+    "depth": 2,
+    "status": 200,
+    "title": "My Support Tickets | BallEngine",
+    "links": 45,
+    "finalUrl": "https://ballengine.app/fr/support/tickets"
+  },
+  {
+    "url": "https://ballengine.app/de/support/tickets",
+    "depth": 2,
+    "status": 200,
+    "title": "Meine Support-Tickets | BallEngine",
+    "links": 45,
+    "finalUrl": "https://ballengine.app/de/support/tickets"
+  },
+  {
+    "url": "https://ballengine.app/ja/support/tickets",
+    "depth": 2,
+    "status": 200,
+    "title": "マイサポートチケット | BallEngine",
+    "links": 45,
+    "finalUrl": "https://ballengine.app/ja/support/tickets"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password",
+    "depth": 2,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password",
+    "depth": 2,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password"
+  },
+  {
+    "url": "https://ballengine.app/fr/forgot-password",
+    "depth": 2,
+    "status": 200,
+    "title": "Mot de passe oublié | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/fr/forgot-password"
+  },
+  {
+    "url": "https://ballengine.app/de/forgot-password",
+    "depth": 2,
+    "status": 200,
+    "title": "Passwort vergessen | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/de/forgot-password"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password",
+    "depth": 2,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fautomation",
+    "depth": 2,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Fautomation",
+    "depth": 2,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Fautomation",
+    "depth": 2,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/de/login?redirect=%2Fautomation",
+    "depth": 2,
+    "status": 200,
+    "title": "Einloggen | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/de/login?redirect=%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fautomation",
+    "depth": 2,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/leaderboard",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/leaderboard\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/leaderboard",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/leaderboard\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/leaderboard",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/leaderboard\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/de/leaderboard",
+    "depth": 2,
+    "status": 200,
+    "title": "BallEngine | Bouncing Ball Simulator",
+    "links": 42,
+    "finalUrl": "https://ballengine.app/de/leaderboard"
+  },
+  {
+    "url": "https://ballengine.app/ja/leaderboard",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/leaderboard\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/byobe-demo.html",
+    "depth": 2,
+    "status": 200,
+    "title": "Orbit Arcade (BYOBE demo website)",
+    "links": 0,
+    "finalUrl": "https://ballengine.app/byobe-demo"
+  },
+  {
+    "url": "https://ballengine.app/login?redirect=%2Fdeveloper",
+    "depth": 2,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/login?redirect=%2Fdeveloper"
+  },
+  {
+    "url": "https://ballengine.app/support?topic=billing",
+    "depth": 2,
+    "status": 200,
+    "title": "サポートセンター | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/support?topic=billing"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=/affiliate",
+    "depth": 2,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=/affiliate",
+    "depth": 2,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=/affiliate",
+    "depth": 2,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=/affiliate",
+    "depth": 2,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup?redirect=/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=/affiliate",
+    "depth": 2,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup?redirect=/affiliate",
+    "depth": 2,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup?redirect=/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/de/login?redirect=/affiliate",
+    "depth": 2,
+    "status": 200,
+    "title": "Einloggen | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/de/login?redirect=/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/de/signup?redirect=/affiliate",
+    "depth": 2,
+    "status": 200,
+    "title": "Registrieren | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/de/signup?redirect=/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=/affiliate",
+    "depth": 2,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=/affiliate",
+    "depth": 2,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=/affiliate"
+  },
+  {
+    "url": "https://ballengine.app/support?topic=billing&subject=Enterprise%20plan%20enquiry",
+    "depth": 2,
+    "status": 200,
+    "title": "サポートセンター | BallEngine",
+    "links": 43,
+    "finalUrl": "https://ballengine.app/support?topic=billing&subject=Enterprise%20plan%20enquiry"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=rhythmic",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/start?mode=rhythmic\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=escape",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/start?mode=escape\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=drawer",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/start?mode=drawer\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=spawner",
+    "depth": 2,
+    "status": 200,
+    "title": "はじめる | BallEngine",
+    "links": 2,
+    "finalUrl": "https://ballengine.app/start?mode=spawner"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=ghost-escape",
+    "depth": 2,
+    "status": 200,
+    "title": "はじめる | BallEngine",
+    "links": 2,
+    "finalUrl": "https://ballengine.app/start?mode=ghost-escape"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=breaker",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/start?mode=breaker\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=glass-tower",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/start?mode=glass-tower\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/modes/count-up",
+    "depth": 2,
+    "status": 200,
+    "title": "Accumulate Mode: Bouncing Balls That Fill the Screen | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/spawner"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=flag-battle",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/start?mode=flag-battle\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=weapon-battle",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/start?mode=weapon-battle\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=merge-evolution",
+    "depth": 2,
+    "status": 200,
+    "title": "はじめる | BallEngine",
+    "links": 2,
+    "finalUrl": "https://ballengine.app/start?mode=merge-evolution"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=glass-rush",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/start?mode=glass-rush\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=wave-3d",
+    "depth": 2,
+    "status": 200,
+    "title": "Get started | BallEngine",
+    "links": 2,
+    "finalUrl": "https://ballengine.app/start?mode=wave-3d"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=marble-run-3d",
+    "depth": 2,
+    "status": 200,
+    "title": "Get started | BallEngine",
+    "links": 2,
+    "finalUrl": "https://ballengine.app/start?mode=marble-run-3d"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=ball-crush",
+    "depth": 2,
+    "status": 200,
+    "title": "はじめる | BallEngine",
+    "links": 2,
+    "finalUrl": "https://ballengine.app/start?mode=ball-crush"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=jelly-3d",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/start?mode=jelly-3d\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=cut-count",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/start?mode=cut-count\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=magnet",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/start?mode=magnet\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/start?mode=grid-merge",
+    "depth": 2,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/start?mode=grid-merge\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/modes/merge-2048",
+    "depth": 2,
+    "status": 200,
+    "title": "Accumulate Mode: Bouncing Balls That Fill the Screen | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/spawner"
+  },
+  {
+    "url": "https://ballengine.app/modes/accumulation",
+    "depth": 2,
+    "status": 200,
+    "title": "Accumulate Mode: Bouncing Balls That Fill the Screen | BallEngine",
+    "links": 52,
+    "finalUrl": "https://ballengine.app/modes/spawner"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Froadmap",
+    "depth": 2,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Descape",
+    "depth": 3,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Descape"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dghost-escape",
+    "depth": 3,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dghost-escape"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dmagnet",
+    "depth": 3,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dmagnet"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dball-crush",
+    "depth": 3,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dball-crush"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dbreaker",
+    "depth": 3,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dbreaker"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dmarble-run-3d",
+    "depth": 3,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dmarble-run-3d"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dflag-battle",
+    "depth": 3,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dflag-battle"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dglass-tower%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dglass-tower%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dgrid-merge%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Dgrid-merge%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Froadmap",
+    "depth": 3,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Djelly-3d",
+    "depth": 3,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Djelly-3d"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Dglass-tower",
+    "depth": 3,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Dglass-tower"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Drhythmic%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Drhythmic%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Ddrawer%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Ddrawer%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Dghost-escape%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Dghost-escape%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Dmarble-run-3d%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Dmarble-run-3d%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Dgrid-merge%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fstudio%3Fmode%3Dgrid-merge%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Froadmap",
+    "depth": 3,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstart%2Fplans",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstart%2Fplans"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Drhythmic",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Drhythmic"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dcut-count",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dcut-count"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dmarble-run-3d",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dmarble-run-3d"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dflag-battle",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dflag-battle"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Drhythmic%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Drhythmic%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Descape%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Descape%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dbreaker%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dbreaker%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dflag-battle%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dflag-battle%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dglass-rush%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dglass-rush%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dball-crush%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Dball-crush%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Froadmap",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dglass-rush",
+    "depth": 3,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dglass-rush"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dmerge-evolution",
+    "depth": 3,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dmerge-evolution"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Descape",
+    "depth": 3,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Descape"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dghost-escape",
+    "depth": 3,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dghost-escape"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dmagnet",
+    "depth": 3,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dmagnet"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Drhythmic",
+    "depth": 3,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Drhythmic"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dbreaker",
+    "depth": 3,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dbreaker"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dweapon-battle",
+    "depth": 3,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dweapon-battle"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dspawner",
+    "depth": 3,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dspawner"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dglass-tower",
+    "depth": 3,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dglass-tower"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Descape%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Descape%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1",
+    "depth": 3,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/de/login?redirect=%2Fde%2Fstart%2Fplans",
+    "depth": 3,
+    "status": 200,
+    "title": "Einloggen | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/de/login?redirect=%2Fde%2Fstart%2Fplans"
+  },
+  {
+    "url": "https://ballengine.app/de/login?redirect=%2Froadmap",
+    "depth": 3,
+    "status": 200,
+    "title": "Einloggen | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/de/login?redirect=%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/support/tickets",
+    "depth": 3,
+    "status": 200,
+    "title": "Meine Support-Tickets | BallEngine",
+    "links": 45,
+    "finalUrl": "https://ballengine.app/support/tickets"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fautomation",
+    "depth": 3,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fautomation",
+    "depth": 3,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fautomation",
+    "depth": 3,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=%2Fes%2Fautomation",
+    "depth": 3,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup?redirect=%2Fes%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fautomation",
+    "depth": 3,
+    "status": 200,
+    "title": "Mot de passe oublié | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fautomation",
+    "depth": 3,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/de/forgot-password?redirect=%2Fde%2Fautomation",
+    "depth": 3,
+    "status": 200,
+    "title": "Passwort vergessen | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/de/forgot-password?redirect=%2Fde%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/de/signup?redirect=%2Fde%2Fautomation",
+    "depth": 3,
+    "status": 200,
+    "title": "Registrieren | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/de/signup?redirect=%2Fde%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fautomation",
+    "depth": 3,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fautomation",
+    "depth": 3,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/leaderboard",
+    "depth": 3,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/leaderboard\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fdeveloper",
+    "depth": 3,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fdeveloper"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fdeveloper",
+    "depth": 3,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fdeveloper"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "登入 | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=%2Fes%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup?redirect=%2Fes%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Fes%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Fes%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "Mot de passe oublié | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Ffr%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Ffr%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/de/forgot-password?redirect=%2Fde%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "Passwort vergessen | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/de/forgot-password?redirect=%2Fde%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/de/signup?redirect=%2Fde%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "Registrieren | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/de/signup?redirect=%2Fde%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/de/login?redirect=%2Fde%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "Einloggen | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/de/login?redirect=%2Fde%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Faffiliate",
+    "depth": 3,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Faffiliate"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Froadmap",
+    "depth": 3,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Froadmap",
+    "depth": 3,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Descape",
+    "depth": 4,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Descape"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Descape",
+    "depth": 4,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Descape"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dghost-escape",
+    "depth": 4,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dghost-escape"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dghost-escape",
+    "depth": 4,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dghost-escape"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dmagnet",
+    "depth": 4,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dmagnet"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dmagnet",
+    "depth": 4,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dmagnet"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dball-crush",
+    "depth": 4,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dball-crush"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dball-crush",
+    "depth": 4,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dball-crush\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dbreaker",
+    "depth": 4,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dbreaker"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dbreaker",
+    "depth": 4,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dbreaker"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dmarble-run-3d",
+    "depth": 4,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dmarble-run-3d"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dmarble-run-3d",
+    "depth": 4,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dmarble-run-3d"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dflag-battle",
+    "depth": 4,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dflag-battle"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dflag-battle",
+    "depth": 4,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dflag-battle"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dglass-tower%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dglass-tower%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dglass-tower%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dglass-tower%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dgrid-merge%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Fstudio%3Fmode%3Dgrid-merge%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dgrid-merge%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "Registrarse | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/es/signup?redirect=%2Fes%2Fstudio%3Fmode%3Dgrid-merge%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Froadmap",
+    "depth": 4,
+    "status": 200,
+    "title": "Has olvidado tu contraseña | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/es/forgot-password?redirect=%2Fes%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/es/signup?redirect=%2Fes%2Froadmap",
+    "depth": 4,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/es/signup?redirect=%2Fes%2Froadmap\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Djelly-3d",
+    "depth": 4,
+    "status": 200,
+    "title": "Mot de passe oublié | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Djelly-3d"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Djelly-3d",
+    "depth": 4,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Djelly-3d"
+  },
+  {
+    "url": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Dglass-tower",
+    "depth": 4,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Dglass-tower\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Dglass-tower",
+    "depth": 4,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Dglass-tower"
+  },
+  {
+    "url": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Drhythmic%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "Mot de passe oublié | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Drhythmic%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Drhythmic%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Drhythmic%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Ddrawer%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "Mot de passe oublié | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Ddrawer%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Ddrawer%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Ddrawer%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Dghost-escape%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "Mot de passe oublié | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Dghost-escape%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Dghost-escape%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Dghost-escape%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "Mot de passe oublié | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Dmarble-run-3d%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "Mot de passe oublié | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Dmarble-run-3d%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Dmarble-run-3d%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Dmarble-run-3d%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "Mot de passe oublié | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Dgrid-merge%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "Mot de passe oublié | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Fstudio%3Fmode%3Dgrid-merge%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Dgrid-merge%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Fstudio%3Fmode%3Dgrid-merge%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Froadmap",
+    "depth": 4,
+    "status": 200,
+    "title": "Mot de passe oublié | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/fr/forgot-password?redirect=%2Ffr%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Froadmap",
+    "depth": 4,
+    "status": 200,
+    "title": "S'inscrire | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/fr/signup?redirect=%2Ffr%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstart%2Fplans",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstart%2Fplans"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstart%2Fplans",
+    "depth": 4,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstart%2Fplans"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Drhythmic",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Drhythmic"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Drhythmic",
+    "depth": 4,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Drhythmic"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dcut-count",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dcut-count"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dcut-count",
+    "depth": 4,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dcut-count"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dmarble-run-3d",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dmarble-run-3d"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dmarble-run-3d",
+    "depth": 4,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dmarble-run-3d"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dflag-battle",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dflag-battle"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dflag-battle",
+    "depth": 4,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dflag-battle"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Drhythmic%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Drhythmic%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Drhythmic%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Drhythmic%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Descape%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Descape%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Descape%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Descape%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dbreaker%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dbreaker%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dbreaker%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dbreaker%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dflag-battle%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dflag-battle%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dflag-battle%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dflag-battle%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dweapon-battle%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dglass-rush%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dglass-rush%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dglass-rush%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dglass-rush%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dball-crush%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Dball-crush%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dball-crush%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Dball-crush%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1",
+    "depth": 4,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/ja/signup?redirect=%2Fja%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Froadmap",
+    "depth": 4,
+    "status": 200,
+    "title": "パスワードをお忘れですか | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/ja/forgot-password?redirect=%2Fja%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/ja/signup?redirect=%2Fja%2Froadmap",
+    "depth": 4,
+    "status": 200,
+    "title": "新規登録 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/ja/signup?redirect=%2Fja%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dglass-rush",
+    "depth": 4,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dglass-rush"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dglass-rush",
+    "depth": 4,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dglass-rush"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dmerge-evolution",
+    "depth": 4,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dmerge-evolution"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dmerge-evolution",
+    "depth": 4,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dmerge-evolution"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Descape",
+    "depth": 4,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Descape"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Descape",
+    "depth": 4,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Descape"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dghost-escape",
+    "depth": 4,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dghost-escape"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dghost-escape",
+    "depth": 4,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dghost-escape"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dmagnet",
+    "depth": 4,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dmagnet"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dmagnet",
+    "depth": 4,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dmagnet"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Drhythmic",
+    "depth": 4,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Drhythmic"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Drhythmic",
+    "depth": 4,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Drhythmic"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dbreaker",
+    "depth": 4,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dbreaker"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dbreaker",
+    "depth": 4,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dbreaker"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dweapon-battle",
+    "depth": 4,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dweapon-battle"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dweapon-battle",
+    "depth": 4,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dweapon-battle"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dspawner",
+    "depth": 4,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dspawner"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dspawner",
+    "depth": 4,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dspawner"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dglass-tower",
+    "depth": 4,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dglass-tower"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dglass-tower",
+    "depth": 4,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Dglass-tower"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Descape%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Descape%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Descape%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Descape%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "忘記密碼 | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/zh-tw/forgot-password?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1",
+    "depth": 4,
+    "status": 200,
+    "title": "註冊 | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/zh-tw/signup?redirect=%2Fzh-tw%2Fstudio%3Fmode%3Djelly-3d%26tutorial%3D1"
+  },
+  {
+    "url": "https://ballengine.app/de/forgot-password?redirect=%2Fde%2Fstart%2Fplans",
+    "depth": 4,
+    "status": 200,
+    "title": "Passwort vergessen | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/de/forgot-password?redirect=%2Fde%2Fstart%2Fplans"
+  },
+  {
+    "url": "https://ballengine.app/de/signup?redirect=%2Fde%2Fstart%2Fplans",
+    "depth": 4,
+    "status": 200,
+    "title": "Registrieren | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/de/signup?redirect=%2Fde%2Fstart%2Fplans"
+  },
+  {
+    "url": "https://ballengine.app/de/forgot-password?redirect=%2Fde%2Froadmap",
+    "depth": 4,
+    "status": 200,
+    "title": "Passwort vergessen | BallEngine",
+    "links": 6,
+    "finalUrl": "https://ballengine.app/de/forgot-password?redirect=%2Fde%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/de/signup?redirect=%2Fde%2Froadmap",
+    "depth": 4,
+    "status": 200,
+    "title": "Registrieren | BallEngine",
+    "links": 8,
+    "finalUrl": "https://ballengine.app/de/signup?redirect=%2Fde%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fautomation",
+    "depth": 4,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Fautomation\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/es/login?redirect=%2Fes%2Fautomation",
+    "depth": 4,
+    "status": 200,
+    "title": "Iniciar sesión | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/es/login?redirect=%2Fes%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fautomation",
+    "depth": 4,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Ffr%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/de/login?redirect=%2Fde%2Fautomation",
+    "depth": 4,
+    "status": 200,
+    "title": "Einloggen | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/de/login?redirect=%2Fde%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Fautomation",
+    "depth": 4,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Fautomation"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fdeveloper",
+    "depth": 4,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fdeveloper"
+  },
+  {
+    "url": "https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Froadmap",
+    "depth": 4,
+    "status": null,
+    "title": null,
+    "links": 0,
+    "finalUrl": null,
+    "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://ballengine.app/zh-tw/login?redirect=%2Fzh-tw%2Froadmap\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "url": "https://ballengine.app/fr/login?redirect=%2Ffr%2Froadmap",
+    "depth": 5,
+    "status": 200,
+    "title": "Se connecter | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/fr/login?redirect=%2Ffr%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/ja/login?redirect=%2Fja%2Froadmap",
+    "depth": 5,
+    "status": 200,
+    "title": "ログイン | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/ja/login?redirect=%2Fja%2Froadmap"
+  },
+  {
+    "url": "https://ballengine.app/de/login?redirect=%2Fde%2Froadmap",
+    "depth": 5,
+    "status": 200,
+    "title": "Einloggen | BallEngine",
+    "links": 9,
+    "finalUrl": "https://ballengine.app/de/login?redirect=%2Fde%2Froadmap"
+  }
+]

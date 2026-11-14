@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <!--
+    GOOGLE CONSENT MODE v2 — DEFAULTS. This block must stay ABOVE the gtag.js tag below,
+    and it must stay inline (not bundled): the guarantee it provides is purely one of ORDERING.
+
+    Until now GA4 and GTM loaded on every page with no consent signal at all, which means they set
+    their cookies immediately — while the banner's only button flipped a localStorage string and
+    changed nothing. Anything that arrives after the tags have already stored an identifier is too
+    late; the storage happened.
+
+    So everything non-essential starts DENIED for everyone. In that state the tags still load and
+    still function, but they set no cookies and send no identifiers — and `consent update` (from
+    src/lib/consent.ts, or the replay below) upgrades them in place, with no page reload.
+
+    `security_storage` is granted from the start: it is the anti-fraud/abuse signal, which is
+    strictly necessary and is not something a visitor is asked to opt into.
+
+    The replay is what stops a RETURNING visitor being denied for the second or so it takes React to
+    boot — long enough to lose the pageview they already agreed to send. It reads the same key and
+    honours the same version as src/lib/consent.ts (CONSENT_STORAGE_KEY / CONSENT_VERSION); if you
+    change either there, change it here. It is wrapped in try/catch because localStorage throws
+    outright in some private-mode and embedded-webview contexts, and a throw here would take the
+    tags — and then the app shell — down with it.
+  -->
+  <script>
+    // Admin ▸ Visitor Journeys runs the Studio framed inside /admin to replay a visit. That is not
+    // traffic, so the Google tags below stay off. Same test as src/lib/journeyReplaySandbox.ts.
+    window.__BE_JOURNEY_REPLAY__ = false;
+    try {
+      window.__BE_JOURNEY_REPLAY__ = window.top !== window.self &&
+        /[?&]journeyReplay=1(?:&|$)/.test(location.search) &&
+        window.parent.location.origin === location.origin &&
+        /^\/admin(?:\/|$)/.test(window.parent.location.pathname);
+    } catch (e) { /* cross-origin parent: a normal page */ }
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+      functionality_storage: 'denied',
+      personalization_storage: 'denied',
+      security_storage: 'granted',
+      wait_for_update: 500
+    });
+    try {
+      var beConsent = JSON.parse(localStorage.getItem('be_cookie_consent') || 'null');
+      if (beConsent && beConsent.v === 5 && beConsent.categories) {
+        var c = beConsent.categories;
+        var g = function (on) { return on ? 'granted' : 'denied'; };
+        gtag('consent', 'update', {
+          ad_storage: g(c.marketing),
+          ad_user_data: g(c.marketing),
+          ad_personalization: g(c.marketing),
+          analytics_storage: g(c.analytics),
+          functionality_storage: g(c.preferences),
+          personalization_storage: g(c.preferences),
+          security_storage: 'granted'
+        });
+      }
+    } catch (e) { /* storage unavailable — stay on the denied defaults */ }
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7BNE2MELD4"></script>
+  <script>
+    if (!window.__BE_JOURNEY_REPLAY__) {
+      gtag('js', new Date());
+
+      gtag('config', 'G-7BNE2MELD4');
+    }
+  </script>
+  <!--
+    No Google Tag Manager. GTM-53MFK2DJ was published EMPTY ("tags": [] in its gtm.js, checked
+    2026-09-26): 113 KB and ~150 ms of main thread per page load that did nothing. GA4 runs from the
+    gtag.js tag above. If a tag is ever needed in GTM, put the loader back and move GA4 into GTM
+    at the same time, so the site never runs GA4 from both.
+  -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+  <!--
+    Poisoned-asset self-heal. /assets/* is served with `max-age=1y, immutable`, and
+    Cloudflare applies those headers BY REQUEST PATH — so if an asset request ever
+    transiently returns the SPA-fallback HTML (deploy propagation race), the browser
+    caches that HTML as the asset FOR A YEAR and `immutable` means it never revalidates.
+    Strict MIME checking then refuses the "stylesheet"/"script" on every load, and even
+    reinstalling the desktop app doesn't clear the WebView2 profile cache. This must be
+    INLINE in the document (which always revalidates): when a same-origin /assets/*
+    stylesheet or script fails, re-request it once with a cache-busting query (a new URL
+    bypasses the poisoned cache entry). If the busted URL fails too, the HTML itself is
+    stale — reload the page once (sessionStorage-guarded) to fetch a fresh document.
+  -->
+  <script>
+    (function () {
+      function heal(t, isLink) {
+        var attr = isLink ? 'href' : 'src';
+        var url = t.getAttribute(attr) || '';
+        // Only heal our own hashed assets; external CDNs manage themselves.
+        if (url.indexOf('/assets/') !== 0 &&
+            url.indexOf(location.origin + '/assets/') !== 0) return;
+        if (url.indexOf('cachebust=') === -1) {
+          var busted = url + (url.indexOf('?') > -1 ? '&' : '?') + 'cachebust=' + Date.now();
+          var n;
+          if (isLink) {
+            n = t.cloneNode();
+            n.setAttribute('href', busted);
+          } else {
+            // Cloned <script> elements never execute (the "already started" flag is
+            // copied), so build a fresh element and copy the attributes across.
+            n = document.createElement('script');
+            for (var i = 0; i < t.attributes.length; i++) {
+              n.setAttribute(t.attributes[i].name, t.attributes[i].value);
+            }
+            n.setAttribute('src', busted);
+          }
+          (t.parentNode || document.head).insertBefore(n, t.nextSibling);
+          if (t.parentNode) t.parentNode.removeChild(t);
+        } else if (!sessionStorage.getItem('assetHealReloaded')) {
+          sessionStorage.setItem('assetHealReloaded', '1');
+          location.reload();
+        }
+      }
+      // 404s / network failures fire `error` on the element.
+      window.addEventListener('error', function (e) {
+        var t = e.target;
+        if (!t || !t.tagName || t === window) return;
+        if (t.tagName === 'LINK' && t.rel === 'stylesheet') heal(t, true);
+        else if (t.tagName === 'SCRIPT' && t.src) heal(t, false);
+      }, true);
+      // A stylesheet whose response is HTML fires `load` (not error) and is then
+      // refused by strict MIME checking — the tell is link.sheet === null.
+      window.addEventListener('load', function (e) {
+        var t = e.target;
+        if (!t || t === window || t.tagName !== 'LINK' || t.rel !== 'stylesheet') return;
+        if (!t.sheet) heal(t, true);
+      }, true);
+    })();
+  </script>
+  <meta name="msvalidate.01" content="1AB5EF297A63FC4A7A5FAC0425B89764" />
+  <meta name="p:domain_verify" content="0b3a5215135039e9ec98d86539ac5d3a"/>
+  <title>BallEngine: #1 Bouncing Ball Simulator</title>
+  <!--
+    Per-page <meta name="description">, keywords, Open Graph and Twitter tags are injected
+    per-route by src/components/SEO.tsx (react-helmet) and baked into each page at prerender
+    time. They were intentionally REMOVED from this static shell: hardcoding the homepage's
+    values here made every prerendered sub-page inherit the homepage description / og:title /
+    og:url (react-helmet's meta tags carry no marker, so the prerender dedup kept these static
+    ones and dropped the per-page ones). The <title> above is kept only as a no-JS fallback;
+    react-helmet overrides it per route.
+  -->
+
+  <!-- Favicons & Brand Icons -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="apple-touch-icon" sizes="167x167" href="apple-touch-icon-167x167.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="120x120" href="apple-touch-icon-120x120.png" />
+  <link rel="mask-icon" href="safari-pinned-tab.svg" color="#0891b2" />
+  <meta name="msapplication-TileColor" content="#0891b2" />
+  <meta name="msapplication-config" content="/browserconfig.xml" />
+  <meta name="msapplication-TileImage" content="/mstile-150x150.png" />
+
+  <!--
+    Structured Data — brand entity graph.
+
+    These three nodes are what Google reads for BRAND queries, and they are joined by
+    `@id` so Search resolves them to ONE entity instead of three loose objects. Keep the
+    `@id` values stable; changing them re-starts entity consolidation from scratch.
+
+    `alternateName` must carry every string a user might type for us — critically the
+    TWO-WORD "Ball Engine", which is a contested generic term (an automotive machine shop
+    and a historic steam-engine maker both own strong signals for it). A previous
+    find-and-replace flattened this list to three copies of the domain and dropped the
+    real alternates; that is why the two-word query surfaced nothing. Do not let a bulk
+    rename touch these values again.
+  -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://ballengine.app/#organization",
+      "name": "BallEngine",
+      "legalName": "Ball Engine Studios",
+      "alternateName": [
+        "Ball Engine",
+        "BallEngine.app",
+        "ballengine.app",
+        "BallEngine Creator Studio"
+      ],
+      "url": "https://ballengine.app/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://ballengine.app/logo.png"
+      },
+      "description": "BallEngine (also written Ball Engine) is the #1 browser-based bouncing ball simulator and creator studio for creating satisfying ball simulations and viral content for TikTok, Reels, and YouTube Shorts.",
+      "sameAs": [
+        "https://youtube.com/@funcirclegames",
+        "https://www.instagram.com/funcirclegames",
+        "https://www.tiktok.com/@funcirclegames",
+        "https://x.com/funcirclegames",
+        "https://www.threads.com/@funcirclegames"
+      ]
+    }
+    </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "@id": "https://ballengine.app/#software",
+      "name": "BallEngine",
+      "alternateName": ["Ball Engine", "BallEngine Simulator", "BallEngine Creator Studio"],
+      "publisher": { "@id": "https://ballengine.app/#organization" },
+      "image": "https://ballengine.app/logo.png",
+      "operatingSystem": "Web",
+      "applicationCategory": "MultimediaApplication",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Starter Studio",
+          "price": "0.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Lite",
+          "price": "19.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Creator",
+          "price": "29.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Pro",
+          "price": "49.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Elite",
+          "price": "99.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Agency",
+          "price": "199.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        }
+      ]
+    }
+    </script>
+  <!--
+    Pricing tiers (Starter / Lite / Creator / Pro / Elite / Agency) are SaaS subscription plans and are already
+    represented as `offers` on the SoftwareApplication schema above. The standalone Product
+    schema was REMOVED: marking subscription plans as Product made Google's Rich Results test
+    flag "missing field review / aggregateRating" on every page, and we have no genuine
+    customer ratings to supply. Fabricating review/aggregateRating to clear the warning would
+    violate Google's structured-data policy (self-serving / fake reviews → manual action).
+    Re-introduce Product + aggregateRating ONLY when real, on-page user reviews exist.
+  -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://ballengine.app/#website",
+      "name": "BallEngine",
+      "alternateName": ["Ball Engine", "ballengine.app"],
+      "url": "https://ballengine.app/",
+      "image": "https://ballengine.app/logo.png",
+      "publisher": { "@id": "https://ballengine.app/#organization" }
+    }
+    </script>
+  <!--
+    BRAND FONTS are self-hosted (src/styles/fonts.css, files in public/fonts/). They used to come
+    from a render-blocking fonts.googleapis.com stylesheet, which put two extra connections
+    (googleapis for the CSS, gstatic for the files) ahead of first paint. Preloading the one face
+    every page paints with (Figtree, latin, upright) starts it in parallel with index.css instead
+    of after it. `crossorigin` is required: fonts are fetched in CORS mode, and a preload without
+    it is a separate request the font load cannot reuse.
+
+    The ~30 text-overlay picker families are NOT here. They load on demand inside the studio;
+    see src/lib/overlayFonts.ts.
+  -->
+  <link rel="preload" href="fonts/figtree/v9/_Xms-HUzqDCFdgfMm4S9DQ.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preconnect" href="https://cdn.ballengine.app" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#06b6d4" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Unregister existing service workers on localhost to prevent caching issues in development
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          for (const registration of registrations) {
+            registration.unregister().then((success) => {
+              if (success) console.log('SW: Unregistered active service worker on localhost.');
+            });
+          }
+        });
+      } else {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+        });
+      }
+    }
+  </script>
+  <!--
+    /studio is served with an empty #root, so until the entry script runs a phone showed a white
+    page and then the Studio's dark outline (src/components/ui/StudioSkeleton.tsx). This paints the
+    empty root in the Studio's own colour instead. `:empty` stops matching the moment React renders,
+    so it never touches another page. Dark unless the saved Studio config says otherwise, the same
+    test as StudioSkeleton (STORAGE_KEY hypnotic_ball_config_v25).
+  -->
+  <script>
+    try {
+      if (/^\/(?:[a-z]{2}(?:-[a-z]{2,4})?\/)?studio\/?$/i.test(location.pathname)) {
+        document.documentElement.setAttribute('data-boot-studio',
+          /"darkMode"\s*:\s*false/.test(localStorage.getItem('hypnotic_ball_config_v25') || '') ? 'light' : 'dark');
+      }
+    } catch (e) { /* storage blocked: the plain white shell, as before */ }
+  </script>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    html[data-boot-studio] #root:empty { min-height: 100vh; }
+    html[data-boot-studio="dark"] #root:empty { background: #09090b; }
+    html[data-boot-studio="light"] #root:empty { background: #e4e4e7; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.25);
+      background-clip: content-box;
+    }
+
+    /* Dark Mode Scrollbar */
+    .dark ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      background-clip: content-box;
+    }
+
+    .dark ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.25);
+      background-clip: content-box;
+    }
+
+    /* Custom scrollbar class for specific containers */
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(139, 92, 246, 0.4);
+      /* Purple-500 with opacity */
+      background-clip: content-box;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(139, 92, 246, 0.6);
+      background-clip: content-box;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(167, 139, 250, 0.5);
+      /* Purple-400 */
+      background-clip: content-box;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(167, 139, 250, 0.7);
+      background-clip: content-box;
+    }
+  </style>
+  <!--
+    Kick the hero reels request off before the bundle exists.
+
+    The homepage's first visual comes from /api/hero-reels, and that call lives in a React
+    effect — so it could not start until 2.4MB of JavaScript had downloaded, parsed and
+    mounted. Measured cold, the request began at ~2.76s and the thumbnails it names only
+    started downloading at ~4.1s. The response is 3.3KB and `public, max-age=60`, so
+    firing it here puts it in the HTTP cache long before the app asks, and the app's own
+    fetch is then served from cache instead of crossing the network.
+
+    The parsed body is parked on window.__heroReelsPrefetch and home.tsx CONSUMES it, so this is
+    the only /api/hero-reels request of the page load. It used to be a bare warm-up that the app
+    then repeated, which still put a second (sometimes third) request on the wire. The promise
+    resolves null on any failure and never rejects; home.tsx falls back to its own fetch then.
+  -->
+  <script>
+    try {
+      window.__heroReelsPrefetch = fetch('/api/hero-reels')
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; });
+    } catch (e) { /* no fetch: the app's own call still runs */ }
+  </script>
+  <!--
+    REMOVED: the esm.sh importmap (react / react-dom / vite) and the synchronous paddle.js tag.
+
+    The importmap was scaffold residue. Nothing resolved through it — the bundle is
+    self-contained and Vite rewrites every bare specifier at build time — so it only
+    advertised a set of CDN origins we do not use.
+
+    paddle.js was loaded here as a BLOCKING script on every page, including pages with no
+    checkout. It was also redundant: ensurePaddleLoaded() in src/components/PaddleCheckout.tsx
+    already injects the script on demand, with a 5s timeout and adblocker handling — and it
+    even removes any pre-existing paddle.js tag first. Having the tag here meant window.Paddle
+    was always present, so that lazy path short-circuited and was effectively dead code on the
+    web. Checkout now loads Paddle at the moment a plan is clicked, which is what that helper
+    was written for.
+  -->
+  <script type="module" crossorigin src="assets/index-3pf76ICO.js"></script>
+  <link rel="modulepreload" crossorigin href="assets/vendor-react-kqrIXDwM.js">
+  <link rel="modulepreload" crossorigin href="assets/vendor-motion-EOl-odwX.js">
+  <link rel="stylesheet" crossorigin href="assets/index-DoMKM56W.css">
+<style>html,body{background-color:#0a0a0a}</style></head>
+
+<body>
+  <div id="root"></div>
+  <noscript>
+    <div style="padding: 20px; font-family: sans-serif;">
+      <!-- No heading elements in here. This block is copied into EVERY prerendered page, so a
+           heading here gave all 1,400 URLs a second, homepage-worded H1 next to the page's own. -->
+      <p><strong>BallEngine</strong> (also written <strong>Ball Engine</strong>, at
+        <strong>ballengine.app</strong>) is a browser-based bouncing ball simulator
+        and creator studio for music-synced 2D and 3D physics videos.</p>
+
+      <p><strong>Plans</strong></p>
+      <ul>
+        <!-- Keep in sync with src/constants/pricing.ts and the SoftwareApplication offers above.
+             These drifted to a stale $29/$159, then $99, and contradicted the JSON-LD on the same page. -->
+        <li><strong>Starter Studio:</strong> Free. The full Studio with a live preview; exporting a video needs a plan.</li>
+        <li><strong>Lite:</strong> $19/mo. No watermark, 1080p, commercial license, 15 exports per month (one video every other day).</li>
+        <li><strong>Creator:</strong> $29/mo. Every 2D setting, commercial license, no watermark, 30 exports per month, Automation Lite included (60 posts a month). The recommended plan.</li>
+        <li><strong>Pro:</strong> $49/mo. Everything in Creator, 3D settings, 4K rendering, your own watermark text, 60 exports per month, Automation Growth included (240 posts a month).</li>
+        <li><strong>Elite:</strong> $99/mo. Everything in Pro, 150 exports per month, Automation Scale included (600 posts a month), 200 GB storage.</li>
+        <li><strong>Agency:</strong> $199/mo. Everything in Elite, 500 exports per month, Automation Max included (2,000 posts a month), 500 GB storage.</li>
+      </ul>
+
+      <nav>
+        <a href="index.html">Home</a> |
+        <a href="modes.html">All modes</a> |
+        <a href="play.html">Games</a> |
+        <a href="plans.html">Pricing</a> |
+        <a href="support.html">Support</a>
+      </nav>
+
+      <p>BallEngine, ballengine.app</p>
+      <p>Follow BallEngine:</p>
+      <nav>
+        <a href="https://youtube.com/@funcirclegames">YouTube</a> |
+        <a href="https://www.instagram.com/funcirclegames">Instagram</a> |
+        <a href="https://www.tiktok.com/@funcirclegames">TikTok</a> |
+        <a href="https://x.com/funcirclegames">Twitter / X</a> |
+        <a href="https://www.threads.com/@funcirclegames">Threads</a>
+      </nav>
+    </div>
+  </noscript>
+<!-- Cloudflare Pages Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "61906db637f044638bdee99f6e5c9222"}'></script><!-- Cloudflare Pages Analytics --><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5a0e96f8d5a4043',t:'MTc5NDYwNTc4NQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5a0e96f8d5a4043',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+
+</html>

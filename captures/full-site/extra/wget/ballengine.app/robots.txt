@@ -1,0 +1,34 @@
+# robots.txt for ballengine.app
+#
+# One group for every crawler. A crawler obeys ONLY the most specific group that names it, so the
+# old per-bot "User-agent: GPTBot / Allow: /" groups silently exempted those bots from every
+# Disallow in the `*` group (/api, /studio, /settings...). Search and AI crawlers are all welcome
+# on the public site; they share the same private-path rules.
+
+User-agent: *
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: Google-Extended
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+User-agent: Applebot
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: Bytespider
+Allow: /
+Disallow: /admin
+Disallow: /employee
+Disallow: /api
+Disallow: /storage
+Disallow: /profile
+Disallow: /settings
+Disallow: /studio
+Disallow: /dashboard
+Disallow: /__instrument-preview.html
+
+Sitemap: https://ballengine.app/sitemap.xml

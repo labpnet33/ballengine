@@ -1,0 +1,20 @@
+Webcloner public website capture
+==============================
+Requested URL: https://ballengine.app/
+Pages visited (total): 664
+Pages visited (this run): 0
+Remaining queued pages: 0
+Resources saved (total): 1152
+Bytes saved (total): 83.16 MiB
+Robots exclusions (this run): 1
+Page/asset errors: 0
+Output: /home/ubuntu/ballengine/captures/full-site/playwright
+Resume: use the same --out directory with --resume.
+
+Limitations:
+- Public HTTP pages and browser-loaded resources only.
+- Server-side source code and databases cannot be downloaded by a browser.
+- Account-only/paid content, credentials, protected resources and bypasses are excluded.
+- Offline hosting is not guaranteed. Rebuild backend routes and APIs independently.
+- Some lazy-loaded assets require user interaction and will not appear.
+- Respect site licenses, copyright, robots.txt and Terms of Service.

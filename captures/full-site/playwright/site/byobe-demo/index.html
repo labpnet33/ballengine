@@ -1,0 +1,128 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Orbit Arcade (BYOBE demo website)</title>
+<!--
+  A pretend customer website for BYOBE (Build Your Own Ball Engine). Nothing here is BallEngine code
+  except the <iframe>. The styles below are deliberately hostile (global resets, !important borders
+  on every iframe and button, a serif body, a light pastel theme) to prove the player is unaffected:
+  it runs in BallEngine's own frame, so none of this reaches it.
+
+  Open with ?key=be_pk_… (a key registered for this page's origin). On localhost the player is loaded
+  from 127.0.0.1 so the frame is genuinely cross-origin, like a real customer site.
+-->
+<style>
+  * { box-sizing: content-box; margin: 0; font-family: Georgia, 'Times New Roman', serif !important; }
+  body { background: #fdf3e7; color: #3b2a1a; padding: 24px; line-height: 1.6; }
+  header { display: flex; align-items: baseline; gap: 16px; border-bottom: 3px double #3b2a1a; padding-bottom: 12px; }
+  h1 { font-size: 34px; letter-spacing: 2px; text-transform: uppercase; }
+  button { all: unset; background: #ff6f59 !important; color: #fff !important; padding: 10px 18px !important; border-radius: 0 !important; cursor: pointer; font-weight: bold; }
+  button:disabled { opacity: .5; cursor: default; }
+  iframe { border: 6px dashed #3b2a1a !important; filter: none; }
+  select { font-size: 16px; padding: 6px; }
+  .wrap { display: grid; grid-template-columns: minmax(260px, 380px) 1fr; gap: 28px; margin-top: 24px; }
+  @media (max-width: 760px) { .wrap { grid-template-columns: 1fr; } }
+  .player { width: 100%; aspect-ratio: 9 / 16; display: block; }
+  .card { background: #fff; border: 2px solid #3b2a1a; padding: 16px; margin-bottom: 16px; }
+  #log { font-family: monospace !important; font-size: 12px; max-height: 220px; overflow: auto; background: #3b2a1a; color: #fdf3e7; padding: 8px; }
+  video { width: 100%; max-width: 320px; display: block; margin-top: 8px; border: 2px solid #3b2a1a; }
+  code { background: #f1e0c8; padding: 0 4px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Orbit Arcade</h1>
+  <span>physics toys for your feed</span>
+</header>
+
+<div class="wrap">
+  <div>
+    <iframe id="player" class="player" allow="autoplay; fullscreen" title="Ball simulation" src="https://ballengine.app/embed?key=&amp;mode=FLAG_BATTLE&amp;visitor=demo-visitor-1&amp;duration=10"></iframe>
+  </div>
+  <div>
+    <div class="card">
+      <p><strong>Pick a toy</strong></p>
+      <div class="row">
+        <select id="mode">
+          <option value="FLAG_BATTLE">Flag Battle</option>
+          <option value="RHYTHMIC">Rhythmic Bounce</option>
+          <option value="ESCAPE">Circle Escape</option>
+          <option value="SPACE_SPIRAL">Space Spiral</option>
+          <option value="MARBLE_RUN_3D">Marble Run 3D</option>
+        </select>
+        <button id="shuffle">Shuffle from my page</button>
+        <button id="make" disabled="">Make my video</button>
+      </div>
+      <p id="left" style="margin-top:8px"></p>
+    </div>
+    <div class="card">
+      <p><strong>Your finished video</strong> (handed to this page by the player, ready to upload to our own server)</p>
+      <div id="out">Open this page with ?key=be_pk_... to load the player.</div>
+    </div>
+    <div class="card">
+      <p><strong>Events from the player</strong></p>
+      <pre id="log">11:04:55 PM  loading FLAG_BATTLE
+</pre>
+    </div>
+    <div class="card">
+      <p><strong>Cloud renders</strong> for visitors on slow phones are made from OUR server with the secret key, never from this page:</p>
+      <pre style="white-space:pre-wrap;font-family:monospace!important;font-size:12px">curl -X POST https://ballengine.app/api/v1/videos \
+  -H "Authorization: Bearer be_sk_..." \
+  -d '{"mode":"FLAG_BATTLE","duration":30}'</pre>
+    </div>
+  </div>
+</div>
+
+<script>
+  const q = new URLSearchParams(location.search);
+  const key = q.get('key') || '';
+  const local = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  // Cross-origin on purpose: localhost and 127.0.0.1 are different sites to the browser.
+  const host = q.get('host') || (local ? `${location.protocol}//${location.hostname === 'localhost' ? '127.0.0.1' : 'localhost'}:${location.port}` : 'https://ballengine.app');
+  const frame = document.getElementById('player');
+  const log = (m) => { const el = document.getElementById('log'); el.textContent = `${new Date().toLocaleTimeString()}  ${m}\n` + el.textContent; };
+
+  function load() {
+    const mode = document.getElementById('mode').value;
+    frame.src = `${host}/embed?key=${encodeURIComponent(key)}&mode=${mode}&visitor=demo-visitor-1&duration=10`;
+    document.getElementById('make').disabled = true;
+    log(`loading ${mode}`);
+  }
+  // Level 2 mode picker: switch in place with set-mode (no reload).
+  document.getElementById('mode').onchange = (e) => send({ type: 'set-mode', mode: e.target.value });
+  const send = (msg) => frame.contentWindow.postMessage({ target: 'ballengine', ...msg }, host);
+  document.getElementById('shuffle').onclick = () => send({ type: 'randomize' });
+  document.getElementById('make').onclick = () => send({ type: 'export' });
+
+  window.addEventListener('message', (e) => {
+    if (e.origin !== host || e.data?.source !== 'ballengine') return;
+    const d = e.data;
+    if (d.type === 'export-progress') { document.getElementById('make').textContent = `Making ${d.progress}%`; return; }
+    log(`${d.type}${d.remaining != null ? ` (videos left: ${d.remaining})` : ''}${d.message ? `: ${d.message}` : ''}`);
+    if (d.type === 'ready') {
+      document.getElementById('make').disabled = false;
+      document.getElementById('left').textContent = `${d.remaining} videos left this month`;
+      const sel = document.getElementById('mode');
+      if (Array.isArray(d.modes)) sel.innerHTML = d.modes.map((m) => `<option value="${m.id}"${m.id === d.mode ? ' selected' : ''}>${m.name}</option>`).join('');
+    }
+    if (d.type === 'export-done') {
+      document.getElementById('make').textContent = 'Make my video';
+      document.getElementById('left').textContent = `${d.remaining} videos left this month`;
+      const v = document.createElement('video');
+      v.controls = true; v.src = URL.createObjectURL(d.video);
+      const out = document.getElementById('out');
+      out.textContent = `MP4, ${(d.video.size / 1048576).toFixed(1)} MB`;
+      out.appendChild(v);
+    }
+    if (d.type === 'export-failed' || d.type === 'limit-reached') document.getElementById('make').textContent = 'Make my video';
+  });
+
+  if (!key) document.getElementById('out').textContent = 'Open this page with ?key=be_pk_... to load the player.';
+  load();
+</script>
+<!-- Cloudflare Pages Analytics --><script defer="" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&quot;token&quot;: &quot;61906db637f044638bdee99f6e5c9222&quot;}"></script><!-- Cloudflare Pages Analytics --><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5a16b0ace07002c',t:'MTc5NDYxMTA5NA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5a16b0ace07002c',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; visibility: hidden;"></iframe><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;91669cc11cd949b88b36c3a7e5455e84&quot;,&quot;r&quot;:1,&quot;spa&quot;:2}" crossorigin="anonymous"></script>
+
+
+</body></html>

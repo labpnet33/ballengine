@@ -1,0 +1,496 @@
+<!DOCTYPE html><html lang="es" class="dark" data-rh-managed="lang" data-cookie-sheet=""><head>
+  <!--
+    GOOGLE CONSENT MODE v2 — DEFAULTS. This block must stay ABOVE the gtag.js tag below,
+    and it must stay inline (not bundled): the guarantee it provides is purely one of ORDERING.
+
+    Until now GA4 and GTM loaded on every page with no consent signal at all, which means they set
+    their cookies immediately — while the banner's only button flipped a localStorage string and
+    changed nothing. Anything that arrives after the tags have already stored an identifier is too
+    late; the storage happened.
+
+    So everything non-essential starts DENIED for everyone. In that state the tags still load and
+    still function, but they set no cookies and send no identifiers — and `consent update` (from
+    src/lib/consent.ts, or the replay below) upgrades them in place, with no page reload.
+
+    `security_storage` is granted from the start: it is the anti-fraud/abuse signal, which is
+    strictly necessary and is not something a visitor is asked to opt into.
+
+    The replay is what stops a RETURNING visitor being denied for the second or so it takes React to
+    boot — long enough to lose the pageview they already agreed to send. It reads the same key and
+    honours the same version as src/lib/consent.ts (CONSENT_STORAGE_KEY / CONSENT_VERSION); if you
+    change either there, change it here. It is wrapped in try/catch because localStorage throws
+    outright in some private-mode and embedded-webview contexts, and a throw here would take the
+    tags — and then the app shell — down with it.
+  -->
+  <script>
+    // Admin ▸ Visitor Journeys runs the Studio framed inside /admin to replay a visit. That is not
+    // traffic, so the Google tags below stay off. Same test as src/lib/journeyReplaySandbox.ts.
+    window.__BE_JOURNEY_REPLAY__ = false;
+    try {
+      window.__BE_JOURNEY_REPLAY__ = window.top !== window.self &&
+        /[?&]journeyReplay=1(?:&|$)/.test(location.search) &&
+        window.parent.location.origin === location.origin &&
+        /^\/admin(?:\/|$)/.test(window.parent.location.pathname);
+    } catch (e) { /* cross-origin parent: a normal page */ }
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+      functionality_storage: 'denied',
+      personalization_storage: 'denied',
+      security_storage: 'granted',
+      wait_for_update: 500
+    });
+    try {
+      var beConsent = JSON.parse(localStorage.getItem('be_cookie_consent') || 'null');
+      if (beConsent && beConsent.v === 5 && beConsent.categories) {
+        var c = beConsent.categories;
+        var g = function (on) { return on ? 'granted' : 'denied'; };
+        gtag('consent', 'update', {
+          ad_storage: g(c.marketing),
+          ad_user_data: g(c.marketing),
+          ad_personalization: g(c.marketing),
+          analytics_storage: g(c.analytics),
+          functionality_storage: g(c.preferences),
+          personalization_storage: g(c.preferences),
+          security_storage: 'granted'
+        });
+      }
+    } catch (e) { /* storage unavailable — stay on the denied defaults */ }
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-7BNE2MELD4"></script>
+  <script>
+    if (!window.__BE_JOURNEY_REPLAY__) {
+      gtag('js', new Date());
+
+      gtag('config', 'G-7BNE2MELD4');
+    }
+  </script>
+  <!--
+    No Google Tag Manager. GTM-53MFK2DJ was published EMPTY ("tags": [] in its gtm.js, checked
+    2026-09-26): 113 KB and ~150 ms of main thread per page load that did nothing. GA4 runs from the
+    gtag.js tag above. If a tag is ever needed in GTM, put the loader back and move GA4 into GTM
+    at the same time, so the site never runs GA4 from both.
+  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+  <!--
+    Poisoned-asset self-heal. /assets/* is served with `max-age=1y, immutable`, and
+    Cloudflare applies those headers BY REQUEST PATH — so if an asset request ever
+    transiently returns the SPA-fallback HTML (deploy propagation race), the browser
+    caches that HTML as the asset FOR A YEAR and `immutable` means it never revalidates.
+    Strict MIME checking then refuses the "stylesheet"/"script" on every load, and even
+    reinstalling the desktop app doesn't clear the WebView2 profile cache. This must be
+    INLINE in the document (which always revalidates): when a same-origin /assets/*
+    stylesheet or script fails, re-request it once with a cache-busting query (a new URL
+    bypasses the poisoned cache entry). If the busted URL fails too, the HTML itself is
+    stale — reload the page once (sessionStorage-guarded) to fetch a fresh document.
+  -->
+  <script>
+    (function () {
+      function heal(t, isLink) {
+        var attr = isLink ? 'href' : 'src';
+        var url = t.getAttribute(attr) || '';
+        // Only heal our own hashed assets; external CDNs manage themselves.
+        if (url.indexOf('/assets/') !== 0 &&
+            url.indexOf(location.origin + '/assets/') !== 0) return;
+        if (url.indexOf('cachebust=') === -1) {
+          var busted = url + (url.indexOf('?') > -1 ? '&' : '?') + 'cachebust=' + Date.now();
+          var n;
+          if (isLink) {
+            n = t.cloneNode();
+            n.setAttribute('href', busted);
+          } else {
+            // Cloned <script> elements never execute (the "already started" flag is
+            // copied), so build a fresh element and copy the attributes across.
+            n = document.createElement('script');
+            for (var i = 0; i < t.attributes.length; i++) {
+              n.setAttribute(t.attributes[i].name, t.attributes[i].value);
+            }
+            n.setAttribute('src', busted);
+          }
+          (t.parentNode || document.head).insertBefore(n, t.nextSibling);
+          if (t.parentNode) t.parentNode.removeChild(t);
+        } else if (!sessionStorage.getItem('assetHealReloaded')) {
+          sessionStorage.setItem('assetHealReloaded', '1');
+          location.reload();
+        }
+      }
+      // 404s / network failures fire `error` on the element.
+      window.addEventListener('error', function (e) {
+        var t = e.target;
+        if (!t || !t.tagName || t === window) return;
+        if (t.tagName === 'LINK' && t.rel === 'stylesheet') heal(t, true);
+        else if (t.tagName === 'SCRIPT' && t.src) heal(t, false);
+      }, true);
+      // A stylesheet whose response is HTML fires `load` (not error) and is then
+      // refused by strict MIME checking — the tell is link.sheet === null.
+      window.addEventListener('load', function (e) {
+        var t = e.target;
+        if (!t || t === window || t.tagName !== 'LINK' || t.rel !== 'stylesheet') return;
+        if (!t.sheet) heal(t, true);
+      }, true);
+    })();
+  </script>
+  <meta name="msvalidate.01" content="1AB5EF297A63FC4A7A5FAC0425B89764">
+  <meta name="p:domain_verify" content="0b3a5215135039e9ec98d86539ac5d3a">
+  <title>Registrarse | BallEngine</title><title>Registrarse | BallEngine</title>
+  <!--
+    Per-page <meta name="description">, keywords, Open Graph and Twitter tags are injected
+    per-route by src/components/SEO.tsx (react-helmet) and baked into each page at prerender
+    time. They were intentionally REMOVED from this static shell: hardcoding the homepage's
+    values here made every prerendered sub-page inherit the homepage description / og:title /
+    og:url (react-helmet's meta tags carry no marker, so the prerender dedup kept these static
+    ones and dropped the per-page ones). The <title> above is kept only as a no-JS fallback;
+    react-helmet overrides it per route.
+  -->
+
+  <!-- Favicons & Brand Icons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="/apple-touch-icon-167x167.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0891b2">
+  <meta name="msapplication-TileColor" content="#0891b2">
+  <meta name="msapplication-config" content="/browserconfig.xml">
+  <meta name="msapplication-TileImage" content="/mstile-150x150.png">
+
+  <!--
+    Structured Data — brand entity graph.
+
+    These three nodes are what Google reads for BRAND queries, and they are joined by
+    `@id` so Search resolves them to ONE entity instead of three loose objects. Keep the
+    `@id` values stable; changing them re-starts entity consolidation from scratch.
+
+    `alternateName` must carry every string a user might type for us — critically the
+    TWO-WORD "Ball Engine", which is a contested generic term (an automotive machine shop
+    and a historic steam-engine maker both own strong signals for it). A previous
+    find-and-replace flattened this list to three copies of the domain and dropped the
+    real alternates; that is why the two-word query surfaced nothing. Do not let a bulk
+    rename touch these values again.
+  -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://ballengine.app/#organization",
+      "name": "BallEngine",
+      "legalName": "Ball Engine Studios",
+      "alternateName": [
+        "Ball Engine",
+        "BallEngine.app",
+        "ballengine.app",
+        "BallEngine Creator Studio"
+      ],
+      "url": "https://ballengine.app/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://ballengine.app/logo.png"
+      },
+      "description": "BallEngine (also written Ball Engine) is the #1 browser-based bouncing ball simulator and creator studio for creating satisfying ball simulations and viral content for TikTok, Reels, and YouTube Shorts.",
+      "sameAs": [
+        "https://youtube.com/@funcirclegames",
+        "https://www.instagram.com/funcirclegames",
+        "https://www.tiktok.com/@funcirclegames",
+        "https://x.com/funcirclegames",
+        "https://www.threads.com/@funcirclegames"
+      ]
+    }
+    </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "@id": "https://ballengine.app/#software",
+      "name": "BallEngine",
+      "alternateName": ["Ball Engine", "BallEngine Simulator", "BallEngine Creator Studio"],
+      "publisher": { "@id": "https://ballengine.app/#organization" },
+      "image": "https://ballengine.app/logo.png",
+      "operatingSystem": "Web",
+      "applicationCategory": "MultimediaApplication",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Starter Studio",
+          "price": "0.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Lite",
+          "price": "19.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Creator",
+          "price": "29.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Pro",
+          "price": "49.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Elite",
+          "price": "99.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Agency",
+          "price": "199.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        }
+      ]
+    }
+    </script>
+  <!--
+    Pricing tiers (Starter / Lite / Creator / Pro / Elite / Agency) are SaaS subscription plans and are already
+    represented as `offers` on the SoftwareApplication schema above. The standalone Product
+    schema was REMOVED: marking subscription plans as Product made Google's Rich Results test
+    flag "missing field review / aggregateRating" on every page, and we have no genuine
+    customer ratings to supply. Fabricating review/aggregateRating to clear the warning would
+    violate Google's structured-data policy (self-serving / fake reviews → manual action).
+    Re-introduce Product + aggregateRating ONLY when real, on-page user reviews exist.
+  -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://ballengine.app/#website",
+      "name": "BallEngine",
+      "alternateName": ["Ball Engine", "ballengine.app"],
+      "url": "https://ballengine.app/",
+      "image": "https://ballengine.app/logo.png",
+      "publisher": { "@id": "https://ballengine.app/#organization" }
+    }
+    </script>
+  <!--
+    BRAND FONTS are self-hosted (src/styles/fonts.css, files in public/fonts/). They used to come
+    from a render-blocking fonts.googleapis.com stylesheet, which put two extra connections
+    (googleapis for the CSS, gstatic for the files) ahead of first paint. Preloading the one face
+    every page paints with (Figtree, latin, upright) starts it in parallel with index.css instead
+    of after it. `crossorigin` is required: fonts are fetched in CORS mode, and a preload without
+    it is a separate request the font load cannot reuse.
+
+    The ~30 text-overlay picker families are NOT here. They load on demand inside the studio;
+    see src/lib/overlayFonts.ts.
+  -->
+  <link rel="preload" href="/fonts/figtree/v9/_Xms-HUzqDCFdgfMm4S9DQ.woff2" as="font" type="font/woff2" crossorigin="">
+  <link rel="preconnect" href="https://cdn.ballengine.app">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#06b6d4">
+  <script>
+    if ('serviceWorker' in navigator) {
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Unregister existing service workers on localhost to prevent caching issues in development
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          for (const registration of registrations) {
+            registration.unregister().then((success) => {
+              if (success) console.log('SW: Unregistered active service worker on localhost.');
+            });
+          }
+        });
+      } else {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+        });
+      }
+    }
+  </script>
+  <!--
+    /studio is served with an empty #root, so until the entry script runs a phone showed a white
+    page and then the Studio's dark outline (src/components/ui/StudioSkeleton.tsx). This paints the
+    empty root in the Studio's own colour instead. `:empty` stops matching the moment React renders,
+    so it never touches another page. Dark unless the saved Studio config says otherwise, the same
+    test as StudioSkeleton (STORAGE_KEY hypnotic_ball_config_v25).
+  -->
+  <script>
+    try {
+      if (/^\/(?:[a-z]{2}(?:-[a-z]{2,4})?\/)?studio\/?$/i.test(location.pathname)) {
+        document.documentElement.setAttribute('data-boot-studio',
+          /"darkMode"\s*:\s*false/.test(localStorage.getItem('hypnotic_ball_config_v25') || '') ? 'light' : 'dark');
+      }
+    } catch (e) { /* storage blocked: the plain white shell, as before */ }
+  </script>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    html[data-boot-studio] #root:empty { min-height: 100vh; }
+    html[data-boot-studio="dark"] #root:empty { background: #09090b; }
+    html[data-boot-studio="light"] #root:empty { background: #e4e4e7; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.25);
+      background-clip: content-box;
+    }
+
+    /* Dark Mode Scrollbar */
+    .dark ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      background-clip: content-box;
+    }
+
+    .dark ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.25);
+      background-clip: content-box;
+    }
+
+    /* Custom scrollbar class for specific containers */
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(139, 92, 246, 0.4);
+      /* Purple-500 with opacity */
+      background-clip: content-box;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(139, 92, 246, 0.6);
+      background-clip: content-box;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(167, 139, 250, 0.5);
+      /* Purple-400 */
+      background-clip: content-box;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(167, 139, 250, 0.7);
+      background-clip: content-box;
+    }
+  </style>
+  <!--
+    Kick the hero reels request off before the bundle exists.
+
+    The homepage's first visual comes from /api/hero-reels, and that call lives in a React
+    effect — so it could not start until 2.4MB of JavaScript had downloaded, parsed and
+    mounted. Measured cold, the request began at ~2.76s and the thumbnails it names only
+    started downloading at ~4.1s. The response is 3.3KB and `public, max-age=60`, so
+    firing it here puts it in the HTTP cache long before the app asks, and the app's own
+    fetch is then served from cache instead of crossing the network.
+
+    The parsed body is parked on window.__heroReelsPrefetch and home.tsx CONSUMES it, so this is
+    the only /api/hero-reels request of the page load. It used to be a bare warm-up that the app
+    then repeated, which still put a second (sometimes third) request on the wire. The promise
+    resolves null on any failure and never rejects; home.tsx falls back to its own fetch then.
+  -->
+  <script>
+    try {
+      window.__heroReelsPrefetch = fetch('/api/hero-reels')
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; });
+    } catch (e) { /* no fetch: the app's own call still runs */ }
+  </script>
+  <!--
+    REMOVED: the esm.sh importmap (react / react-dom / vite) and the synchronous paddle.js tag.
+
+    The importmap was scaffold residue. Nothing resolved through it — the bundle is
+    self-contained and Vite rewrites every bare specifier at build time — so it only
+    advertised a set of CDN origins we do not use.
+
+    paddle.js was loaded here as a BLOCKING script on every page, including pages with no
+    checkout. It was also redundant: ensurePaddleLoaded() in src/components/PaddleCheckout.tsx
+    already injects the script on demand, with a 5s timeout and adblocker handling — and it
+    even removes any pre-existing paddle.js tag first. Having the tag here meant window.Paddle
+    was always present, so that lazy path short-circuited and was effectively dead code on the
+    web. Checkout now loads Paddle at the moment a plan is clicked, which is what that helper
+    was written for.
+  -->
+  <script type="module" crossorigin="" src="/assets/index-3pf76ICO.js"></script>
+  <link rel="modulepreload" crossorigin="" href="/assets/vendor-react-kqrIXDwM.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/vendor-motion-EOl-odwX.js">
+  <link rel="stylesheet" crossorigin="" href="/assets/index-DoMKM56W.css">
+<style type="text/css">[data-sonner-toaster][dir=ltr],html[dir=ltr]{--toast-icon-margin-start:-3px;--toast-icon-margin-end:4px;--toast-svg-margin-start:-1px;--toast-svg-margin-end:0px;--toast-button-margin-start:auto;--toast-button-margin-end:0;--toast-close-button-start:0;--toast-close-button-end:unset;--toast-close-button-transform:translate(-35%, -35%)}[data-sonner-toaster][dir=rtl],html[dir=rtl]{--toast-icon-margin-start:4px;--toast-icon-margin-end:-3px;--toast-svg-margin-start:0px;--toast-svg-margin-end:-1px;--toast-button-margin-start:0;--toast-button-margin-end:auto;--toast-close-button-start:unset;--toast-close-button-end:0;--toast-close-button-transform:translate(35%, -35%)}[data-sonner-toaster]{position:fixed;width:var(--width);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;--gray1:hsl(0, 0%, 99%);--gray2:hsl(0, 0%, 97.3%);--gray3:hsl(0, 0%, 95.1%);--gray4:hsl(0, 0%, 93%);--gray5:hsl(0, 0%, 90.9%);--gray6:hsl(0, 0%, 88.7%);--gray7:hsl(0, 0%, 85.8%);--gray8:hsl(0, 0%, 78%);--gray9:hsl(0, 0%, 56.1%);--gray10:hsl(0, 0%, 52.3%);--gray11:hsl(0, 0%, 43.5%);--gray12:hsl(0, 0%, 9%);--border-radius:8px;box-sizing:border-box;padding:0;margin:0;list-style:none;outline:0;z-index:999999999;transition:transform .4s ease}@media (hover:none) and (pointer:coarse){[data-sonner-toaster][data-lifted=true]{transform:none}}[data-sonner-toaster][data-x-position=right]{right:var(--offset-right)}[data-sonner-toaster][data-x-position=left]{left:var(--offset-left)}[data-sonner-toaster][data-x-position=center]{left:50%;transform:translateX(-50%)}[data-sonner-toaster][data-y-position=top]{top:var(--offset-top)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--offset-bottom)}[data-sonner-toast]{--y:translateY(100%);--lift-amount:calc(var(--lift) * var(--gap));z-index:var(--z-index);position:absolute;opacity:0;transform:var(--y);touch-action:none;transition:transform .4s,opacity .4s,height .4s,box-shadow .2s;box-sizing:border-box;outline:0;overflow-wrap:anywhere}[data-sonner-toast][data-styled=true]{padding:16px;background:var(--normal-bg);border:1px solid var(--normal-border);color:var(--normal-text);border-radius:var(--border-radius);box-shadow:0 4px 12px rgba(0,0,0,.1);width:var(--width);font-size:13px;display:flex;align-items:center;gap:6px}[data-sonner-toast]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-y-position=top]{top:0;--y:translateY(-100%);--lift:1;--lift-amount:calc(1 * var(--gap))}[data-sonner-toast][data-y-position=bottom]{bottom:0;--y:translateY(100%);--lift:-1;--lift-amount:calc(var(--lift) * var(--gap))}[data-sonner-toast][data-styled=true] [data-description]{font-weight:400;line-height:1.4;color:#3f3f3f}[data-rich-colors=true][data-sonner-toast][data-styled=true] [data-description]{color:inherit}[data-sonner-toaster][data-sonner-theme=dark] [data-description]{color:#e8e8e8}[data-sonner-toast][data-styled=true] [data-title]{font-weight:500;line-height:1.5;color:inherit}[data-sonner-toast][data-styled=true] [data-icon]{display:flex;height:16px;width:16px;position:relative;justify-content:flex-start;align-items:center;flex-shrink:0;margin-left:var(--toast-icon-margin-start);margin-right:var(--toast-icon-margin-end)}[data-sonner-toast][data-promise=true] [data-icon]>svg{opacity:0;transform:scale(.8);transform-origin:center;animation:sonner-fade-in .3s ease forwards}[data-sonner-toast][data-styled=true] [data-icon]>*{flex-shrink:0}[data-sonner-toast][data-styled=true] [data-icon] svg{margin-left:var(--toast-svg-margin-start);margin-right:var(--toast-svg-margin-end)}[data-sonner-toast][data-styled=true] [data-content]{display:flex;flex-direction:column;gap:2px}[data-sonner-toast][data-styled=true] [data-button]{border-radius:4px;padding-left:8px;padding-right:8px;height:24px;font-size:12px;color:var(--normal-bg);background:var(--normal-text);margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end);border:none;font-weight:500;cursor:pointer;outline:0;display:flex;align-items:center;flex-shrink:0;transition:opacity .4s,box-shadow .2s}[data-sonner-toast][data-styled=true] [data-button]:focus-visible{box-shadow:0 0 0 2px rgba(0,0,0,.4)}[data-sonner-toast][data-styled=true] [data-button]:first-of-type{margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end)}[data-sonner-toast][data-styled=true] [data-cancel]{color:var(--normal-text);background:rgba(0,0,0,.08)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-styled=true] [data-cancel]{background:rgba(255,255,255,.3)}[data-sonner-toast][data-styled=true] [data-close-button]{position:absolute;left:var(--toast-close-button-start);right:var(--toast-close-button-end);top:0;height:20px;width:20px;display:flex;justify-content:center;align-items:center;padding:0;color:var(--gray12);background:var(--normal-bg);border:1px solid var(--gray4);transform:var(--toast-close-button-transform);border-radius:50%;cursor:pointer;z-index:1;transition:opacity .1s,background .2s,border-color .2s}[data-sonner-toast][data-styled=true] [data-close-button]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-styled=true] [data-disabled=true]{cursor:not-allowed}[data-sonner-toast][data-styled=true]:hover [data-close-button]:hover{background:var(--gray2);border-color:var(--gray5)}[data-sonner-toast][data-swiping=true]::before{content:'';position:absolute;left:-100%;right:-100%;height:100%;z-index:-1}[data-sonner-toast][data-y-position=top][data-swiping=true]::before{bottom:50%;transform:scaleY(3) translateY(50%)}[data-sonner-toast][data-y-position=bottom][data-swiping=true]::before{top:50%;transform:scaleY(3) translateY(-50%)}[data-sonner-toast][data-swiping=false][data-removed=true]::before{content:'';position:absolute;inset:0;transform:scaleY(2)}[data-sonner-toast][data-expanded=true]::after{content:'';position:absolute;left:0;height:calc(var(--gap) + 1px);bottom:100%;width:100%}[data-sonner-toast][data-mounted=true]{--y:translateY(0);opacity:1}[data-sonner-toast][data-expanded=false][data-front=false]{--scale:var(--toasts-before) * 0.05 + 1;--y:translateY(calc(var(--lift-amount) * var(--toasts-before))) scale(calc(-1 * var(--scale)));height:var(--front-toast-height)}[data-sonner-toast]>*{transition:opacity .4s}[data-sonner-toast][data-x-position=right]{right:0}[data-sonner-toast][data-x-position=left]{left:0}[data-sonner-toast][data-expanded=false][data-front=false][data-styled=true]>*{opacity:0}[data-sonner-toast][data-visible=false]{opacity:0;pointer-events:none}[data-sonner-toast][data-mounted=true][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset)));height:var(--initial-height)}[data-sonner-toast][data-removed=true][data-front=true][data-swipe-out=false]{--y:translateY(calc(var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=false]{--y:translateY(40%);opacity:0;transition:transform .5s,opacity .2s}[data-sonner-toast][data-removed=true][data-front=false]::before{height:calc(var(--initial-height) + 20%)}[data-sonner-toast][data-swiping=true]{transform:var(--y) translateY(var(--swipe-amount-y,0)) translateX(var(--swipe-amount-x,0));transition:none}[data-sonner-toast][data-swiped=true]{user-select:none}[data-sonner-toast][data-swipe-out=true][data-y-position=bottom],[data-sonner-toast][data-swipe-out=true][data-y-position=top]{animation-duration:.2s;animation-timing-function:ease-out;animation-fill-mode:forwards}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=left]{animation-name:swipe-out-left}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=right]{animation-name:swipe-out-right}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=up]{animation-name:swipe-out-up}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=down]{animation-name:swipe-out-down}@keyframes swipe-out-left{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) - 100%));opacity:0}}@keyframes swipe-out-right{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) + 100%));opacity:0}}@keyframes swipe-out-up{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) - 100%));opacity:0}}@keyframes swipe-out-down{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) + 100%));opacity:0}}@media (max-width:600px){[data-sonner-toaster]{position:fixed;right:var(--mobile-offset-right);left:var(--mobile-offset-left);width:100%}[data-sonner-toaster][dir=rtl]{left:calc(var(--mobile-offset-left) * -1)}[data-sonner-toaster] [data-sonner-toast]{left:0;right:0;width:calc(100% - var(--mobile-offset-left) * 2)}[data-sonner-toaster][data-x-position=left]{left:var(--mobile-offset-left)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--mobile-offset-bottom)}[data-sonner-toaster][data-y-position=top]{top:var(--mobile-offset-top)}[data-sonner-toaster][data-x-position=center]{left:var(--mobile-offset-left);right:var(--mobile-offset-right);transform:none}}[data-sonner-toaster][data-sonner-theme=light]{--normal-bg:#fff;--normal-border:var(--gray4);--normal-text:var(--gray12);--success-bg:hsl(143, 85%, 96%);--success-border:hsl(145, 92%, 87%);--success-text:hsl(140, 100%, 27%);--info-bg:hsl(208, 100%, 97%);--info-border:hsl(221, 91%, 93%);--info-text:hsl(210, 92%, 45%);--warning-bg:hsl(49, 100%, 97%);--warning-border:hsl(49, 91%, 84%);--warning-text:hsl(31, 92%, 45%);--error-bg:hsl(359, 100%, 97%);--error-border:hsl(359, 100%, 94%);--error-text:hsl(360, 100%, 45%)}[data-sonner-toaster][data-sonner-theme=light] [data-sonner-toast][data-invert=true]{--normal-bg:#000;--normal-border:hsl(0, 0%, 20%);--normal-text:var(--gray1)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-invert=true]{--normal-bg:#fff;--normal-border:var(--gray3);--normal-text:var(--gray12)}[data-sonner-toaster][data-sonner-theme=dark]{--normal-bg:#000;--normal-bg-hover:hsl(0, 0%, 12%);--normal-border:hsl(0, 0%, 20%);--normal-border-hover:hsl(0, 0%, 25%);--normal-text:var(--gray1);--success-bg:hsl(150, 100%, 6%);--success-border:hsl(147, 100%, 12%);--success-text:hsl(150, 86%, 65%);--info-bg:hsl(215, 100%, 6%);--info-border:hsl(223, 43%, 17%);--info-text:hsl(216, 87%, 65%);--warning-bg:hsl(64, 100%, 6%);--warning-border:hsl(60, 100%, 9%);--warning-text:hsl(46, 87%, 65%);--error-bg:hsl(358, 76%, 10%);--error-border:hsl(357, 89%, 16%);--error-text:hsl(358, 100%, 81%)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]{background:var(--normal-bg);border-color:var(--normal-border);color:var(--normal-text)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]:hover{background:var(--normal-bg-hover);border-color:var(--normal-border-hover)}[data-rich-colors=true][data-sonner-toast][data-type=success]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=success] [data-close-button]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=info]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=info] [data-close-button]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning] [data-close-button]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=error]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}[data-rich-colors=true][data-sonner-toast][data-type=error] [data-close-button]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}.sonner-loading-wrapper{--size:16px;height:var(--size);width:var(--size);position:absolute;inset:0;z-index:10}.sonner-loading-wrapper[data-visible=false]{transform-origin:center;animation:sonner-fade-out .2s ease forwards}.sonner-spinner{position:relative;top:50%;left:50%;height:var(--size);width:var(--size)}.sonner-loading-bar{animation:sonner-spin 1.2s linear infinite;background:var(--gray11);border-radius:6px;height:8%;left:-10%;position:absolute;top:-3.9%;width:24%}.sonner-loading-bar:first-child{animation-delay:-1.2s;transform:rotate(.0001deg) translate(146%)}.sonner-loading-bar:nth-child(2){animation-delay:-1.1s;transform:rotate(30deg) translate(146%)}.sonner-loading-bar:nth-child(3){animation-delay:-1s;transform:rotate(60deg) translate(146%)}.sonner-loading-bar:nth-child(4){animation-delay:-.9s;transform:rotate(90deg) translate(146%)}.sonner-loading-bar:nth-child(5){animation-delay:-.8s;transform:rotate(120deg) translate(146%)}.sonner-loading-bar:nth-child(6){animation-delay:-.7s;transform:rotate(150deg) translate(146%)}.sonner-loading-bar:nth-child(7){animation-delay:-.6s;transform:rotate(180deg) translate(146%)}.sonner-loading-bar:nth-child(8){animation-delay:-.5s;transform:rotate(210deg) translate(146%)}.sonner-loading-bar:nth-child(9){animation-delay:-.4s;transform:rotate(240deg) translate(146%)}.sonner-loading-bar:nth-child(10){animation-delay:-.3s;transform:rotate(270deg) translate(146%)}.sonner-loading-bar:nth-child(11){animation-delay:-.2s;transform:rotate(300deg) translate(146%)}.sonner-loading-bar:nth-child(12){animation-delay:-.1s;transform:rotate(330deg) translate(146%)}@keyframes sonner-fade-in{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}@keyframes sonner-fade-out{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}@keyframes sonner-spin{0%{opacity:1}100%{opacity:.15}}@media (prefers-reduced-motion){.sonner-loading-bar,[data-sonner-toast],[data-sonner-toast]>*{transition:none!important;animation:none!important}}.sonner-loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transform-origin:center;transition:opacity .2s,transform .2s}.sonner-loader[data-visible=false]{opacity:0;transform:scale(.8) translate(-50%,-50%)}</style><meta name="description" content="Crea una cuenta en ballengine.app y empieza a hacer vídeos de pelotas que rebotan sincronizados con música para TikTok, Reels y YouTube Shorts."><meta name="keywords" content="BallEngine, Ball Engine, ballengine.app, BallEngine Creator Studio, ball simulation, physics simulator, ASMR physics videos, satisfying ball simulation, physics video generator, faceless video generator, TikTok shorts creator, YouTube shorts generator"><meta property="og:type" content="website"><meta property="og:site_name" content="BallEngine"><meta property="og:title" content="Registrarse | BallEngine"><meta property="og:description" content="Crea una cuenta en ballengine.app y empieza a hacer vídeos de pelotas que rebotan sincronizados con música para TikTok, Reels y YouTube Shorts."><meta property="og:image" content="https://ballengine.app/og-card.jpg"><meta property="og:url" content="https://ballengine.app/es/signup"><meta property="og:locale" content="es_ES"><meta property="og:locale:alternate" content="en_US"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@Ballengine_app"><meta name="twitter:title" content="Registrarse | BallEngine"><meta name="twitter:description" content="Crea una cuenta en ballengine.app y empieza a hacer vídeos de pelotas que rebotan sincronizados con música para TikTok, Reels y YouTube Shorts."><meta name="twitter:image" content="https://ballengine.app/og-card.jpg"><meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"><link rel="canonical" href="https://ballengine.app/es/signup"><link rel="alternate" hreflang="x-default" href="https://ballengine.app/signup"><link rel="alternate" hreflang="en" href="https://ballengine.app/signup"><link rel="alternate" hreflang="es" href="https://ballengine.app/es/signup"><link rel="alternate" hreflang="fr" href="https://ballengine.app/fr/signup"><link rel="alternate" hreflang="de" href="https://ballengine.app/de/signup"><link rel="alternate" hreflang="ja" href="https://ballengine.app/ja/signup"><link rel="alternate" hreflang="zh-tw" href="https://ballengine.app/zh-tw/signup"><link rel="icon" type="image/x-icon" href="/favicon.ico"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png"><link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0891b2"><script id="cf-turnstile-script" src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback&amp;render=explicit" defer="" async=""></script><style type="text/css">[data-sonner-toaster][dir=ltr],html[dir=ltr]{--toast-icon-margin-start:-3px;--toast-icon-margin-end:4px;--toast-svg-margin-start:-1px;--toast-svg-margin-end:0px;--toast-button-margin-start:auto;--toast-button-margin-end:0;--toast-close-button-start:0;--toast-close-button-end:unset;--toast-close-button-transform:translate(-35%, -35%)}[data-sonner-toaster][dir=rtl],html[dir=rtl]{--toast-icon-margin-start:4px;--toast-icon-margin-end:-3px;--toast-svg-margin-start:0px;--toast-svg-margin-end:-1px;--toast-button-margin-start:0;--toast-button-margin-end:auto;--toast-close-button-start:unset;--toast-close-button-end:0;--toast-close-button-transform:translate(35%, -35%)}[data-sonner-toaster]{position:fixed;width:var(--width);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;--gray1:hsl(0, 0%, 99%);--gray2:hsl(0, 0%, 97.3%);--gray3:hsl(0, 0%, 95.1%);--gray4:hsl(0, 0%, 93%);--gray5:hsl(0, 0%, 90.9%);--gray6:hsl(0, 0%, 88.7%);--gray7:hsl(0, 0%, 85.8%);--gray8:hsl(0, 0%, 78%);--gray9:hsl(0, 0%, 56.1%);--gray10:hsl(0, 0%, 52.3%);--gray11:hsl(0, 0%, 43.5%);--gray12:hsl(0, 0%, 9%);--border-radius:8px;box-sizing:border-box;padding:0;margin:0;list-style:none;outline:0;z-index:999999999;transition:transform .4s ease}@media (hover:none) and (pointer:coarse){[data-sonner-toaster][data-lifted=true]{transform:none}}[data-sonner-toaster][data-x-position=right]{right:var(--offset-right)}[data-sonner-toaster][data-x-position=left]{left:var(--offset-left)}[data-sonner-toaster][data-x-position=center]{left:50%;transform:translateX(-50%)}[data-sonner-toaster][data-y-position=top]{top:var(--offset-top)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--offset-bottom)}[data-sonner-toast]{--y:translateY(100%);--lift-amount:calc(var(--lift) * var(--gap));z-index:var(--z-index);position:absolute;opacity:0;transform:var(--y);touch-action:none;transition:transform .4s,opacity .4s,height .4s,box-shadow .2s;box-sizing:border-box;outline:0;overflow-wrap:anywhere}[data-sonner-toast][data-styled=true]{padding:16px;background:var(--normal-bg);border:1px solid var(--normal-border);color:var(--normal-text);border-radius:var(--border-radius);box-shadow:0 4px 12px rgba(0,0,0,.1);width:var(--width);font-size:13px;display:flex;align-items:center;gap:6px}[data-sonner-toast]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-y-position=top]{top:0;--y:translateY(-100%);--lift:1;--lift-amount:calc(1 * var(--gap))}[data-sonner-toast][data-y-position=bottom]{bottom:0;--y:translateY(100%);--lift:-1;--lift-amount:calc(var(--lift) * var(--gap))}[data-sonner-toast][data-styled=true] [data-description]{font-weight:400;line-height:1.4;color:#3f3f3f}[data-rich-colors=true][data-sonner-toast][data-styled=true] [data-description]{color:inherit}[data-sonner-toaster][data-sonner-theme=dark] [data-description]{color:#e8e8e8}[data-sonner-toast][data-styled=true] [data-title]{font-weight:500;line-height:1.5;color:inherit}[data-sonner-toast][data-styled=true] [data-icon]{display:flex;height:16px;width:16px;position:relative;justify-content:flex-start;align-items:center;flex-shrink:0;margin-left:var(--toast-icon-margin-start);margin-right:var(--toast-icon-margin-end)}[data-sonner-toast][data-promise=true] [data-icon]>svg{opacity:0;transform:scale(.8);transform-origin:center;animation:sonner-fade-in .3s ease forwards}[data-sonner-toast][data-styled=true] [data-icon]>*{flex-shrink:0}[data-sonner-toast][data-styled=true] [data-icon] svg{margin-left:var(--toast-svg-margin-start);margin-right:var(--toast-svg-margin-end)}[data-sonner-toast][data-styled=true] [data-content]{display:flex;flex-direction:column;gap:2px}[data-sonner-toast][data-styled=true] [data-button]{border-radius:4px;padding-left:8px;padding-right:8px;height:24px;font-size:12px;color:var(--normal-bg);background:var(--normal-text);margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end);border:none;font-weight:500;cursor:pointer;outline:0;display:flex;align-items:center;flex-shrink:0;transition:opacity .4s,box-shadow .2s}[data-sonner-toast][data-styled=true] [data-button]:focus-visible{box-shadow:0 0 0 2px rgba(0,0,0,.4)}[data-sonner-toast][data-styled=true] [data-button]:first-of-type{margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end)}[data-sonner-toast][data-styled=true] [data-cancel]{color:var(--normal-text);background:rgba(0,0,0,.08)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-styled=true] [data-cancel]{background:rgba(255,255,255,.3)}[data-sonner-toast][data-styled=true] [data-close-button]{position:absolute;left:var(--toast-close-button-start);right:var(--toast-close-button-end);top:0;height:20px;width:20px;display:flex;justify-content:center;align-items:center;padding:0;color:var(--gray12);background:var(--normal-bg);border:1px solid var(--gray4);transform:var(--toast-close-button-transform);border-radius:50%;cursor:pointer;z-index:1;transition:opacity .1s,background .2s,border-color .2s}[data-sonner-toast][data-styled=true] [data-close-button]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-styled=true] [data-disabled=true]{cursor:not-allowed}[data-sonner-toast][data-styled=true]:hover [data-close-button]:hover{background:var(--gray2);border-color:var(--gray5)}[data-sonner-toast][data-swiping=true]::before{content:'';position:absolute;left:-100%;right:-100%;height:100%;z-index:-1}[data-sonner-toast][data-y-position=top][data-swiping=true]::before{bottom:50%;transform:scaleY(3) translateY(50%)}[data-sonner-toast][data-y-position=bottom][data-swiping=true]::before{top:50%;transform:scaleY(3) translateY(-50%)}[data-sonner-toast][data-swiping=false][data-removed=true]::before{content:'';position:absolute;inset:0;transform:scaleY(2)}[data-sonner-toast][data-expanded=true]::after{content:'';position:absolute;left:0;height:calc(var(--gap) + 1px);bottom:100%;width:100%}[data-sonner-toast][data-mounted=true]{--y:translateY(0);opacity:1}[data-sonner-toast][data-expanded=false][data-front=false]{--scale:var(--toasts-before) * 0.05 + 1;--y:translateY(calc(var(--lift-amount) * var(--toasts-before))) scale(calc(-1 * var(--scale)));height:var(--front-toast-height)}[data-sonner-toast]>*{transition:opacity .4s}[data-sonner-toast][data-x-position=right]{right:0}[data-sonner-toast][data-x-position=left]{left:0}[data-sonner-toast][data-expanded=false][data-front=false][data-styled=true]>*{opacity:0}[data-sonner-toast][data-visible=false]{opacity:0;pointer-events:none}[data-sonner-toast][data-mounted=true][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset)));height:var(--initial-height)}[data-sonner-toast][data-removed=true][data-front=true][data-swipe-out=false]{--y:translateY(calc(var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=false]{--y:translateY(40%);opacity:0;transition:transform .5s,opacity .2s}[data-sonner-toast][data-removed=true][data-front=false]::before{height:calc(var(--initial-height) + 20%)}[data-sonner-toast][data-swiping=true]{transform:var(--y) translateY(var(--swipe-amount-y,0)) translateX(var(--swipe-amount-x,0));transition:none}[data-sonner-toast][data-swiped=true]{user-select:none}[data-sonner-toast][data-swipe-out=true][data-y-position=bottom],[data-sonner-toast][data-swipe-out=true][data-y-position=top]{animation-duration:.2s;animation-timing-function:ease-out;animation-fill-mode:forwards}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=left]{animation-name:swipe-out-left}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=right]{animation-name:swipe-out-right}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=up]{animation-name:swipe-out-up}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=down]{animation-name:swipe-out-down}@keyframes swipe-out-left{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) - 100%));opacity:0}}@keyframes swipe-out-right{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) + 100%));opacity:0}}@keyframes swipe-out-up{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) - 100%));opacity:0}}@keyframes swipe-out-down{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) + 100%));opacity:0}}@media (max-width:600px){[data-sonner-toaster]{position:fixed;right:var(--mobile-offset-right);left:var(--mobile-offset-left);width:100%}[data-sonner-toaster][dir=rtl]{left:calc(var(--mobile-offset-left) * -1)}[data-sonner-toaster] [data-sonner-toast]{left:0;right:0;width:calc(100% - var(--mobile-offset-left) * 2)}[data-sonner-toaster][data-x-position=left]{left:var(--mobile-offset-left)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--mobile-offset-bottom)}[data-sonner-toaster][data-y-position=top]{top:var(--mobile-offset-top)}[data-sonner-toaster][data-x-position=center]{left:var(--mobile-offset-left);right:var(--mobile-offset-right);transform:none}}[data-sonner-toaster][data-sonner-theme=light]{--normal-bg:#fff;--normal-border:var(--gray4);--normal-text:var(--gray12);--success-bg:hsl(143, 85%, 96%);--success-border:hsl(145, 92%, 87%);--success-text:hsl(140, 100%, 27%);--info-bg:hsl(208, 100%, 97%);--info-border:hsl(221, 91%, 93%);--info-text:hsl(210, 92%, 45%);--warning-bg:hsl(49, 100%, 97%);--warning-border:hsl(49, 91%, 84%);--warning-text:hsl(31, 92%, 45%);--error-bg:hsl(359, 100%, 97%);--error-border:hsl(359, 100%, 94%);--error-text:hsl(360, 100%, 45%)}[data-sonner-toaster][data-sonner-theme=light] [data-sonner-toast][data-invert=true]{--normal-bg:#000;--normal-border:hsl(0, 0%, 20%);--normal-text:var(--gray1)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-invert=true]{--normal-bg:#fff;--normal-border:var(--gray3);--normal-text:var(--gray12)}[data-sonner-toaster][data-sonner-theme=dark]{--normal-bg:#000;--normal-bg-hover:hsl(0, 0%, 12%);--normal-border:hsl(0, 0%, 20%);--normal-border-hover:hsl(0, 0%, 25%);--normal-text:var(--gray1);--success-bg:hsl(150, 100%, 6%);--success-border:hsl(147, 100%, 12%);--success-text:hsl(150, 86%, 65%);--info-bg:hsl(215, 100%, 6%);--info-border:hsl(223, 43%, 17%);--info-text:hsl(216, 87%, 65%);--warning-bg:hsl(64, 100%, 6%);--warning-border:hsl(60, 100%, 9%);--warning-text:hsl(46, 87%, 65%);--error-bg:hsl(358, 76%, 10%);--error-border:hsl(357, 89%, 16%);--error-text:hsl(358, 100%, 81%)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]{background:var(--normal-bg);border-color:var(--normal-border);color:var(--normal-text)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]:hover{background:var(--normal-bg-hover);border-color:var(--normal-border-hover)}[data-rich-colors=true][data-sonner-toast][data-type=success]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=success] [data-close-button]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=info]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=info] [data-close-button]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning] [data-close-button]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=error]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}[data-rich-colors=true][data-sonner-toast][data-type=error] [data-close-button]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}.sonner-loading-wrapper{--size:16px;height:var(--size);width:var(--size);position:absolute;inset:0;z-index:10}.sonner-loading-wrapper[data-visible=false]{transform-origin:center;animation:sonner-fade-out .2s ease forwards}.sonner-spinner{position:relative;top:50%;left:50%;height:var(--size);width:var(--size)}.sonner-loading-bar{animation:sonner-spin 1.2s linear infinite;background:var(--gray11);border-radius:6px;height:8%;left:-10%;position:absolute;top:-3.9%;width:24%}.sonner-loading-bar:first-child{animation-delay:-1.2s;transform:rotate(.0001deg) translate(146%)}.sonner-loading-bar:nth-child(2){animation-delay:-1.1s;transform:rotate(30deg) translate(146%)}.sonner-loading-bar:nth-child(3){animation-delay:-1s;transform:rotate(60deg) translate(146%)}.sonner-loading-bar:nth-child(4){animation-delay:-.9s;transform:rotate(90deg) translate(146%)}.sonner-loading-bar:nth-child(5){animation-delay:-.8s;transform:rotate(120deg) translate(146%)}.sonner-loading-bar:nth-child(6){animation-delay:-.7s;transform:rotate(150deg) translate(146%)}.sonner-loading-bar:nth-child(7){animation-delay:-.6s;transform:rotate(180deg) translate(146%)}.sonner-loading-bar:nth-child(8){animation-delay:-.5s;transform:rotate(210deg) translate(146%)}.sonner-loading-bar:nth-child(9){animation-delay:-.4s;transform:rotate(240deg) translate(146%)}.sonner-loading-bar:nth-child(10){animation-delay:-.3s;transform:rotate(270deg) translate(146%)}.sonner-loading-bar:nth-child(11){animation-delay:-.2s;transform:rotate(300deg) translate(146%)}.sonner-loading-bar:nth-child(12){animation-delay:-.1s;transform:rotate(330deg) translate(146%)}@keyframes sonner-fade-in{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}@keyframes sonner-fade-out{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}@keyframes sonner-spin{0%{opacity:1}100%{opacity:.15}}@media (prefers-reduced-motion){.sonner-loading-bar,[data-sonner-toast],[data-sonner-toast]>*{transition:none!important;animation:none!important}}.sonner-loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transform-origin:center;transition:opacity .2s,transform .2s}.sonner-loader[data-visible=false]{opacity:0;transform:scale(.8) translate(-50%,-50%)}</style><meta name="description" content="Crea una cuenta en ballengine.app y empieza a hacer vídeos de pelotas que rebotan sincronizados con música para TikTok, Reels y YouTube Shorts."><meta name="keywords" content="BallEngine, Ball Engine, ballengine.app, BallEngine Creator Studio, ball simulation, physics simulator, ASMR physics videos, satisfying ball simulation, physics video generator, faceless video generator, TikTok shorts creator, YouTube shorts generator"><meta property="og:type" content="website"><meta property="og:site_name" content="BallEngine"><meta property="og:title" content="Registrarse | BallEngine"><meta property="og:description" content="Crea una cuenta en ballengine.app y empieza a hacer vídeos de pelotas que rebotan sincronizados con música para TikTok, Reels y YouTube Shorts."><meta property="og:image" content="https://ballengine.app/og-card.jpg"><meta property="og:url" content="https://ballengine.app/es/signup"><meta property="og:locale" content="es_ES"><meta property="og:locale:alternate" content="en_US"><meta property="og:locale:alternate" content="fr_FR"><meta property="og:locale:alternate" content="de_DE"><meta property="og:locale:alternate" content="ja_JP"><meta property="og:locale:alternate" content="zh_TW"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@Ballengine_app"><meta name="twitter:title" content="Registrarse | BallEngine"><meta name="twitter:description" content="Crea una cuenta en ballengine.app y empieza a hacer vídeos de pelotas que rebotan sincronizados con música para TikTok, Reels y YouTube Shorts."><meta name="twitter:image" content="https://ballengine.app/og-card.jpg"><meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"><link rel="canonical" href="https://ballengine.app/es/signup"><link rel="alternate" hreflang="x-default" href="https://ballengine.app/signup"><link rel="alternate" hreflang="en" href="https://ballengine.app/signup"><link rel="alternate" hreflang="es" href="https://ballengine.app/es/signup"><link rel="alternate" hreflang="fr" href="https://ballengine.app/fr/signup"><link rel="alternate" hreflang="de" href="https://ballengine.app/de/signup"><link rel="alternate" hreflang="ja" href="https://ballengine.app/ja/signup"><link rel="alternate" hreflang="zh-tw" href="https://ballengine.app/zh-tw/signup"><link rel="icon" type="image/x-icon" href="/favicon.ico"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png"><link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0891b2"></head>
+
+<body style="overflow: auto;">
+  <div id="root"><div class="flex flex-col min-h-screen bg-background text-foreground overflow-x-clip selection:bg-primary selection:text-primary-foreground transition-colors duration-500"><header class="fixed left-0 right-0 z-50 w-full border-b border-border bg-card top-0"><div class="container-page"><div class="flex h-16 items-center justify-between gap-4"><a class="flex shrink-0 items-center gap-2.5" href="/es" data-discover="true"><picture class="flex h-9 w-9 items-center justify-center"><source srcset="/logo.webp" type="image/webp"><source srcset="/logo.png" type="image/png"><img alt="" width="36" height="36" class="h-9 w-9 object-contain" src="/logo.png"></picture><span class="font-display text-lg font-bold tracking-tight text-foreground">BallEngine</span></a><nav class="hidden items-center gap-1 lg:flex"><div class="relative"><button type="button" aria-expanded="false" class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground"><span>Funciones</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 opacity-60 transition-transform" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div class="relative"><button type="button" aria-expanded="false" class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground"><span>Desarrollador</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 opacity-60 transition-transform" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div class="relative"><button type="button" aria-expanded="false" class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground"><span>Recursos</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 opacity-60 transition-transform" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><a class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground" href="/es/plans" data-discover="true">Precios</a><a class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground" href="/es/studio" data-discover="true">Estudio</a></nav><div class="hidden items-center gap-2 md:flex"><button type="button" tabindex="0" aria-haspopup="menu" id="base-ui-_r_4_" data-slot="dropdown-menu-trigger" title="Cambiar idioma" aria-label="Idioma" class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe be-i be-h-blue be-loop be-wiggle size-4" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><g transform="rotate(-20 12 12)"><ellipse cx="12" cy="12" rx="4" ry="9"></ellipse><path d="M3.5 9h17M3.5 15h17"></path></g></svg></button><div class="h-5 w-px bg-border"></div><div class="flex items-center gap-2"><a class="btn btn-ghost" href="/es/login" data-discover="true">Iniciar sesión</a></div></div><div class="flex items-center gap-2 lg:hidden"><button type="button" tabindex="0" aria-haspopup="menu" id="base-ui-_r_a_" data-slot="dropdown-menu-trigger" title="Cambiar idioma" aria-label="Idioma" class="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted md:hidden" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe be-i be-h-blue be-loop be-wiggle size-4" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><g transform="rotate(-20 12 12)"><ellipse cx="12" cy="12" rx="4" ry="9"></ellipse><path d="M3.5 9h17M3.5 15h17"></path></g></svg></button><button type="button" aria-expanded="false" class="flex h-11 w-11 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted"><span class="sr-only">Alternar menú principal</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu be-i size-5" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg></button></div></div></div></header><main class="flex-grow relative pt-0"><div class="flex min-h-screen items-center justify-center px-4 pt-28 pb-16 md:pt-32"><div class="w-full max-w-[420px]"><div class="mb-6 text-center"><h1 class="font-display text-2xl font-bold leading-tight tracking-[-0.02em] text-foreground">Crea tu cuenta de BallEngine</h1><p class="t-small mt-2">Crea tu cuenta para empezar a hacer videos.</p></div><div class="surface-card rounded-2xl p-5 sm:p-8"><button type="button" class="btn btn-secondary w-full dark:border-white/15 dark:bg-white/5 dark:text-zinc-100 dark:hover:border-white/25 dark:hover:bg-white/10 [&amp;_svg]:size-[18px]"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-1 .67-2.28 1.07-3.71 1.07-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.11c-.22-.66-.35-1.36-.35-2.11s.13-1.45.35-2.11V7.05H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.95l3.66-2.84z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84c.87-2.6 3.3-4.51 6.16-4.51z" fill="#EA4335"></path></svg><span>Registrarse con Google</span></button><label class="mt-4 flex min-h-11 cursor-pointer items-start gap-2.5 py-1 text-[13px] leading-snug text-muted-foreground"><input class="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-border text-cyan-600 dark:text-cyan-400 focus:ring-cyan-600" type="checkbox"><span>Envíame ofertas exclusivas para suscriptores, nuevos modos y consejos</span></label><div class="relative my-6 text-center"><div class="absolute inset-0 flex items-center" aria-hidden="true"><div class="w-full border-t border-border dark:border-white/10"></div></div><span class="relative bg-card px-3 text-[13px] text-muted-foreground dark:text-zinc-400">O regístrese con correo electrónico</span></div><form class="space-y-5"><div class="hidden" aria-hidden="true"><input tabindex="-1" autocomplete="off" type="text" value="" name="website"></div><div class="space-y-1.5"><div class="flex items-center justify-between gap-3"><label for="signup-email" class="t-label">Correo electrónico</label></div><input id="signup-email" inputmode="email" required="" autocomplete="email" autocapitalize="none" spellcheck="false" class="field" placeholder="name@example.com" type="email" value=""></div><div class="space-y-1.5"><div class="flex items-center justify-between gap-3"><label for="signup-password" class="t-label">Contraseña</label></div><div class="relative"><input id="signup-password" required="" autocomplete="new-password" class="field pr-12" placeholder="••••••••" type="password" value=""><button type="button" aria-label="Mostrar contraseña" aria-pressed="false" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye be-i be-h-blue be-pop size-4" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12Z"></path><circle cx="12" cy="12" r="3.6"></circle></svg></button></div></div><div class="flex justify-center empty:hidden"><div id="cf-turnstile" style="width: fit-content; height: auto; display: flex;"><div><div></div><input type="hidden" name="cf-turnstile-response" id="cf-chl-widget-da6uc_response"></div></div></div><button type="submit" aria-busy="false" class="btn btn-primary btn-lg w-full">Crear cuenta</button></form><p class="t-caption text-center mt-4">Al crear una cuenta, aceptas nuestros <a class="font-medium text-cyan-700 dark:text-cyan-300 hover:text-cyan-800 dark:hover:text-cyan-200" href="/terms-of-service" data-discover="true">Términos</a> y nuestra <a class="font-medium text-cyan-700 dark:text-cyan-300 hover:text-cyan-800 dark:hover:text-cyan-200" href="/privacy-policy" data-discover="true">Política de privacidad</a></p></div><p class="mt-6 text-center text-sm text-muted-foreground">¿Tiene una cuenta? <a class="link" href="/es/login?redirect=%2Fes%2Fstudio%3Fmode%3Descape" data-discover="true">Iniciar sesión</a></p></div></div></main><div role="region" aria-label="Preferencias de cookies" class="shell-lift fixed inset-x-0 bottom-0 z-[100] animate-in fade-in duration-200 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[26rem]"><div class="overflow-hidden rounded-t-2xl border-t border-border bg-card shadow-lg sm:rounded-2xl sm:border"><div class="px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-6"><div class="mb-1.5 flex items-center justify-between gap-3 sm:mb-2"><h2 class="t-h4">Preferencias de cookies</h2><button type="button" aria-label="Minimizar" title="Minimizar" class="-mr-2 flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><p class="mb-3 text-[13px] leading-snug text-muted-foreground sm:text-sm">Utilizamos cookies necesarias para el funcionamiento del sitio y, solo con tu consentimiento, cookies de preferencias, análisis y atribución. <a class="font-medium text-foreground transition-colors hover:text-cyan-700 dark:hover:text-cyan-300" href="/cookie-policy" data-discover="true">Política de cookies</a></p><div class="grid grid-cols-2 gap-2"><button class="btn btn-secondary cursor-pointer px-3">Solo las esenciales</button><button class="btn btn-primary cursor-pointer px-3">Aceptar todo</button></div></div></div></div><section aria-label="Notificaciones alt+T" tabindex="-1" aria-live="polite" aria-relevant="additions text" aria-atomic="false"></section></div></div>
+  <noscript>
+    <div style="padding: 20px; font-family: sans-serif;">
+      <!-- No heading elements in here. This block is copied into EVERY prerendered page, so a
+           heading here gave all 1,400 URLs a second, homepage-worded H1 next to the page's own. -->
+      <p><strong>BallEngine</strong> (also written <strong>Ball Engine</strong>, at
+        <strong>ballengine.app</strong>) is a browser-based bouncing ball simulator
+        and creator studio for music-synced 2D and 3D physics videos.</p>
+
+      <p><strong>Plans</strong></p>
+      <ul>
+        <!-- Keep in sync with src/constants/pricing.ts and the SoftwareApplication offers above.
+             These drifted to a stale $29/$159, then $99, and contradicted the JSON-LD on the same page. -->
+        <li><strong>Starter Studio:</strong> Free. The full Studio with a live preview; exporting a video needs a plan.</li>
+        <li><strong>Lite:</strong> $19/mo. No watermark, 1080p, commercial license, 15 exports per month (one video every other day).</li>
+        <li><strong>Creator:</strong> $29/mo. Every 2D setting, commercial license, no watermark, 30 exports per month, Automation Lite included (60 posts a month). The recommended plan.</li>
+        <li><strong>Pro:</strong> $49/mo. Everything in Creator, 3D settings, 4K rendering, your own watermark text, 60 exports per month, Automation Growth included (240 posts a month).</li>
+        <li><strong>Elite:</strong> $99/mo. Everything in Pro, 150 exports per month, Automation Scale included (600 posts a month), 200 GB storage.</li>
+        <li><strong>Agency:</strong> $199/mo. Everything in Elite, 500 exports per month, Automation Max included (2,000 posts a month), 500 GB storage.</li>
+      </ul>
+
+      <nav>
+        <a href="/">Home</a> |
+        <a href="/modes">All modes</a> |
+        <a href="/play">Games</a> |
+        <a href="/plans">Pricing</a> |
+        <a href="/support">Support</a>
+      </nav>
+
+      <p>BallEngine, ballengine.app</p>
+      <p>Follow BallEngine:</p>
+      <nav>
+        <a href="https://youtube.com/@funcirclegames">YouTube</a> |
+        <a href="https://www.instagram.com/funcirclegames">Instagram</a> |
+        <a href="https://www.tiktok.com/@funcirclegames">TikTok</a> |
+        <a href="https://x.com/funcirclegames">Twitter / X</a> |
+        <a href="https://www.threads.com/@funcirclegames">Threads</a>
+      </nav>
+    </div>
+  </noscript>
+
+
+
+<!-- Cloudflare Pages Analytics --><script defer="" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&quot;token&quot;: &quot;61906db637f044638bdee99f6e5c9222&quot;}"></script><!-- Cloudflare Pages Analytics --><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5a1dfb6fd250b19',t:'MTc5NDYxNTg3Mw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5a1dfb6fd250b19',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; visibility: hidden;"></iframe><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;91669cc11cd949b88b36c3a7e5455e84&quot;,&quot;r&quot;:1,&quot;spa&quot;:2}" crossorigin="anonymous"></script>
+</body></html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html><html lang="en" class="dark" data-rh-managed="lang"><head>
+  <!--
+    GOOGLE CONSENT MODE v2 — DEFAULTS. This block must stay ABOVE the gtag.js tag below,
+    and it must stay inline (not bundled): the guarantee it provides is purely one of ORDERING.
+
+    Until now GA4 and GTM loaded on every page with no consent signal at all, which means they set
+    their cookies immediately — while the banner's only button flipped a localStorage string and
+    changed nothing. Anything that arrives after the tags have already stored an identifier is too
+    late; the storage happened.
+
+    So everything non-essential starts DENIED for everyone. In that state the tags still load and
+    still function, but they set no cookies and send no identifiers — and `consent update` (from
+    src/lib/consent.ts, or the replay below) upgrades them in place, with no page reload.
+
+    `security_storage` is granted from the start: it is the anti-fraud/abuse signal, which is
+    strictly necessary and is not something a visitor is asked to opt into.
+
+    The replay is what stops a RETURNING visitor being denied for the second or so it takes React to
+    boot — long enough to lose the pageview they already agreed to send. It reads the same key and
+    honours the same version as src/lib/consent.ts (CONSENT_STORAGE_KEY / CONSENT_VERSION); if you
+    change either there, change it here. It is wrapped in try/catch because localStorage throws
+    outright in some private-mode and embedded-webview contexts, and a throw here would take the
+    tags — and then the app shell — down with it.
+  -->
+  <script>
+    // Admin ▸ Visitor Journeys runs the Studio framed inside /admin to replay a visit. That is not
+    // traffic, so the Google tags below stay off. Same test as src/lib/journeyReplaySandbox.ts.
+    window.__BE_JOURNEY_REPLAY__ = false;
+    try {
+      window.__BE_JOURNEY_REPLAY__ = window.top !== window.self &&
+        /[?&]journeyReplay=1(?:&|$)/.test(location.search) &&
+        window.parent.location.origin === location.origin &&
+        /^\/admin(?:\/|$)/.test(window.parent.location.pathname);
+    } catch (e) { /* cross-origin parent: a normal page */ }
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+      functionality_storage: 'denied',
+      personalization_storage: 'denied',
+      security_storage: 'granted',
+      wait_for_update: 500
+    });
+    try {
+      var beConsent = JSON.parse(localStorage.getItem('be_cookie_consent') || 'null');
+      if (beConsent && beConsent.v === 5 && beConsent.categories) {
+        var c = beConsent.categories;
+        var g = function (on) { return on ? 'granted' : 'denied'; };
+        gtag('consent', 'update', {
+          ad_storage: g(c.marketing),
+          ad_user_data: g(c.marketing),
+          ad_personalization: g(c.marketing),
+          analytics_storage: g(c.analytics),
+          functionality_storage: g(c.preferences),
+          personalization_storage: g(c.preferences),
+          security_storage: 'granted'
+        });
+      }
+    } catch (e) { /* storage unavailable — stay on the denied defaults */ }
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-7BNE2MELD4"></script>
+  <script>
+    if (!window.__BE_JOURNEY_REPLAY__) {
+      gtag('js', new Date());
+
+      gtag('config', 'G-7BNE2MELD4');
+    }
+  </script>
+  <!--
+    No Google Tag Manager. GTM-53MFK2DJ was published EMPTY ("tags": [] in its gtm.js, checked
+    2026-09-26): 113 KB and ~150 ms of main thread per page load that did nothing. GA4 runs from the
+    gtag.js tag above. If a tag is ever needed in GTM, put the loader back and move GA4 into GTM
+    at the same time, so the site never runs GA4 from both.
+  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+  <!--
+    Poisoned-asset self-heal. /assets/* is served with `max-age=1y, immutable`, and
+    Cloudflare applies those headers BY REQUEST PATH — so if an asset request ever
+    transiently returns the SPA-fallback HTML (deploy propagation race), the browser
+    caches that HTML as the asset FOR A YEAR and `immutable` means it never revalidates.
+    Strict MIME checking then refuses the "stylesheet"/"script" on every load, and even
+    reinstalling the desktop app doesn't clear the WebView2 profile cache. This must be
+    INLINE in the document (which always revalidates): when a same-origin /assets/*
+    stylesheet or script fails, re-request it once with a cache-busting query (a new URL
+    bypasses the poisoned cache entry). If the busted URL fails too, the HTML itself is
+    stale — reload the page once (sessionStorage-guarded) to fetch a fresh document.
+  -->
+  <script>
+    (function () {
+      function heal(t, isLink) {
+        var attr = isLink ? 'href' : 'src';
+        var url = t.getAttribute(attr) || '';
+        // Only heal our own hashed assets; external CDNs manage themselves.
+        if (url.indexOf('/assets/') !== 0 &&
+            url.indexOf(location.origin + '/assets/') !== 0) return;
+        if (url.indexOf('cachebust=') === -1) {
+          var busted = url + (url.indexOf('?') > -1 ? '&' : '?') + 'cachebust=' + Date.now();
+          var n;
+          if (isLink) {
+            n = t.cloneNode();
+            n.setAttribute('href', busted);
+          } else {
+            // Cloned <script> elements never execute (the "already started" flag is
+            // copied), so build a fresh element and copy the attributes across.
+            n = document.createElement('script');
+            for (var i = 0; i < t.attributes.length; i++) {
+              n.setAttribute(t.attributes[i].name, t.attributes[i].value);
+            }
+            n.setAttribute('src', busted);
+          }
+          (t.parentNode || document.head).insertBefore(n, t.nextSibling);
+          if (t.parentNode) t.parentNode.removeChild(t);
+        } else if (!sessionStorage.getItem('assetHealReloaded')) {
+          sessionStorage.setItem('assetHealReloaded', '1');
+          location.reload();
+        }
+      }
+      // 404s / network failures fire `error` on the element.
+      window.addEventListener('error', function (e) {
+        var t = e.target;
+        if (!t || !t.tagName || t === window) return;
+        if (t.tagName === 'LINK' && t.rel === 'stylesheet') heal(t, true);
+        else if (t.tagName === 'SCRIPT' && t.src) heal(t, false);
+      }, true);
+      // A stylesheet whose response is HTML fires `load` (not error) and is then
+      // refused by strict MIME checking — the tell is link.sheet === null.
+      window.addEventListener('load', function (e) {
+        var t = e.target;
+        if (!t || t === window || t.tagName !== 'LINK' || t.rel !== 'stylesheet') return;
+        if (!t.sheet) heal(t, true);
+      }, true);
+    })();
+  </script>
+  <meta name="msvalidate.01" content="1AB5EF297A63FC4A7A5FAC0425B89764">
+  <meta name="p:domain_verify" content="0b3a5215135039e9ec98d86539ac5d3a">
+  <title>Fireflies 3D: Firefly Synchronisation Videos On The Beat | BallEngine</title>
+  <!--
+    Per-page <meta name="description">, keywords, Open Graph and Twitter tags are injected
+    per-route by src/components/SEO.tsx (react-helmet) and baked into each page at prerender
+    time. They were intentionally REMOVED from this static shell: hardcoding the homepage's
+    values here made every prerendered sub-page inherit the homepage description / og:title /
+    og:url (react-helmet's meta tags carry no marker, so the prerender dedup kept these static
+    ones and dropped the per-page ones). The <title> above is kept only as a no-JS fallback;
+    react-helmet overrides it per route.
+  -->
+
+  <!-- Favicons & Brand Icons -->
+  <link rel="icon" type="image/x-icon" href="../favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="../favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="../apple-touch-icon-167x167.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="../apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="../apple-touch-icon-120x120.png">
+  <link rel="mask-icon" href="../safari-pinned-tab.svg" color="#0891b2">
+  <meta name="msapplication-TileColor" content="#0891b2">
+  <meta name="msapplication-config" content="/browserconfig.xml">
+  <meta name="msapplication-TileImage" content="/mstile-150x150.png">
+
+  <!--
+    Structured Data — brand entity graph.
+
+    These three nodes are what Google reads for BRAND queries, and they are joined by
+    `@id` so Search resolves them to ONE entity instead of three loose objects. Keep the
+    `@id` values stable; changing them re-starts entity consolidation from scratch.
+
+    `alternateName` must carry every string a user might type for us — critically the
+    TWO-WORD "Ball Engine", which is a contested generic term (an automotive machine shop
+    and a historic steam-engine maker both own strong signals for it). A previous
+    find-and-replace flattened this list to three copies of the domain and dropped the
+    real alternates; that is why the two-word query surfaced nothing. Do not let a bulk
+    rename touch these values again.
+  -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://ballengine.app/#organization",
+      "name": "BallEngine",
+      "legalName": "Ball Engine Studios",
+      "alternateName": [
+        "Ball Engine",
+        "BallEngine.app",
+        "ballengine.app",
+        "BallEngine Creator Studio"
+      ],
+      "url": "https://ballengine.app/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://ballengine.app/logo.png"
+      },
+      "description": "BallEngine (also written Ball Engine) is the #1 browser-based bouncing ball simulator and creator studio for creating satisfying ball simulations and viral content for TikTok, Reels, and YouTube Shorts.",
+      "sameAs": [
+        "https://youtube.com/@funcirclegames",
+        "https://www.instagram.com/funcirclegames",
+        "https://www.tiktok.com/@funcirclegames",
+        "https://x.com/funcirclegames",
+        "https://www.threads.com/@funcirclegames"
+      ]
+    }
+    </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "@id": "https://ballengine.app/#software",
+      "name": "BallEngine",
+      "alternateName": ["Ball Engine", "BallEngine Simulator", "BallEngine Creator Studio"],
+      "publisher": { "@id": "https://ballengine.app/#organization" },
+      "image": "https://ballengine.app/logo.png",
+      "operatingSystem": "Web",
+      "applicationCategory": "MultimediaApplication",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Starter Studio",
+          "price": "0.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Lite",
+          "price": "19.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Creator",
+          "price": "29.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Pro",
+          "price": "49.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Elite",
+          "price": "99.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        },
+        {
+          "@type": "Offer",
+          "name": "Agency",
+          "price": "199.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://ballengine.app/#pricing"
+        }
+      ]
+    }
+    </script>
+  <!--
+    Pricing tiers (Starter / Lite / Creator / Pro / Elite / Agency) are SaaS subscription plans and are already
+    represented as `offers` on the SoftwareApplication schema above. The standalone Product
+    schema was REMOVED: marking subscription plans as Product made Google's Rich Results test
+    flag "missing field review / aggregateRating" on every page, and we have no genuine
+    customer ratings to supply. Fabricating review/aggregateRating to clear the warning would
+    violate Google's structured-data policy (self-serving / fake reviews → manual action).
+    Re-introduce Product + aggregateRating ONLY when real, on-page user reviews exist.
+  -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://ballengine.app/#website",
+      "name": "BallEngine",
+      "alternateName": ["Ball Engine", "ballengine.app"],
+      "url": "https://ballengine.app/",
+      "image": "https://ballengine.app/logo.png",
+      "publisher": { "@id": "https://ballengine.app/#organization" }
+    }
+    </script>
+  <!--
+    BRAND FONTS are self-hosted (src/styles/fonts.css, files in public/fonts/). They used to come
+    from a render-blocking fonts.googleapis.com stylesheet, which put two extra connections
+    (googleapis for the CSS, gstatic for the files) ahead of first paint. Preloading the one face
+    every page paints with (Figtree, latin, upright) starts it in parallel with index.css instead
+    of after it. `crossorigin` is required: fonts are fetched in CORS mode, and a preload without
+    it is a separate request the font load cannot reuse.
+
+    The ~30 text-overlay picker families are NOT here. They load on demand inside the studio;
+    see src/lib/overlayFonts.ts.
+  -->
+  <link rel="preload" href="../fonts/figtree/v9/_Xms-HUzqDCFdgfMm4S9DQ.woff2" as="font" type="font/woff2" crossorigin="">
+  <link rel="preconnect" href="https://cdn.ballengine.app">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#06b6d4">
+  <script>
+    if ('serviceWorker' in navigator) {
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Unregister existing service workers on localhost to prevent caching issues in development
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          for (const registration of registrations) {
+            registration.unregister().then((success) => {
+              if (success) console.log('SW: Unregistered active service worker on localhost.');
+            });
+          }
+        });
+      } else {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+        });
+      }
+    }
+  </script>
+  <!--
+    /studio is served with an empty #root, so until the entry script runs a phone showed a white
+    page and then the Studio's dark outline (src/components/ui/StudioSkeleton.tsx). This paints the
+    empty root in the Studio's own colour instead. `:empty` stops matching the moment React renders,
+    so it never touches another page. Dark unless the saved Studio config says otherwise, the same
+    test as StudioSkeleton (STORAGE_KEY hypnotic_ball_config_v25).
+  -->
+  <script>
+    try {
+      if (/^\/(?:[a-z]{2}(?:-[a-z]{2,4})?\/)?studio\/?$/i.test(location.pathname)) {
+        document.documentElement.setAttribute('data-boot-studio',
+          /"darkMode"\s*:\s*false/.test(localStorage.getItem('hypnotic_ball_config_v25') || '') ? 'light' : 'dark');
+      }
+    } catch (e) { /* storage blocked: the plain white shell, as before */ }
+  </script>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    html[data-boot-studio] #root:empty { min-height: 100vh; }
+    html[data-boot-studio="dark"] #root:empty { background: #09090b; }
+    html[data-boot-studio="light"] #root:empty { background: #e4e4e7; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.25);
+      background-clip: content-box;
+    }
+
+    /* Dark Mode Scrollbar */
+    .dark ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      background-clip: content-box;
+    }
+
+    .dark ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.25);
+      background-clip: content-box;
+    }
+
+    /* Custom scrollbar class for specific containers */
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(139, 92, 246, 0.4);
+      /* Purple-500 with opacity */
+      background-clip: content-box;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(139, 92, 246, 0.6);
+      background-clip: content-box;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(167, 139, 250, 0.5);
+      /* Purple-400 */
+      background-clip: content-box;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(167, 139, 250, 0.7);
+      background-clip: content-box;
+    }
+  </style>
+  <!--
+    Kick the hero reels request off before the bundle exists.
+
+    The homepage's first visual comes from /api/hero-reels, and that call lives in a React
+    effect — so it could not start until 2.4MB of JavaScript had downloaded, parsed and
+    mounted. Measured cold, the request began at ~2.76s and the thumbnails it names only
+    started downloading at ~4.1s. The response is 3.3KB and `public, max-age=60`, so
+    firing it here puts it in the HTTP cache long before the app asks, and the app's own
+    fetch is then served from cache instead of crossing the network.
+
+    The parsed body is parked on window.__heroReelsPrefetch and home.tsx CONSUMES it, so this is
+    the only /api/hero-reels request of the page load. It used to be a bare warm-up that the app
+    then repeated, which still put a second (sometimes third) request on the wire. The promise
+    resolves null on any failure and never rejects; home.tsx falls back to its own fetch then.
+  -->
+  <script>
+    try {
+      window.__heroReelsPrefetch = fetch('/api/hero-reels')
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; });
+    } catch (e) { /* no fetch: the app's own call still runs */ }
+  </script>
+  <!--
+    REMOVED: the esm.sh importmap (react / react-dom / vite) and the synchronous paddle.js tag.
+
+    The importmap was scaffold residue. Nothing resolved through it — the bundle is
+    self-contained and Vite rewrites every bare specifier at build time — so it only
+    advertised a set of CDN origins we do not use.
+
+    paddle.js was loaded here as a BLOCKING script on every page, including pages with no
+    checkout. It was also redundant: ensurePaddleLoaded() in src/components/PaddleCheckout.tsx
+    already injects the script on demand, with a 5s timeout and adblocker handling — and it
+    even removes any pre-existing paddle.js tag first. Having the tag here meant window.Paddle
+    was always present, so that lazy path short-circuited and was effectively dead code on the
+    web. Checkout now loads Paddle at the moment a plan is clicked, which is what that helper
+    was written for.
+  -->
+  <script type="module" crossorigin="" src="../assets/index-3pf76ICO.js"></script>
+  <link rel="modulepreload" crossorigin="" href="../assets/vendor-react-kqrIXDwM.js">
+  <link rel="modulepreload" crossorigin="" href="../assets/vendor-motion-EOl-odwX.js">
+  <link rel="stylesheet" crossorigin="" href="../assets/index-DoMKM56W.css">
+<style type="text/css">[data-sonner-toaster][dir=ltr],html[dir=ltr]{--toast-icon-margin-start:-3px;--toast-icon-margin-end:4px;--toast-svg-margin-start:-1px;--toast-svg-margin-end:0px;--toast-button-margin-start:auto;--toast-button-margin-end:0;--toast-close-button-start:0;--toast-close-button-end:unset;--toast-close-button-transform:translate(-35%, -35%)}[data-sonner-toaster][dir=rtl],html[dir=rtl]{--toast-icon-margin-start:4px;--toast-icon-margin-end:-3px;--toast-svg-margin-start:0px;--toast-svg-margin-end:-1px;--toast-button-margin-start:0;--toast-button-margin-end:auto;--toast-close-button-start:unset;--toast-close-button-end:0;--toast-close-button-transform:translate(35%, -35%)}[data-sonner-toaster]{position:fixed;width:var(--width);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;--gray1:hsl(0, 0%, 99%);--gray2:hsl(0, 0%, 97.3%);--gray3:hsl(0, 0%, 95.1%);--gray4:hsl(0, 0%, 93%);--gray5:hsl(0, 0%, 90.9%);--gray6:hsl(0, 0%, 88.7%);--gray7:hsl(0, 0%, 85.8%);--gray8:hsl(0, 0%, 78%);--gray9:hsl(0, 0%, 56.1%);--gray10:hsl(0, 0%, 52.3%);--gray11:hsl(0, 0%, 43.5%);--gray12:hsl(0, 0%, 9%);--border-radius:8px;box-sizing:border-box;padding:0;margin:0;list-style:none;outline:0;z-index:999999999;transition:transform .4s ease}@media (hover:none) and (pointer:coarse){[data-sonner-toaster][data-lifted=true]{transform:none}}[data-sonner-toaster][data-x-position=right]{right:var(--offset-right)}[data-sonner-toaster][data-x-position=left]{left:var(--offset-left)}[data-sonner-toaster][data-x-position=center]{left:50%;transform:translateX(-50%)}[data-sonner-toaster][data-y-position=top]{top:var(--offset-top)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--offset-bottom)}[data-sonner-toast]{--y:translateY(100%);--lift-amount:calc(var(--lift) * var(--gap));z-index:var(--z-index);position:absolute;opacity:0;transform:var(--y);touch-action:none;transition:transform .4s,opacity .4s,height .4s,box-shadow .2s;box-sizing:border-box;outline:0;overflow-wrap:anywhere}[data-sonner-toast][data-styled=true]{padding:16px;background:var(--normal-bg);border:1px solid var(--normal-border);color:var(--normal-text);border-radius:var(--border-radius);box-shadow:0 4px 12px rgba(0,0,0,.1);width:var(--width);font-size:13px;display:flex;align-items:center;gap:6px}[data-sonner-toast]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-y-position=top]{top:0;--y:translateY(-100%);--lift:1;--lift-amount:calc(1 * var(--gap))}[data-sonner-toast][data-y-position=bottom]{bottom:0;--y:translateY(100%);--lift:-1;--lift-amount:calc(var(--lift) * var(--gap))}[data-sonner-toast][data-styled=true] [data-description]{font-weight:400;line-height:1.4;color:#3f3f3f}[data-rich-colors=true][data-sonner-toast][data-styled=true] [data-description]{color:inherit}[data-sonner-toaster][data-sonner-theme=dark] [data-description]{color:#e8e8e8}[data-sonner-toast][data-styled=true] [data-title]{font-weight:500;line-height:1.5;color:inherit}[data-sonner-toast][data-styled=true] [data-icon]{display:flex;height:16px;width:16px;position:relative;justify-content:flex-start;align-items:center;flex-shrink:0;margin-left:var(--toast-icon-margin-start);margin-right:var(--toast-icon-margin-end)}[data-sonner-toast][data-promise=true] [data-icon]>svg{opacity:0;transform:scale(.8);transform-origin:center;animation:sonner-fade-in .3s ease forwards}[data-sonner-toast][data-styled=true] [data-icon]>*{flex-shrink:0}[data-sonner-toast][data-styled=true] [data-icon] svg{margin-left:var(--toast-svg-margin-start);margin-right:var(--toast-svg-margin-end)}[data-sonner-toast][data-styled=true] [data-content]{display:flex;flex-direction:column;gap:2px}[data-sonner-toast][data-styled=true] [data-button]{border-radius:4px;padding-left:8px;padding-right:8px;height:24px;font-size:12px;color:var(--normal-bg);background:var(--normal-text);margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end);border:none;font-weight:500;cursor:pointer;outline:0;display:flex;align-items:center;flex-shrink:0;transition:opacity .4s,box-shadow .2s}[data-sonner-toast][data-styled=true] [data-button]:focus-visible{box-shadow:0 0 0 2px rgba(0,0,0,.4)}[data-sonner-toast][data-styled=true] [data-button]:first-of-type{margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end)}[data-sonner-toast][data-styled=true] [data-cancel]{color:var(--normal-text);background:rgba(0,0,0,.08)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-styled=true] [data-cancel]{background:rgba(255,255,255,.3)}[data-sonner-toast][data-styled=true] [data-close-button]{position:absolute;left:var(--toast-close-button-start);right:var(--toast-close-button-end);top:0;height:20px;width:20px;display:flex;justify-content:center;align-items:center;padding:0;color:var(--gray12);background:var(--normal-bg);border:1px solid var(--gray4);transform:var(--toast-close-button-transform);border-radius:50%;cursor:pointer;z-index:1;transition:opacity .1s,background .2s,border-color .2s}[data-sonner-toast][data-styled=true] [data-close-button]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-styled=true] [data-disabled=true]{cursor:not-allowed}[data-sonner-toast][data-styled=true]:hover [data-close-button]:hover{background:var(--gray2);border-color:var(--gray5)}[data-sonner-toast][data-swiping=true]::before{content:'';position:absolute;left:-100%;right:-100%;height:100%;z-index:-1}[data-sonner-toast][data-y-position=top][data-swiping=true]::before{bottom:50%;transform:scaleY(3) translateY(50%)}[data-sonner-toast][data-y-position=bottom][data-swiping=true]::before{top:50%;transform:scaleY(3) translateY(-50%)}[data-sonner-toast][data-swiping=false][data-removed=true]::before{content:'';position:absolute;inset:0;transform:scaleY(2)}[data-sonner-toast][data-expanded=true]::after{content:'';position:absolute;left:0;height:calc(var(--gap) + 1px);bottom:100%;width:100%}[data-sonner-toast][data-mounted=true]{--y:translateY(0);opacity:1}[data-sonner-toast][data-expanded=false][data-front=false]{--scale:var(--toasts-before) * 0.05 + 1;--y:translateY(calc(var(--lift-amount) * var(--toasts-before))) scale(calc(-1 * var(--scale)));height:var(--front-toast-height)}[data-sonner-toast]>*{transition:opacity .4s}[data-sonner-toast][data-x-position=right]{right:0}[data-sonner-toast][data-x-position=left]{left:0}[data-sonner-toast][data-expanded=false][data-front=false][data-styled=true]>*{opacity:0}[data-sonner-toast][data-visible=false]{opacity:0;pointer-events:none}[data-sonner-toast][data-mounted=true][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset)));height:var(--initial-height)}[data-sonner-toast][data-removed=true][data-front=true][data-swipe-out=false]{--y:translateY(calc(var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=false]{--y:translateY(40%);opacity:0;transition:transform .5s,opacity .2s}[data-sonner-toast][data-removed=true][data-front=false]::before{height:calc(var(--initial-height) + 20%)}[data-sonner-toast][data-swiping=true]{transform:var(--y) translateY(var(--swipe-amount-y,0)) translateX(var(--swipe-amount-x,0));transition:none}[data-sonner-toast][data-swiped=true]{user-select:none}[data-sonner-toast][data-swipe-out=true][data-y-position=bottom],[data-sonner-toast][data-swipe-out=true][data-y-position=top]{animation-duration:.2s;animation-timing-function:ease-out;animation-fill-mode:forwards}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=left]{animation-name:swipe-out-left}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=right]{animation-name:swipe-out-right}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=up]{animation-name:swipe-out-up}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=down]{animation-name:swipe-out-down}@keyframes swipe-out-left{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) - 100%));opacity:0}}@keyframes swipe-out-right{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) + 100%));opacity:0}}@keyframes swipe-out-up{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) - 100%));opacity:0}}@keyframes swipe-out-down{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) + 100%));opacity:0}}@media (max-width:600px){[data-sonner-toaster]{position:fixed;right:var(--mobile-offset-right);left:var(--mobile-offset-left);width:100%}[data-sonner-toaster][dir=rtl]{left:calc(var(--mobile-offset-left) * -1)}[data-sonner-toaster] [data-sonner-toast]{left:0;right:0;width:calc(100% - var(--mobile-offset-left) * 2)}[data-sonner-toaster][data-x-position=left]{left:var(--mobile-offset-left)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--mobile-offset-bottom)}[data-sonner-toaster][data-y-position=top]{top:var(--mobile-offset-top)}[data-sonner-toaster][data-x-position=center]{left:var(--mobile-offset-left);right:var(--mobile-offset-right);transform:none}}[data-sonner-toaster][data-sonner-theme=light]{--normal-bg:#fff;--normal-border:var(--gray4);--normal-text:var(--gray12);--success-bg:hsl(143, 85%, 96%);--success-border:hsl(145, 92%, 87%);--success-text:hsl(140, 100%, 27%);--info-bg:hsl(208, 100%, 97%);--info-border:hsl(221, 91%, 93%);--info-text:hsl(210, 92%, 45%);--warning-bg:hsl(49, 100%, 97%);--warning-border:hsl(49, 91%, 84%);--warning-text:hsl(31, 92%, 45%);--error-bg:hsl(359, 100%, 97%);--error-border:hsl(359, 100%, 94%);--error-text:hsl(360, 100%, 45%)}[data-sonner-toaster][data-sonner-theme=light] [data-sonner-toast][data-invert=true]{--normal-bg:#000;--normal-border:hsl(0, 0%, 20%);--normal-text:var(--gray1)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-invert=true]{--normal-bg:#fff;--normal-border:var(--gray3);--normal-text:var(--gray12)}[data-sonner-toaster][data-sonner-theme=dark]{--normal-bg:#000;--normal-bg-hover:hsl(0, 0%, 12%);--normal-border:hsl(0, 0%, 20%);--normal-border-hover:hsl(0, 0%, 25%);--normal-text:var(--gray1);--success-bg:hsl(150, 100%, 6%);--success-border:hsl(147, 100%, 12%);--success-text:hsl(150, 86%, 65%);--info-bg:hsl(215, 100%, 6%);--info-border:hsl(223, 43%, 17%);--info-text:hsl(216, 87%, 65%);--warning-bg:hsl(64, 100%, 6%);--warning-border:hsl(60, 100%, 9%);--warning-text:hsl(46, 87%, 65%);--error-bg:hsl(358, 76%, 10%);--error-border:hsl(357, 89%, 16%);--error-text:hsl(358, 100%, 81%)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]{background:var(--normal-bg);border-color:var(--normal-border);color:var(--normal-text)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]:hover{background:var(--normal-bg-hover);border-color:var(--normal-border-hover)}[data-rich-colors=true][data-sonner-toast][data-type=success]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=success] [data-close-button]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=info]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=info] [data-close-button]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning] [data-close-button]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=error]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}[data-rich-colors=true][data-sonner-toast][data-type=error] [data-close-button]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}.sonner-loading-wrapper{--size:16px;height:var(--size);width:var(--size);position:absolute;inset:0;z-index:10}.sonner-loading-wrapper[data-visible=false]{transform-origin:center;animation:sonner-fade-out .2s ease forwards}.sonner-spinner{position:relative;top:50%;left:50%;height:var(--size);width:var(--size)}.sonner-loading-bar{animation:sonner-spin 1.2s linear infinite;background:var(--gray11);border-radius:6px;height:8%;left:-10%;position:absolute;top:-3.9%;width:24%}.sonner-loading-bar:first-child{animation-delay:-1.2s;transform:rotate(.0001deg) translate(146%)}.sonner-loading-bar:nth-child(2){animation-delay:-1.1s;transform:rotate(30deg) translate(146%)}.sonner-loading-bar:nth-child(3){animation-delay:-1s;transform:rotate(60deg) translate(146%)}.sonner-loading-bar:nth-child(4){animation-delay:-.9s;transform:rotate(90deg) translate(146%)}.sonner-loading-bar:nth-child(5){animation-delay:-.8s;transform:rotate(120deg) translate(146%)}.sonner-loading-bar:nth-child(6){animation-delay:-.7s;transform:rotate(150deg) translate(146%)}.sonner-loading-bar:nth-child(7){animation-delay:-.6s;transform:rotate(180deg) translate(146%)}.sonner-loading-bar:nth-child(8){animation-delay:-.5s;transform:rotate(210deg) translate(146%)}.sonner-loading-bar:nth-child(9){animation-delay:-.4s;transform:rotate(240deg) translate(146%)}.sonner-loading-bar:nth-child(10){animation-delay:-.3s;transform:rotate(270deg) translate(146%)}.sonner-loading-bar:nth-child(11){animation-delay:-.2s;transform:rotate(300deg) translate(146%)}.sonner-loading-bar:nth-child(12){animation-delay:-.1s;transform:rotate(330deg) translate(146%)}@keyframes sonner-fade-in{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}@keyframes sonner-fade-out{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}@keyframes sonner-spin{0%{opacity:1}100%{opacity:.15}}@media (prefers-reduced-motion){.sonner-loading-bar,[data-sonner-toast],[data-sonner-toast]>*{transition:none!important;animation:none!important}}.sonner-loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transform-origin:center;transition:opacity .2s,transform .2s}.sonner-loader[data-visible=false]{opacity:0;transform:scale(.8) translate(-50%,-50%)}</style><meta name="description" content="Create firefly synchronisation videos where tens of thousands of oscillators blink in chaos until the coupling crosses its critical value and the swarm locks to the track tempo. In development and playable as a preview."><meta name="keywords" content="fireflies 3d mode, firefly synchronisation, kuramoto model animation, sync visual, oscillator swarm video, ballengine.app, BallEngine, Ball Engine, ballengine.app, BallEngine Creator Studio, ball simulation, physics simulator, ASMR physics videos, satisfying ball simulation, physics video generator, faceless video generator, TikTok shorts creator, YouTube shorts generator"><meta property="og:type" content="website"><meta property="og:site_name" content="BallEngine"><meta property="og:title" content="Fireflies 3D: Firefly Synchronisation Videos On The Beat | BallEngine"><meta property="og:description" content="Create firefly synchronisation videos where tens of thousands of oscillators blink in chaos until the coupling crosses its critical value and the swarm locks to the track tempo. In development and playable as a preview."><meta property="og:image" content="https://ballengine.app/og-card.jpg"><meta property="og:url" content="https://ballengine.app/modes/fireflies"><meta property="og:locale" content="en_US"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@Ballengine_app"><meta name="twitter:title" content="Fireflies 3D: Firefly Synchronisation Videos On The Beat | BallEngine"><meta name="twitter:description" content="Create firefly synchronisation videos where tens of thousands of oscillators blink in chaos until the coupling crosses its critical value and the swarm locks to the track tempo. In development and playable as a preview."><meta name="twitter:image" content="https://ballengine.app/og-card.jpg"><meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"><link rel="canonical" href="fireflies.html"><link rel="alternate" hreflang="x-default" href="fireflies.html"><link rel="alternate" hreflang="en" href="fireflies.html"><link rel="icon" type="image/x-icon" href="../favicon.ico"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png"><link rel="icon" type="image/png" sizes="48x48" href="../favicon-48x48.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png"><link rel="mask-icon" href="../safari-pinned-tab.svg" color="#0891b2"></head>
+
+<body style="overflow: auto;">
+  <div id="root"><div class="flex flex-col min-h-screen bg-background text-foreground overflow-x-clip selection:bg-primary selection:text-primary-foreground transition-colors duration-500"><header class="fixed left-0 right-0 z-50 w-full border-b border-border bg-card top-0"><div class="container-page"><div class="flex h-16 items-center justify-between gap-4"><a class="flex shrink-0 items-center gap-2.5" href="../index.html" data-discover="true"><picture class="flex h-9 w-9 items-center justify-center"><source srcset="/logo.webp" type="image/webp"><source srcset="/logo.png" type="image/png"><img alt="" width="36" height="36" class="h-9 w-9 object-contain" src="../logo.png"></picture><span class="font-display text-lg font-bold tracking-tight text-foreground">BallEngine</span></a><nav class="hidden items-center gap-1 lg:flex"><div class="relative"><button type="button" aria-expanded="false" class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground"><span>Features</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 opacity-60 transition-transform" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div class="relative"><button type="button" aria-expanded="false" class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground"><span>Developer</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 opacity-60 transition-transform" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><div class="relative"><button type="button" aria-expanded="false" class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground"><span>Resources</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 opacity-60 transition-transform" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></div><a class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground" href="../plans.html" data-discover="true">Pricing</a><a class="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground" href="../studio.html" data-discover="true">Studio</a></nav><div class="hidden items-center gap-2 md:flex"><button type="button" tabindex="0" aria-haspopup="menu" id="base-ui-_r_4_" data-slot="dropdown-menu-trigger" title="Change language" aria-label="Language" class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe be-i be-h-blue be-loop be-wiggle size-4" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><g transform="rotate(-20 12 12)"><ellipse cx="12" cy="12" rx="4" ry="9"></ellipse><path d="M3.5 9h17M3.5 15h17"></path></g></svg></button><div class="h-5 w-px bg-border"></div><div class="flex items-center gap-2"><a class="btn btn-ghost" href="../login.html" data-discover="true">Log in</a><a class="btn btn-primary" href="../start.html" data-discover="true">Start free</a></div></div><div class="flex items-center gap-2 lg:hidden"><a class="btn btn-primary btn-sm md:hidden" href="../start.html" data-discover="true">Start free</a><button type="button" tabindex="0" aria-haspopup="menu" id="base-ui-_r_a_" data-slot="dropdown-menu-trigger" title="Change language" aria-label="Language" class="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted md:hidden" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe be-i be-h-blue be-loop be-wiggle size-4" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><g transform="rotate(-20 12 12)"><ellipse cx="12" cy="12" rx="4" ry="9"></ellipse><path d="M3.5 9h17M3.5 15h17"></path></g></svg></button><button type="button" aria-expanded="false" class="flex h-11 w-11 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted"><span class="sr-only">Toggle main menu</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu be-i size-5" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg></button></div></div></div></header><main class="flex-grow relative pt-0"><div class="min-h-screen"><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Can I play Fireflies 3D right now?","acceptedAnswer":{"@type":"Answer","text":"Yes. It is in development, so it opens in the studio and runs with sound on our default settings. Export is off until release, and voting for it moves it up the queue."}},{"@type":"Question","name":"Is the synchronisation real or animated?","acceptedAnswer":{"@type":"Answer","text":"Real. Each firefly is a phase oscillator with its own natural frequency coupled to its neighbours, and the swarm locks because the coupling crosses a critical value, not because anything tells it to flash."}},{"@type":"Question","name":"How does it stay on the beat?","acceptedAnswer":{"@type":"Answer","text":"The population’s mean natural frequency is set from the track’s tempo, so a locked swarm flashes at exactly the BPM as a consequence of its own physics."}},{"@type":"Question","name":"What are competing swarms?","acceptedAnswer":{"@type":"Answer","text":"Two populations with different frequencies sharing the field, so synchronisation becomes a contest over which rhythm captures the swarm."}},{"@type":"Question","name":"Why show a sync percentage?","acceptedAnswer":{"@type":"Answer","text":"The transition happens in a couple of seconds and a viewer who is not watching for it can miss what changed. The meter tells them it is coming."}}]},{"@context":"https://schema.org","@type":"HowTo","name":"How to make a Fireflies 3D video","description":"Tens of thousands of oscillators blinking in chaos until the coupling crosses a threshold and the whole swarm snaps into unison on the beat.","step":[{"@type":"HowToStep","position":1,"name":"Set the tempo","text":"Match the swarm’s mean natural frequency to the track’s BPM so a locked swarm flashes on the beat."},{"@type":"HowToStep","position":2,"name":"Plan the coupling ramp","text":"Start below critical and raise it through the threshold at the moment you want the snap."},{"@type":"HowToStep","position":3,"name":"Show the sync meter","text":"The percentage is what turns an abrupt change into an anticipated one."},{"@type":"HowToStep","position":4,"name":"Consider two swarms","text":"If the run needs more than one event, competing populations add a second question."},{"@type":"HowToStep","position":5,"name":"Time the snap to the drop","text":"Put the transition on the biggest moment in the track. It is a large visual event and it deserves one."}]}]}</script><div aria-hidden="true" class="fixed inset-0 -z-20 pointer-events-none bg-background" style="opacity: 1;"></div><header class="container-page pt-28 pb-12 md:pt-32 md:pb-16"><div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-16"><div class="lg:col-span-7"><div class="space-y-5"><h1 class="t-h1">Fireflies 3D: <br>Chaos that snaps into time</h1><div class="t-lead max-w-2xl">Tens of thousands of oscillators pulling on their neighbours until the coupling crosses its threshold and the whole swarm flashes at the tempo of your track.</div><div class="flex flex-wrap items-center gap-3 pt-1"><a class="btn btn-primary btn-lg" href="../studio%3Fmode=fireflies.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play be-i be-h-purple be-loop be-pop fill-current" aria-hidden="true" data-be-fix="" style="--be-fix: rgb(255, 255, 255);"><path d="M7.5 5.2v13.6a1 1 0 0 0 1.5.9l11-6.8a1 1 0 0 0 0-1.8l-11-6.8a1 1 0 0 0-1.5.9Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><path d="M7.5 5.2v13.6a1 1 0 0 0 1.5.9l11-6.8a1 1 0 0 0 0-1.8l-11-6.8a1 1 0 0 0-1.5.9Z"></path></svg>Play the preview</a><div class="flex flex-col items-start gap-1 "><button type="button" aria-pressed="false" title="Vote to have this mode finished sooner" class="btn btn-lg btn-secondary disabled:opacity-60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up be-i w-4 h-4" aria-hidden="true"><path d="m6.5 14.5 5.5-5.5 5.5 5.5"></path></svg><span class="whitespace-nowrap">Build this next</span><span class="tabular-nums font-semibold text-muted-foreground">0</span></button></div></div><div class="t-small pt-1"><p class="flex flex-wrap items-center gap-2"><span class="tag bg-amber-50 dark:bg-amber-400/10 text-amber-800 dark:text-amber-200">In development</span>0 creators want this next</p></div></div></div><div class="mx-auto flex w-full max-w-md justify-center lg:col-span-5"><figure class="mx-auto flex w-full max-w-xs flex-col justify-center" style="height: 491px;"><img alt="A frame from Fireflies 3D" width="192" height="192" loading="lazy" decoding="async" draggable="false" class="aspect-square shrink-0 overflow-hidden bg-zinc-900 w-full rounded-2xl object-cover" src="../mode-thumbs/fireflies.webp%3Fv=9175dd54"><figcaption class="t-caption mt-3 text-center">Open the studio to run this mode live.</figcaption></figure></div></div></header><section class="section-y bg-secondary"><div class="container-page"><div class="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16"><div><h2 class="t-h2 mb-5">Fireflies 3D is being built right now</h2><div class="space-y-4 t-body text-foreground/80"><p>The engine, the physics and the look are done enough to watch. What is not finished is everything around them: the settings, the presets and the export path. So we shipped it as a preview instead of sitting on it.</p><p>The order is decided by these votes rather than by us, and the most-voted modes go first. If this is the one you want, say so.</p></div><div class="mt-6"><div class="flex flex-col items-start gap-1 "><button type="button" aria-pressed="false" title="Vote to have this mode finished sooner" class="btn btn-lg btn-secondary disabled:opacity-60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up be-i w-4 h-4" aria-hidden="true"><path d="m6.5 14.5 5.5-5.5 5.5 5.5"></path></svg><span class="whitespace-nowrap">Build this next</span><span class="tabular-nums font-semibold text-muted-foreground">0</span></button></div></div></div><dl class="divide-y divide-border border-y border-border"><div class="py-5"><dt class="t-h4">What you can do now</dt><dd class="t-small mt-1">Open it in the studio and watch a full run, with sound, exactly as it stands today.</dd></div><div class="py-5"><dt class="t-h4">What is held back</dt><dd class="t-small mt-1">Settings, randomize and export. The preview runs on our defaults so every viewer judges the same version.</dd></div><div class="py-5"><dt class="t-h4">When it ships</dt><dd class="t-small mt-1">The most-voted unfinished mode is the one we take next.</dd></div></dl></div></div></section><section class="section-y"><div class="container-page"><div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16"><div class="lg:col-span-7"><h2 class="t-h2 mb-5">What Fireflies 3D does</h2><p class="t-lead mb-6">Tens of thousands of oscillators blinking in chaos until the coupling crosses a threshold and the whole swarm snaps into unison on the beat.</p><div class="space-y-4 t-body text-foreground/80"><p>Fireflies really do synchronise. Each one has its own natural rhythm and nudges the ones nearby, and past a certain coupling strength the whole population undergoes a genuine phase transition and starts flashing together. That transition is a real result, and it is this mode.</p><p>Tens of thousands of phase oscillators, each with its own natural frequency, coupled to the handful of neighbours around it. Below the critical coupling the swarm blinks in incoherent chaos. Push the coupling past it and the population locks. There is no in-between state that lasts.</p><p>The music sync is causal rather than choreographed, which is the whole reason the mode exists. The swarm’s mean natural frequency is set to the track’s tempo, so a locked swarm flashes at exactly the BPM. Nothing tells it when to flash. It flashes on the beat because that is its frequency.</p></div></div><aside class="lg:col-span-5"><div class="surface-card p-6"><h3 class="t-h3 mb-4">Mode reference</h3><dl class="divide-y divide-border"><div class="flex flex-col gap-1 py-3 first:pt-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4"><dt class="t-caption">Studio mode</dt><dd class="text-sm font-medium text-foreground sm:max-w-[60%] sm:text-right">Fireflies 3D</dd></div><div class="flex flex-col gap-1 py-3 first:pt-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4"><dt class="t-caption">Core mechanic</dt><dd class="text-sm font-medium text-foreground sm:max-w-[60%] sm:text-right">Coupled phase oscillators undergoing a synchronisation transition</dd></div><div class="flex flex-col gap-1 py-3 first:pt-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4"><dt class="t-caption">Typical run length</dt><dd class="text-sm font-medium text-foreground sm:max-w-[60%] sm:text-right">20 to 45 seconds</dd></div><div class="flex flex-col gap-1 py-3 first:pt-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4"><dt class="t-caption">Ends when</dt><dd class="text-sm font-medium text-foreground sm:max-w-[60%] sm:text-right">The swarm locks, or the coupling is dropped for a loop</dd></div><div class="flex flex-col gap-1 py-3 first:pt-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4"><dt class="t-caption">Audio pairing</dt><dd class="text-sm font-medium text-foreground sm:max-w-[60%] sm:text-right">The swarm flashes at the track tempo once locked</dd></div><div class="flex flex-col gap-1 py-3 first:pt-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4"><dt class="t-caption">Best canvas</dt><dd class="text-sm font-medium text-foreground sm:max-w-[60%] sm:text-right">Vertical 9:16 or square</dd></div></dl><a class="btn btn-secondary mt-6 w-full" href="../studio%3Fmode=fireflies.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play be-i be-h-purple be-loop be-pop fill-current" aria-hidden="true"><path d="M7.5 5.2v13.6a1 1 0 0 0 1.5.9l11-6.8a1 1 0 0 0 0-1.8l-11-6.8a1 1 0 0 0-1.5.9Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><path d="M7.5 5.2v13.6a1 1 0 0 0 1.5.9l11-6.8a1 1 0 0 0 0-1.8l-11-6.8a1 1 0 0 0-1.5.9Z"></path></svg>Open Fireflies 3D</a></div></aside></div></div></section><section class="section-y bg-secondary"><div class="container-page"><div class="mb-10 md:mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"><div class="space-y-3 max-w-2xl"><h2 class="t-h2">How a run plays out</h2><div class="t-lead text-base md:text-lg">The exact sequence the engine runs in this mode, from the first frame to the moment the run resolves.</div></div></div><ol class="grid grid-cols-1 gap-x-12 gap-y-8 md:grid-cols-2"><li class="flex items-start gap-4"><span class="t-h4 w-6 shrink-0 tabular-nums text-cyan-700 dark:text-cyan-300">1.</span><div class="min-w-0"><h3 class="t-h4">Every firefly has its own rhythm</h3><p class="t-small mt-1.5">Each oscillator carries a natural frequency drawn around the population mean, so left alone they drift apart and the swarm blinks incoherently.</p></div></li><li class="flex items-start gap-4"><span class="t-h4 w-6 shrink-0 tabular-nums text-cyan-700 dark:text-cyan-300">2.</span><div class="min-w-0"><h3 class="t-h4">Neighbours pull on each other</h3><p class="t-small mt-1.5">Each oscillator is coupled to a handful of nearby ones and adjusts its phase toward theirs. The coupling strength is the one number that decides everything.</p></div></li><li class="flex items-start gap-4"><span class="t-h4 w-6 shrink-0 tabular-nums text-cyan-700 dark:text-cyan-300">3.</span><div class="min-w-0"><h3 class="t-h4">The transition is genuine</h3><p class="t-small mt-1.5">Below a critical coupling the swarm cannot lock at all. Above it, it locks. That is a real phase transition rather than a fade between two animations.</p></div></li><li class="flex items-start gap-4"><span class="t-h4 w-6 shrink-0 tabular-nums text-cyan-700 dark:text-cyan-300">4.</span><div class="min-w-0"><h3 class="t-h4">The tempo is the frequency</h3><p class="t-small mt-1.5">The population’s mean natural frequency is set from the track’s tempo, so a synchronised swarm flashes at the BPM without being told to.</p></div></li></ol></div></section><section class="section-y"><div class="container-page"><div class="mb-10 md:mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"><div class="space-y-3 max-w-2xl"><h2 class="t-h2">Every control in Fireflies 3D</h2><div class="t-lead text-base md:text-lg">These are the settings this mode adds on top of the shared physics, visual, audio, and export controls. Names match the studio sidebar exactly.</div></div></div><div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6"><div class="surface-card p-6"><h3 class="t-h4 mb-3">Tempo and coupling</h3><ul class="mb-4 flex flex-wrap gap-1.5"><li class="tag">Tempo</li><li class="tag">Coupling (the drop)</li></ul><p class="t-small">Coupling is the drop. Raising it through the critical value is what makes the swarm snap into unison, and that is the whole arc of the run.</p></div><div class="surface-card p-6"><h3 class="t-h4 mb-3">Two swarms</h3><ul class="mb-4 flex flex-wrap gap-1.5"><li class="tag">Two Swarms</li><li class="tag">Competing Swarms</li></ul><p class="t-small">Two populations with different frequencies compete for the field, so synchronisation becomes a contest rather than a single outcome.</p></div><div class="surface-card p-6"><h3 class="t-h4 mb-3">Look</h3><ul class="mb-4 flex flex-wrap gap-1.5"><li class="tag">Look</li><li class="tag">Sync Meter</li><li class="tag">Show Sync %</li></ul><p class="t-small">The sync meter states how close the swarm is to unison. It is what lets a viewer see the transition coming instead of only noticing it afterwards.</p></div><div class="surface-card p-6"><h3 class="t-h4 mb-3">Sound</h3><ul class="mb-4 flex flex-wrap gap-1.5"><li class="tag">Sound</li><li class="tag">Per-Event Sounds</li></ul><p class="t-small">Because the flash rate is the tempo, the swarm can voice the beat itself rather than sitting under a track that provides it.</p></div></div></div></section><section class="section-y bg-secondary"><div class="container-page"><div class="mb-10 md:mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"><div class="space-y-3 max-w-2xl"><h2 class="t-h2">Why Fireflies 3D videos hold attention</h2><div class="t-lead text-base md:text-lg">What keeps people watching this mechanic.</div></div></div><div class="grid grid-cols-1 gap-x-12 gap-y-8 md:grid-cols-2"><div><h3 class="t-h4">The snap is a genuine payoff</h3><p class="t-small mt-1.5">Chaos becoming unison in a couple of seconds is a large, unmistakable event, and it is the thing the whole run is building toward.</p></div><div><h3 class="t-h4">The sync meter is a progress bar</h3><p class="t-small mt-1.5">A percentage climbing toward the transition tells the viewer that something is about to happen and roughly when.</p></div><div><h3 class="t-h4">The lock lands on the beat</h3><p class="t-small mt-1.5">Because the mean frequency is the tempo, a locked swarm flashes with the music, so the payoff is audible and visible together.</p></div><div><h3 class="t-h4">Two swarms make it a contest</h3><p class="t-small mt-1.5">Competing populations turn synchronisation into a question of which rhythm wins, which is a second hook layered on the first.</p></div></div></div></section><section class="section-y"><div class="container-page"><div class="mb-10 md:mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"><div class="space-y-3 max-w-2xl"><h2 class="t-h2">Videos you can make in this mode</h2><div class="t-lead text-base md:text-lg">Each of these is a different configuration of the same mode, so one setup session produces a batch of related uploads.</div></div></div><div class="grid grid-cols-1 gap-x-12 gap-y-8 md:grid-cols-2"><div><h3 class="t-h4">Coupling ramp</h3><p class="t-small mt-1.5">Coupling raised through the critical value on the drop so the swarm snaps into unison with the music.</p></div><div><h3 class="t-h4">Sync meter run</h3><p class="t-small mt-1.5">The percentage on screen throughout, so the transition is signposted from the start.</p></div><div><h3 class="t-h4">Competing swarms</h3><p class="t-small mt-1.5">Two populations with different frequencies fighting for the field. The most dramatic version.</p></div><div><h3 class="t-h4">Slow build</h3><p class="t-small mt-1.5">A long incoherent phase before the coupling rises, so the chaos is established before it resolves.</p></div><div><h3 class="t-h4">Tempo match</h3><p class="t-small mt-1.5">The swarm’s mean frequency set precisely to a track’s BPM so the locked flash is exactly on the beat.</p></div><div><h3 class="t-h4">Loop</h3><p class="t-small mt-1.5">Coupling dropped back below critical so the swarm falls apart and re-synchronises, on repeat.</p></div></div></div></section><section class="section-y bg-secondary"><div class="container-page"><div class="mb-10 md:mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"><div class="space-y-3 max-w-2xl"><h2 class="t-h2">Make your first Fireflies 3D video</h2><div class="t-lead text-base md:text-lg">The order that works. Following it out of sequence usually means retuning settings you already set.</div></div></div><ol class="surface-card max-w-3xl divide-y divide-border"><li class="flex items-start gap-4 p-4 sm:p-6"><span class="t-h4 w-6 shrink-0 tabular-nums text-cyan-700 dark:text-cyan-300">1.</span><div class="min-w-0"><h3 class="t-h4">Set the tempo</h3><p class="t-small mt-1.5">Match the swarm’s mean natural frequency to the track’s BPM so a locked swarm flashes on the beat.</p></div></li><li class="flex items-start gap-4 p-4 sm:p-6"><span class="t-h4 w-6 shrink-0 tabular-nums text-cyan-700 dark:text-cyan-300">2.</span><div class="min-w-0"><h3 class="t-h4">Plan the coupling ramp</h3><p class="t-small mt-1.5">Start below critical and raise it through the threshold at the moment you want the snap.</p></div></li><li class="flex items-start gap-4 p-4 sm:p-6"><span class="t-h4 w-6 shrink-0 tabular-nums text-cyan-700 dark:text-cyan-300">3.</span><div class="min-w-0"><h3 class="t-h4">Show the sync meter</h3><p class="t-small mt-1.5">The percentage is what turns an abrupt change into an anticipated one.</p></div></li><li class="flex items-start gap-4 p-4 sm:p-6"><span class="t-h4 w-6 shrink-0 tabular-nums text-cyan-700 dark:text-cyan-300">4.</span><div class="min-w-0"><h3 class="t-h4">Consider two swarms</h3><p class="t-small mt-1.5">If the run needs more than one event, competing populations add a second question.</p></div></li><li class="flex items-start gap-4 p-4 sm:p-6"><span class="t-h4 w-6 shrink-0 tabular-nums text-cyan-700 dark:text-cyan-300">5.</span><div class="min-w-0"><h3 class="t-h4">Time the snap to the drop</h3><p class="t-small mt-1.5">Put the transition on the biggest moment in the track. It is a large visual event and it deserves one.</p></div></li></ol></div></section><section class="section-y"><div class="container-page"><div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16"><div><h2 class="t-h3 mb-4">Settings that make the difference</h2><ol class="list-decimal space-y-3 pl-5 t-body text-foreground/80 marker:text-muted-foreground"><li class="pl-1">The snap is the video. Everything before it is setup, so do not let the incoherent phase run longer than it needs to.</li><li class="pl-1">The sync meter costs nothing and adds anticipation, which is the one thing an abrupt transition otherwise lacks.</li><li class="pl-1">Match the tempo exactly. The mode is at its best when the flash rate and the track are the same number rather than close.</li><li class="pl-1">Competing swarms are worth trying on longer runs, because a single transition is one event and a minute needs more.</li><li class="pl-1">Dropping the coupling back below critical gives a clean loop point.</li></ol></div><div><h2 class="t-h3 mb-4">What breaks a run</h2><ol class="list-decimal space-y-3 pl-5 t-body text-foreground/80 marker:text-muted-foreground"><li class="pl-1">A coupling that starts above critical, so the swarm is already synchronised and the transition never happens.</li><li class="pl-1">A mean frequency that does not match the track, which leaves a locked swarm flashing near but not on the beat.</li><li class="pl-1">Hiding the sync meter, which turns a signposted build into an unexplained sudden change.</li><li class="pl-1">An incoherent phase so long the viewer leaves before the payoff.</li></ol></div></div></div></section><section class="section-y bg-secondary"><div class="container-prose"><div class="space-y-12"><article><h2 class="t-h3 mb-4">Causal sync, not choreographed sync</h2><div class="t-body space-y-4 text-foreground/80"><p>Almost every audio-reactive visual is choreographed: the animation is told when the beat is and responds to it. The result looks synchronised because it was instructed to be, and it will look synchronised to any track you give it.</p><p>Here two numbers go straight into the physics rather than into an animation curve. The population’s mean natural frequency is set to the track’s tempo, and the coupling strength is driven by the arrangement. Nothing ever tells a firefly to flash.</p><p>The swarm flashes on the beat because its oscillators run at the beat frequency and have pulled each other into agreement. That is a different claim from "it looks synchronised", and it is why the lock feels like something happening rather than something being played back.</p></div></article><article><h2 class="t-h3 mb-4">Why a transition beats a fade</h2><div class="t-body space-y-4 text-foreground/80"><p>The Kuramoto model has a critical coupling. Below it, the population cannot maintain coherence and the order parameter sits near zero regardless of how long you wait. Above it, coherence grows and the swarm locks. There is no long intermediate regime.</p><p>That sharpness is exactly what a video wants. A gradual drift from chaos into order would be a slow dissolve, and slow dissolves are not events. A threshold crossing is an event: the swarm goes from visibly incoherent to visibly unified in a couple of seconds.</p><p>It is also why the sync meter matters so much. The transition is fast enough that a viewer who is not primed can miss what happened, and a percentage climbing toward a threshold is the cheapest possible way to tell them to watch.</p></div></article></div></div></section><section class="section-y"><div class="container-prose"><div class="mb-10 md:mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"><div class="space-y-3 max-w-2xl"><h2 class="t-h2">Fireflies 3D questions</h2></div></div><div class="surface-card divide-y divide-border overflow-hidden"><div><h3 class="t-h4"><button type="button" aria-expanded="false" aria-controls="faq-panel-mode-0" class="flex min-h-14 w-full items-center justify-between gap-4 px-6 py-4 text-left transition-colors hover:bg-secondary focus-visible:ring-inset"><span>Can I play Fireflies 3D right now?</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 text-zinc-400 transition-transform duration-150" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></h3><div id="faq-panel-mode-0" hidden="" class="max-w-prose whitespace-pre-line px-6 pb-6 t-body text-muted-foreground">Yes. It is in development, so it opens in the studio and runs with sound on our default settings. Export is off until release, and voting for it moves it up the queue.</div></div><div><h3 class="t-h4"><button type="button" aria-expanded="false" aria-controls="faq-panel-mode-1" class="flex min-h-14 w-full items-center justify-between gap-4 px-6 py-4 text-left transition-colors hover:bg-secondary focus-visible:ring-inset"><span>Is the synchronisation real or animated?</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 text-zinc-400 transition-transform duration-150" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></h3><div id="faq-panel-mode-1" hidden="" class="max-w-prose whitespace-pre-line px-6 pb-6 t-body text-muted-foreground">Real. Each firefly is a phase oscillator with its own natural frequency coupled to its neighbours, and the swarm locks because the coupling crosses a critical value, not because anything tells it to flash.</div></div><div><h3 class="t-h4"><button type="button" aria-expanded="false" aria-controls="faq-panel-mode-2" class="flex min-h-14 w-full items-center justify-between gap-4 px-6 py-4 text-left transition-colors hover:bg-secondary focus-visible:ring-inset"><span>How does it stay on the beat?</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 text-zinc-400 transition-transform duration-150" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></h3><div id="faq-panel-mode-2" hidden="" class="max-w-prose whitespace-pre-line px-6 pb-6 t-body text-muted-foreground">The population’s mean natural frequency is set from the track’s tempo, so a locked swarm flashes at exactly the BPM as a consequence of its own physics.</div></div><div><h3 class="t-h4"><button type="button" aria-expanded="false" aria-controls="faq-panel-mode-3" class="flex min-h-14 w-full items-center justify-between gap-4 px-6 py-4 text-left transition-colors hover:bg-secondary focus-visible:ring-inset"><span>What are competing swarms?</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 text-zinc-400 transition-transform duration-150" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></h3><div id="faq-panel-mode-3" hidden="" class="max-w-prose whitespace-pre-line px-6 pb-6 t-body text-muted-foreground">Two populations with different frequencies sharing the field, so synchronisation becomes a contest over which rhythm captures the swarm.</div></div><div><h3 class="t-h4"><button type="button" aria-expanded="false" aria-controls="faq-panel-mode-4" class="flex min-h-14 w-full items-center justify-between gap-4 px-6 py-4 text-left transition-colors hover:bg-secondary focus-visible:ring-inset"><span>Why show a sync percentage?</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down be-i size-4 shrink-0 text-zinc-400 transition-transform duration-150" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"></path></svg></button></h3><div id="faq-panel-mode-4" hidden="" class="max-w-prose whitespace-pre-line px-6 pb-6 t-body text-muted-foreground">The transition happens in a couple of seconds and a viewer who is not watching for it can miss what changed. The meter tells them it is coming.</div></div></div></div></section><section class="section-y bg-secondary"><div class="container-page"><div class="mb-10 md:mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"><div class="space-y-3 max-w-2xl"><h2 class="t-h2">Modes that pair with Fireflies 3D</h2></div></div><ul class="grid grid-cols-1 gap-4 md:grid-cols-2"><li><a class="surface-card group transition-colors hover:border-cyan-600/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600/30 flex h-full gap-4 p-4" href="phase-bloom.html" data-discover="true"><img alt="" width="192" height="192" loading="lazy" decoding="async" draggable="false" class="aspect-square shrink-0 overflow-hidden rounded-lg bg-zinc-900 w-16 sm:w-20 object-cover" src="../mode-thumbs/phase-bloom.webp%3Fv=d7cab221"><div class="min-w-0"><h3 class="t-h4 transition-colors group-hover:text-cyan-700 dark:group-hover:text-cyan-300">Phase Bloom</h3><p class="t-small mt-1.5">Phase relationships again, imposed rather than emergent.</p></div></a></li><li><a class="surface-card group transition-colors hover:border-cyan-600/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600/30 flex h-full gap-4 p-4" href="eulers-disk.html" data-discover="true"><img alt="" width="192" height="192" loading="lazy" decoding="async" draggable="false" class="aspect-square shrink-0 overflow-hidden rounded-lg bg-zinc-900 w-16 sm:w-20 object-cover" src="../mode-thumbs/eulers-disk.webp%3Fv=f5ed7863"><div class="min-w-0"><h3 class="t-h4 transition-colors group-hover:text-cyan-700 dark:group-hover:text-cyan-300">Eulers Disk 3D</h3><p class="t-small mt-1.5">Many oscillators resolving one at a time instead of together.</p></div></a></li><li><a class="surface-card group transition-colors hover:border-cyan-600/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600/30 flex h-full gap-4 p-4" href="slime.html" data-discover="true"><img alt="" width="192" height="192" loading="lazy" decoding="async" draggable="false" class="aspect-square shrink-0 overflow-hidden rounded-lg bg-zinc-900 w-16 sm:w-20 object-cover" src="../mode-thumbs/slime.webp%3Fv=95adb037"><div class="min-w-0"><h3 class="t-h4 transition-colors group-hover:text-cyan-700 dark:group-hover:text-cyan-300">Slime 3D</h3><p class="t-small mt-1.5">Order emerging from purely local rules at large agent counts.</p></div></a></li></ul><div class="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm"><a class="link" href="../modes.html" data-discover="true">All simulation modes</a><a class="link" href="../tutorials.html" data-discover="true">Creator tutorials</a><a class="link" href="../help.html" data-discover="true">Help</a></div></div></section><section class="section-y border-t border-border"><div class="container-page"><div class="mx-auto max-w-2xl text-center mb-8 md:mb-8"><div class="space-y-3"><h2 class="t-h2">Open Fireflies 3D</h2><div class="t-lead text-base md:text-lg">Every control on this page is already in the studio. Load the mode and start from a working run.</div></div></div><div class="flex flex-col items-center justify-center gap-3 sm:flex-row"><a class="btn btn-primary btn-lg" href="../studio%3Fmode=fireflies.html" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play be-i be-h-purple be-loop be-pop fill-current" aria-hidden="true" data-be-fix="" style="--be-fix: rgb(255, 255, 255);"><path d="M7.5 5.2v13.6a1 1 0 0 0 1.5.9l11-6.8a1 1 0 0 0 0-1.8l-11-6.8a1 1 0 0 0-1.5.9Z" fill-opacity="0.16" stroke="none" style="fill: var(--be-hue, currentColor);"></path><path d="M7.5 5.2v13.6a1 1 0 0 0 1.5.9l11-6.8a1 1 0 0 0 0-1.8l-11-6.8a1 1 0 0 0-1.5.9Z"></path></svg>Play the preview</a><a class="btn btn-secondary btn-lg" href="../modes.html" data-discover="true">Compare all modes</a></div></div></section></div></main><footer class="border-t border-border bg-background pt-12 pb-8"><div class="container-page"><div class="mb-10 grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-3 lg:grid-cols-7"><div class="col-span-2 space-y-4 md:col-span-3 lg:col-span-2"><a class="inline-flex items-center gap-3" href="../index.html" data-discover="true"><picture class="flex h-10 w-10 shrink-0 items-center justify-center"><source srcset="/logo.webp" type="image/webp"><source srcset="/logo.png" type="image/png"><img alt="" width="40" height="40" class="h-10 w-10 object-contain" src="../logo.png"></picture><span class="flex min-w-0 flex-col"><span class="t-h4 leading-none">BallEngine</span><span class="t-caption mt-1">by Ball Engine Studios</span></span></a><p class="t-small max-w-xs">Create satisfying physics videos and synced bouncing ball simulations.</p><div class="flex gap-2"><a href="https://youtube.com/@ballengine_app" target="_blank" rel="noreferrer" aria-label="YouTube" class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card transition-colors hover:border-foreground/25"><svg class="h-4" viewBox="0 0 28 20" role="img" aria-label="YouTube" xmlns="http://www.w3.org/2000/svg" style="min-height: 20px; width: auto;"><title>YouTube</title><path fill="#FF0000" d="M27.4 3.1c-.3-1.2-1.3-2.1-2.5-2.4C22.7 0 14 0 14 0S5.3 0 3.1.7C1.9 1 .9 1.9.6 3.1 0 5.3 0 10 0 10s0 4.7.6 6.9c.3 1.2 1.3 2.1 2.5 2.4C5.3 20 14 20 14 20s8.7 0 10.9-.7c1.2-.3 2.2-1.2 2.5-2.4.6-2.2.6-6.9.6-6.9s0-4.7-.6-6.9z"></path><path fill="#FFFFFF" d="M11.2 14.3l7.3-4.3-7.3-4.3v8.6z"></path></svg></a><a href="https://x.com/Ballengine_app" target="_blank" rel="noreferrer" aria-label="X" class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card transition-colors hover:border-foreground/25"><svg class="h-4 text-foreground" viewBox="0 0 24 24" role="img" aria-label="X" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="min-height: 20px; width: auto;"><title>X</title><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg></a></div></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Product</h2><nav aria-label="Product"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../index.html" data-discover="true">Home</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../start.html" data-discover="true">Start free</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../studio.html" data-discover="true">Studio</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../plans.html" data-discover="true">Pricing</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../automation.html" data-discover="true">Automation</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../developer.html" data-discover="true">Developer platform</a></li><li><a href="https://cdn.ballengine.app/download/BallEngine-Setup.exe?cb=1794215291351" class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1">Download for Windows</a></li></ul></nav></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Learn</h2><nav aria-label="Learn"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../how-it-works.html" data-discover="true">How it works</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../modes.html" data-discover="true">Simulation modes</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../play.html" data-discover="true">Games</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../tutorials.html" data-discover="true">Tutorials</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../blog.html" data-discover="true">Blog</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../roadmap.html" data-discover="true">Roadmap</a></li></ul></nav></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Support</h2><nav aria-label="Support"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../help.html" data-discover="true">Help</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../support.html" data-discover="true">Support center</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../faq.html" data-discover="true">FAQ</a></li></ul></nav></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Company</h2><nav aria-label="Company"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../about.html" data-discover="true">About us</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../affiliate.html" data-discover="true">Affiliate program</a></li></ul></nav></div><div class="col-span-1"><h2 class="t-label mb-2 font-semibold text-foreground md:mb-3">Legal</h2><nav aria-label="Legal"><ul class="md:space-y-1"><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../terms-of-service.html" data-discover="true">Terms of service</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../privacy-policy.html" data-discover="true">Privacy policy</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../refund-policy.html" data-discover="true">Refund policy</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../cookie-policy.html" data-discover="true">Cookie policy</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../acceptable-use.html" data-discover="true">Acceptable use</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../copyright-policy.html" data-discover="true">Copyright policy</a></li><li><a class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1" href="../data-deletion.html" data-discover="true">Data deletion</a></li><li><button type="button" class="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground md:min-h-0 md:py-1 text-left">Cookie preferences</button></li></ul></nav></div></div><div class="flex flex-wrap gap-x-4 gap-y-1 border-t border-border pt-6"><a aria-current="true" class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 font-semibold text-foreground" href="../index.html" data-discover="true">English</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../es.html" data-discover="true">Español</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../fr.html" data-discover="true">Français</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../de.html" data-discover="true">Deutsch</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../ja.html" data-discover="true">日本語</a><a class="inline-flex min-h-11 items-center text-[13px] transition-colors md:min-h-0 md:py-1 text-muted-foreground hover:text-foreground" href="../zh-tw.html" data-discover="true">繁體中文</a></div><p class="t-caption mt-4 font-normal text-muted-foreground">© 2026 Ball Engine Studios. All rights reserved.</p></div></footer><section aria-label="Notifications alt+T" tabindex="-1" aria-live="polite" aria-relevant="additions text" aria-atomic="false"></section></div></div>
+  <noscript>
+    <div style="padding: 20px; font-family: sans-serif;">
+      <!-- No heading elements in here. This block is copied into EVERY prerendered page, so a
+           heading here gave all 1,400 URLs a second, homepage-worded H1 next to the page's own. -->
+      <p><strong>BallEngine</strong> (also written <strong>Ball Engine</strong>, at
+        <strong>ballengine.app</strong>) is a browser-based bouncing ball simulator
+        and creator studio for music-synced 2D and 3D physics videos.</p>
+
+      <p><strong>Plans</strong></p>
+      <ul>
+        <!-- Keep in sync with src/constants/pricing.ts and the SoftwareApplication offers above.
+             These drifted to a stale $29/$159, then $99, and contradicted the JSON-LD on the same page. -->
+        <li><strong>Starter Studio:</strong> Free. The full Studio with a live preview; exporting a video needs a plan.</li>
+        <li><strong>Lite:</strong> $19/mo. No watermark, 1080p, commercial license, 15 exports per month (one video every other day).</li>
+        <li><strong>Creator:</strong> $29/mo. Every 2D setting, commercial license, no watermark, 30 exports per month, Automation Lite included (60 posts a month). The recommended plan.</li>
+        <li><strong>Pro:</strong> $49/mo. Everything in Creator, 3D settings, 4K rendering, your own watermark text, 60 exports per month, Automation Growth included (240 posts a month).</li>
+        <li><strong>Elite:</strong> $99/mo. Everything in Pro, 150 exports per month, Automation Scale included (600 posts a month), 200 GB storage.</li>
+        <li><strong>Agency:</strong> $199/mo. Everything in Elite, 500 exports per month, Automation Max included (2,000 posts a month), 500 GB storage.</li>
+      </ul>
+
+      <nav>
+        <a href="../index.html">Home</a> |
+        <a href="../modes.html">All modes</a> |
+        <a href="../play.html">Games</a> |
+        <a href="../plans.html">Pricing</a> |
+        <a href="../support.html">Support</a>
+      </nav>
+
+      <p>BallEngine, ballengine.app</p>
+      <p>Follow BallEngine:</p>
+      <nav>
+        <a href="https://youtube.com/@funcirclegames">YouTube</a> |
+        <a href="https://www.instagram.com/funcirclegames">Instagram</a> |
+        <a href="https://www.tiktok.com/@funcirclegames">TikTok</a> |
+        <a href="https://x.com/funcirclegames">Twitter / X</a> |
+        <a href="https://www.threads.com/@funcirclegames">Threads</a>
+      </nav>
+    </div>
+  </noscript>
+
+
+
+<!-- Cloudflare Pages Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "61906db637f044638bdee99f6e5c9222"}'></script><!-- Cloudflare Pages Analytics --><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5a0ea9ddda04043',t:'MTc5NDYwNTgzMw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5a0ea9ddda04043',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body></html>
