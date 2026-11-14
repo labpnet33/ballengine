@@ -26,6 +26,12 @@ jobs:
           node --check cloud-saves/music-bank.mjs
           node --check scripts/ballengine-cloud-saves.js
       - name: Check media encoder
-        run: ffmpeg -version | head -n 1
+        run: |
+          if ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+          node --check scripts/test-music-api.cjs
       - name: Test MP3 upload, MIDI, cloud Song Library and playback
         run: node scripts/test-music-api.cjs
