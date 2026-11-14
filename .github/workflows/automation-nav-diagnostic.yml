@@ -1,0 +1,22 @@
+name: Diagnose live Automation page navigation
+on:
+  push:
+    branches: [fix/production-home-route]
+    paths:
+      - scripts/test-live-automation-nav.cjs
+      - .github/workflows/automation-nav-diagnostic.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-nav:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install Playwright
+        run: npm install --prefix "$RUNNER_TEMP/automation-nav" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Test production routes and tab clicks
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/automation-nav/node_modules" node scripts/test-live-automation-nav.cjs
