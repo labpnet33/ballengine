@@ -66,7 +66,7 @@
   // Dismiss only these two identifiable popups; leave Studio controls intact.
   const walkthroughPrompts=[
     {title:/^Quick tour\??$/i,detail:/We show you the main buttons\./i},
-    {title:/^Shuffle just one part$/i,detail:/Like your video but not the trails\?/i}
+    {title:/^Shuffle (?:just )?one part$/i,detail:/Like your video but not the trails\?|Tap a part to get a new random version of just that part/i}
   ];
   const suppressedWalkthroughs=new WeakSet();
   function suppressWalkthrough(scope) {
@@ -75,7 +75,7 @@
     if(scope.matches?.('h1,h2,h3,h4,h5,p,span,strong,b,div'))nodes.push(scope);
     nodes.push(...scope.querySelectorAll('h1,h2,h3,h4,h5,p,span,strong,b,div'));
     for(const node of nodes) {
-      const title=node.textContent?.trim().replace(/\\s+/g,' ');
+      const title=node.textContent?.trim().replace(/\s+/g,' ');
       if(!title || title.length>80)continue;
       const prompt=walkthroughPrompts.find(p=>p.title.test(title));
       if(!prompt)continue;
@@ -122,6 +122,24 @@
       section.style.setProperty('display','none','important');
     }
   }
+  // A captured first-run tip sometimes mounts as a full-screen (z-2100)
+  // modal after the tour check. Its backdrop blocks the real Record button.
+  // Only dismiss these two known instructional prompts; never suppress
+  // general dialogs, export progress, error feedback or settings.
+  function suppressKnownTourBackdrop() {
+    for (const el of document.querySelectorAll('div.fixed')) {
+      if (typeof el.className!=='string' || !el.className.includes('z-[2100]')) continue;
+      const content=(el.textContent||'').replace(/\s+/g,' ').trim();
+      const isShuffle=/\bShuffle (?:just )?one part\b/i.test(content) &&
+        /Tap a part to get a new random version|Like your video but not the trails/i.test(content);
+      const isTour=/\bQuick tour\??\b/i.test(content) &&
+        /We show you the main buttons/i.test(content);
+      if (!isShuffle&&!isTour) continue;
+      el.style.setProperty('display','none','important');
+      el.style.setProperty('pointer-events','none','important');
+      console.info('[BallEngine preview] Dismissed an obsolete onboarding overlay blocking Studio controls.');
+    }
+  }
   let walkthroughQueued=false;
   const scheduledScopes=new Set();
   function scheduleWalkthroughCheck(scope) {
@@ -131,6 +149,7 @@
     queueMicrotask(()=>{
       walkthroughQueued=false;
       for(const node of scheduledScopes){suppressWalkthrough(node);suppressPlanLoadError(node);}
+      suppressKnownTourBackdrop();
       scheduledScopes.clear();
     });
   }
