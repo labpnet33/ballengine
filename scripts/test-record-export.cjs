@@ -42,7 +42,7 @@ async function run(){
   let downloadPromise;
   try{
     report.phase='loading';
-    await page.goto('http://127.0.0.1:'+port+'/studio?mode=ball-crush',{waitUntil:'domcontentloaded',timeout:45000});
+    await page.goto('http://127.0.0.1:'+port+'/studio?mode=rhythmic',{waitUntil:'domcontentloaded',timeout:45000});
     await page.waitForTimeout(10000);
     report.url=page.url();
     report.browserCapabilities=await page.evaluate(()=>({VideoEncoder:typeof VideoEncoder,MediaRecorder:typeof MediaRecorder,OffscreenCanvas:typeof OffscreenCanvas,WebAssembly:typeof WebAssembly}));
@@ -104,6 +104,17 @@ async function run(){
   finally{
     try{await page.screenshot({path:path.join(artifacts,'studio-final.png')});}catch{}
     fs.writeFileSync(path.join(artifacts,'report.json'),JSON.stringify(report,null,2));
+    console.log('RECORD_EXPORT_SUMMARY '+JSON.stringify({
+      phase:report.phase,started:report.started,downloaded:report.downloaded,
+      mode:report.url,clickBlockedByModal:report.clickBlockedByModal,
+      modalTexts:report.visibleModals?.map(x=>x.text),
+      recordButton:report.recordButton,browserCapabilities:report.browserCapabilities,
+      errors:report.errors?.filter(e=>e.type==='test'||e.type==='pageerror'),
+      after5Seconds:report.after5Seconds?.slice(-1700),
+      finalVisibleText:report.finalVisibleText?.slice(-1900),
+      snapshots:report.snapshots?.slice(-5),
+      download:report.download
+    }));
     console.log('RECORD_EXPORT_REPORT '+JSON.stringify(report).slice(0,20000));
     await browser.close();
     await new Promise(resolve=>server.close(resolve));
