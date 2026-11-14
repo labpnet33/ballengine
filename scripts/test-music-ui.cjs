@@ -107,7 +107,13 @@ async function main(){
       await page.waitForTimeout(5000);
       report.midiUploadCompleted=report.requests.some(r=>r.path==='/api/upload'&&r.method==='POST'&&[200,201].includes(r.status));
       const m=await api('/api/melodies');
-      if(m.status===200){const item=m.data.find(x=>String(x.name).startsWith('ui-generated-midi'));if(item)midiId=item.id;}
+      if(m.status===200){
+        const item=m.data.find(x=>String(x.name).startsWith('ui-generated-midi'));
+        if(item){
+          midiId=item.id;
+          try{midiAssetId=new URL(item.url).pathname.split('/api/assets/')[1]||null;}catch{}
+        }
+      }
       await screenshot('after-midi-upload');
     }
     report.phase='passed';
@@ -121,6 +127,7 @@ async function main(){
     if(libraryKey){
       try{if(midiId)await api('/api/melodies/'+midiId,'DELETE');}catch{}
       try{if(newSongId)await api('/api/songs/'+newSongId,'DELETE');}catch{}
+      try{if(midiAssetId)await api('/api/assets/'+midiAssetId,'DELETE');}catch{}
       try{const usage=await api('/api/storage/usage');report.remainingMedia=usage.data.media_count;}catch{}
     }
     try{await screenshot('final');}catch{}
