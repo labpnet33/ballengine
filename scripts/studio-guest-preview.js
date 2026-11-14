@@ -1,6 +1,7 @@
 /* Preview-only local guest adapter for the captured BallEngine frontend.
  * Does not authenticate against ballengine.app or unlock subscriptions.
- * All requests other than the local GET /api/auth/me are left untouched.
+ * The local guest profile and optional UI lock configuration are resolved locally.
+ * This does not grant paid entitlements, credits, or access to third-party APIs.
  */
 (()=>{
   'use strict';
@@ -29,7 +30,18 @@
         headers:{'Content-Type':'application/json','Cache-Control':'no-store'}
       }));
     }
+    // Studio's settings panel waits for its UI-lock configuration request to
+    // complete. The original private endpoint is not part of the public capture.
+    // An empty local configuration means no additional server-defined overrides;
+    // the frontend's built-in FREE/Creator/Pro plan rules remain in place.
+    if(url.origin===window.location.origin &&
+       url.pathname==='/api/ui-locks' && method==='GET'){
+      return Promise.resolve(new Response('[]',{
+        status:200,
+        headers:{'Content-Type':'application/json','Cache-Control':'no-store'}
+      }));
+    }
     return nativeFetch(input,init);
   };
-  console.info('[BallEngine preview] Local FREE guest identity enabled. Cloud APIs and premium features are not emulated.');
+  console.info('[BallEngine preview] Local FREE guest and empty UI-lock configuration enabled; premium/server features are not emulated.');
 })();
