@@ -17,3 +17,9 @@ jobs:
         with:
           persist-credentials: false
       - run: node scripts/audit-publishing.cjs
+      - name: Install Playwright
+        run: npm install --prefix "$RUNNER_TEMP/studio-qa" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original Studio
+        run: node scripts/build-original-studio.cjs
+      - name: Inspect original Automation and Publish UI
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/studio-qa/node_modules" node scripts/test-publishing-audit-ui.cjs
