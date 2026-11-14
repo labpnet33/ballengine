@@ -153,6 +153,20 @@ const newBundle=path.join(staticCapture,'assets','index-3pf76ICO.js');
 const digest=f=>crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex');
 if (digest(originalBundle)!==digest(newBundle))
   throw new Error('Main app bundle differs between original HTML capture and logged-in resources. Review before publishing.');
+// The original captured React /home page redirects to /login while its
+// authentication context has no current user. This independently hosted
+// preview provides a local guest session rather than upstream authentication.
+// Use it as a fallback for the existing /home component only; leave all other
+// React routes and the original layout untouched.
+const homeRouteBefore='dys=()=>{var k;const{user:e,loading:t}=Na(),{tDynamic:n,locale:a}=We()';
+const homeRouteAfter='dys=()=>{var k;const{user:beAuthUser,loading:t}=Na(),e=beAuthUser||window.__BALLENGINE_LOCAL_GUEST__||null,{tDynamic:n,locale:a}=We()';
+let capturedApp=fs.readFileSync(originalBundle,'utf8');
+if (capturedApp.split(homeRouteBefore).length!==2)
+  throw new Error('Expected exactly one original /home auth guard. Review frontend version before changing routes.');
+capturedApp=capturedApp.replace(homeRouteBefore,homeRouteAfter);
+fs.writeFileSync(originalBundle,capturedApp,'utf8');
+console.log('Local guest fallback enabled in original /home React route.');
+
 
 const soundsDir=path.join(web,'sfx');
 const soundCount=fs.readdirSync(soundsDir).filter(n=>n.endsWith('.wav')).length;
