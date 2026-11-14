@@ -1,14 +1,14 @@
 name: Smoke-test original BallEngine Studio preview
 on:
   push:
-    branches: [preview/original-studio-assets]
+    branches: [preview/original-studio-assets, fix/production-home-route]
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   studio-smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
@@ -25,6 +25,10 @@ jobs:
       - name: Run browser smoke test
         run: |
           CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/studio-qa/node_modules" node scripts/test-original-studio.cjs
+      - name: Record and verify a real MP4 export
+        timeout-minutes: 8
+        run: |
+          CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/studio-qa/node_modules" node scripts/test-record-export.cjs
       - name: Save screenshot and report
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
