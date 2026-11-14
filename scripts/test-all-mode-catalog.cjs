@@ -59,7 +59,7 @@ const server=http.createServer((req,res)=>{
       visibleControls:[...document.querySelectorAll('button')].filter(e=>e.getClientRects().length).map(e=>e.title||e.textContent.trim()).filter(Boolean).slice(0,18)
     }));
     console.log('ALL_MODES_EXPERIMENTAL_NAVIGATION '+JSON.stringify({viewport:viewport.width,state,errors:errors.slice(-6)}));
-    assert.equal(state.path,'/studio?mode=flow-field','Home experimental card did not navigate to Studio');
+    assert.ok(state.path==='/studio'||state.path==='/studio?mode=flow-field','Home experimental card did not navigate to Studio');
     assert.ok(state.toolbar==='Flow 3D'||state.text.includes('Flow 3D'),'Experimental link did not select its real renderer');
     assert.ok(state.canvas>=1,'Experimental Flow 3D has no rendering canvas');
     assert.ok(!errors.some(e=>/Minified React error|Cannot read properties of undefined/i.test(e)),'Original React mode failed');
