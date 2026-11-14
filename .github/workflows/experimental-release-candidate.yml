@@ -1,0 +1,27 @@
+name: Validate release candidate for 27 simulation modes
+on:
+  push:
+    branches: [fix/production-home-route]
+    paths:
+      - scripts/build-original-studio.cjs
+      - scripts/test-released-mode-registry.cjs
+      - .github/workflows/experimental-release-candidate.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  release-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install browser controller
+        run: npm install --prefix "$RUNNER_TEMP/release-candidate" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original Studio with QA-gated experimental releases
+        env:
+          BALLENGINE_RELEASE_EXPERIMENTAL: '1'
+        run: node scripts/build-original-studio.cjs
+      - name: Verify released mode registry, native controls, and homepage
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/release-candidate/node_modules" node scripts/test-released-mode-registry.cjs
