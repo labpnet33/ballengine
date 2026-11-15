@@ -58,7 +58,7 @@
     // Send only these supported endpoints to our independent Worker and keep
     // all the existing React UI, MIDI parser, audio slicer and file picker.
     const isCloudApi=url.origin===location.origin &&
-      (/^\/api\/(?:saves|upload|songs|melodies|song-bank|xmidi|guest-publishing)(?:\/|$)/.test(url.pathname)||url.pathname==='/api/storage/usage');
+      (/^\/api\/(?:saves|upload|songs|melodies|song-bank|xmidi|guest-publishing|guest-social)(?:\/|$)/.test(url.pathname)||url.pathname==='/api/storage/usage');
     if(!isCloudApi)return delegate(input,init);
     try{
       const headers=new Headers((init&&init.headers)||(input instanceof Request?input.headers:undefined));
