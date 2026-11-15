@@ -310,6 +310,67 @@ if(capturedApp.split(dominoDefault).length!==2)
 capturedApp=capturedApp.replace(dominoDefault,'domino3DCount:540,domino3DLayout:"CIRCUIT_ROUND"');
 console.log('Domino 3D new-project default reduced to 540 bodies; full control remains available.');
 
+// The original public capture omitted all realistic Phonk Drop WEBP skins.
+// In the independent deployed site, substitute small self-contained vector
+// textures rather than leaving broken/blank faces in a live simulation.
+// The original illustrated skins and custom face/hand uploads remain intact.
+const offlineFaceColours={
+  classic_red:['#f87171','#991b1b','#fff1f2'],
+  crimson_ink:['#fb7185','#4c0519','#ffe4e6'],
+  void_purple:['#c084fc','#581c87','#f3e8ff'],
+  cryo_cyan:['#67e8f9','#155e75','#ecfeff'],
+  acid_yellow:['#fde047','#854d0e','#fef9c3'],
+  hellfire:['#fb923c','#9a3412','#ffedd5'],
+  bloodshot:['#fda4af','#881337','#fff1f2'],
+  shadow_static:['#a1a1aa','#27272a','#f4f4f5'],
+  golden_cursed:['#facc15','#a16207','#fef9c3'],
+  ghost_blue:['#93c5fd','#1e40af','#eff6ff']
+};
+function offlinePhonkVector(skin,part){
+  const palette=offlineFaceColours[skin]||offlineFaceColours.classic_red;
+  const [base,dark,bright]=palette;
+  const seed=Object.keys(offlineFaceColours).indexOf(skin);
+  const eyes=seed%3===0?'#fef9c3':seed%3===1?'#e0f2fe':'#ffffff';
+  if(part==='hands')return [
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
+    '<g fill="'+base+'" stroke="'+dark+'" stroke-width="15" stroke-linejoin="round">',
+    '<path d="M83 475L33 390Q15 355 47 341Q66 331 87 351L58 281Q45 247 72 236Q96 230 112 265L116 205Q117 170 146 173Q166 178 167 208L180 254Q189 222 214 231Q236 245 224 273L217 363Q219 438 179 472Z"/>',
+    '<path d="M429 475L479 390Q497 355 465 341Q446 331 425 351L454 281Q467 247 440 236Q416 230 400 265L396 205Q395 170 366 173Q346 178 345 208L332 254Q323 222 298 231Q276 245 288 273L295 363Q293 438 333 472Z"/>',
+    '</g><path d="M109 395L172 420M403 395L340 420" stroke="'+bright+'" stroke-width="9" stroke-linecap="round"/></svg>'
+  ].join('');
+  return [
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
+    '<defs><radialGradient id="skin" cx="43%" cy="30%" r="73%">',
+    '<stop offset="0" stop-color="'+bright+'"/><stop offset=".48" stop-color="'+base+'"/>',
+    '<stop offset="1" stop-color="'+dark+'"/></radialGradient></defs>',
+    '<ellipse cx="256" cy="251" rx="202" ry="222" fill="url(#skin)" stroke="'+dark+'" stroke-width="15"/>',
+    '<path d="M97 201Q151 155 205 194M307 193Q363 149 415 204" fill="none" stroke="'+dark+'" stroke-width="22" stroke-linecap="round"/>',
+    '<ellipse cx="174" cy="241" rx="54" ry="60" fill="'+eyes+'" stroke="'+dark+'" stroke-width="11"/>',
+    '<ellipse cx="338" cy="241" rx="54" ry="60" fill="'+eyes+'" stroke="'+dark+'" stroke-width="11"/>',
+    '<ellipse cx="180" cy="252" rx="15" ry="30" fill="'+dark+'"/>',
+    '<ellipse cx="333" cy="252" rx="15" ry="30" fill="'+dark+'"/>',
+    '<path d="M116 334Q253 442 396 331Q378 443 257 453Q141 447 116 334Z" fill="'+dark+'" stroke="'+dark+'" stroke-width="8"/>',
+    '<path d="M129 347Q258 400 383 345Q358 405 258 413Q166 405 129 347Z" fill="#fff"/>',
+    '<path d="M178 369V395M224 381V407M275 384V407M324 371V397" fill="none" stroke="'+dark+'" stroke-width="6"/>',
+    '<path d="M77 322Q98 314 112 319M395 319Q414 315 435 325" fill="none" stroke="'+bright+'" stroke-width="9" stroke-linecap="round"/>',
+    '</svg>'
+  ].join('');
+}
+const uncapturedRealisticAssets=new Map();
+for(const match of capturedApp.matchAll(/\/assets\/([a-z_]+)\.(face|hands)-[A-Za-z0-9_-]+\.webp/g)){
+  if(offlineFaceColours[match[1]]&&!fs.existsSync(path.join(web,match[0].slice(1))))
+    uncapturedRealisticAssets.set(match[0],{skin:match[1],part:match[2]});
+}
+if(uncapturedRealisticAssets.size!==20)
+  throw new Error('Expected 20 missing realistic Phonk skins; discovered '+uncapturedRealisticAssets.size);
+for(const [asset,{skin,part}] of uncapturedRealisticAssets){
+  const dataUri='data:image/svg+xml,'+encodeURIComponent(offlinePhonkVector(skin,part));
+  capturedApp=capturedApp.replaceAll('"'+asset+'"','"'+dataUri+'"');
+}
+capturedApp=capturedApp.replace('title:"Realistic trollface"','title:"Offline vector face packs"');
+console.log('Restored',uncapturedRealisticAssets.size,'uncaptured Phonk face/hand assets as independent vector fallbacks.');
+
+
 
 fs.writeFileSync(originalBundle,capturedApp,'utf8');
 // Vercel's static build would otherwise report READY even if the edited 14MB
