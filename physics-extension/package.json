@@ -6,12 +6,17 @@
   "description": "Opt-in physics engine prototypes; original BallEngine is unaffected",
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "smoke": "node test/smoke.mjs"
+    "smoke": "node test/smoke.mjs",
+    "build": "node ../scripts/build-original-studio.cjs"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.21.0",
     "planck": "1.5.1",
-    "three": "0.187.0"
+    "three": "0.187.0",
+    "esbuild": "0.25.12",
+    "mp4-muxer": "5.2.2"
   },
-  "engines": { "node": ">=22" }
+  "engines": {
+    "node": ">=22"
+  }
 }
