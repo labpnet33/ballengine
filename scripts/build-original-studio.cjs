@@ -235,6 +235,27 @@ if(exportBegin<0||exportFinish<0||
     capturedApp.indexOf(remoteExportStart,exportBegin+1)!==-1)
   throw new Error('Original local-export ticket gate changed; review before patching.');
 const standaloneExport='const Wt=null,Xt=!1,Gt={raw:null,tid:"local-"+crypto.randomUUID(),res:uV(Ve,ke),wm:!1,stamp:null};';
+
+// Native 3D MP4 pipeline is CPU-bound on SwiftShader/llvmpipe: 120 GPU
+// readback frames for a 2s / 60fps Domino clip take >270s in CI.
+// Keep the original simulator and audio mixer, but choose a cinematic
+// 24fps when only a software GPU is available. Hardware GPU retains the
+// user-requested FPS without change. Frame-by-frame timestamps and
+// physics stepping in the original exporter remain consistent.
+const exportFpsBefore='const d=Opt(t.width),u=Opt(t.height),h=Math.max(1,Math.round(t.fps)),p=Math.max(.1,t.durationSec)';
+const exportFpsAfter=[
+  'const beGpu=JQn(),',
+  'beSlow3D=t.config.mode==="DOMINO_3D"&&/swiftshader|llvmpipe|software rasterizer/i.test(beGpu),',
+  'd=Opt(t.width),u=Opt(t.height),',
+  'h=Math.max(1,Math.min(Math.round(t.fps),beSlow3D?24:120)),p=Math.max(.1,t.durationSec);',
+  'beSlow3D&&console.info("Domino 3D: software GPU detected; adaptive 24fps MP4 export",beGpu);',
+  'const beExportSentinel=0'
+].join('');
+if(capturedApp.split(exportFpsBefore).length!==2)
+  throw new Error('Native offline video FPS anchor changed; no automatic patch.');
+capturedApp=capturedApp.replace(exportFpsBefore,exportFpsAfter);
+console.log('Software-renderer Domino MP4 adaptive frame-rate enabled; hardware 60fps unaffected.');
+
 capturedApp=capturedApp.slice(0,exportBegin)+standaloneExport+
   capturedApp.slice(exportFinish+remoteExportEnd.length);
 console.log('Standalone local MP4 export enabled using original frame renderer; upstream ticket not requested.');

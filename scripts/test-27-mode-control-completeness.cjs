@@ -31,7 +31,21 @@ const server=http.createServer((req,res)=>{
     await random.waitFor({state:'visible',timeout:9000});
     assert.ok(await random.isEnabled(),'Native Randomize disabled');
     const priorMode=(await title.innerText()).trim();
-    await random.click({timeout:24000});
+    try {
+      await random.click({timeout:14000});
+    } catch(err) {
+      // Animation-heavy WebGL may continuously move an otherwise enabled
+      // button in software Chrome. Retry via a real DOM click, then require
+      // the native undo state to change. Do not mask JS/handler failures.
+      const hit=await random.evaluate(el=>{
+        const box=el.getBoundingClientRect(),top=document.elementFromPoint(box.left+box.width/2,box.top+box.height/2);
+        const unobstructed=top===el||el.contains(top);
+        if(!el.disabled&&unobstructed)el.click();
+        return {unobstructed,disabled:el.disabled,topTag:top?.tagName,topTitle:top?.getAttribute('title')};
+      });
+      if(!hit.unobstructed||hit.disabled)throw err;
+      console.log('MODE_SOFTWARE_GL_CLICK_FALLBACK '+JSON.stringify({slug,hit,reason:String(err).slice(0,140)}));
+    }
     const back=page.locator('button[title="Previous roll"]').first();
     // Native roll/history state is applied asynchronously after the first
     // render update; do not fail on a transient disabled button.
@@ -43,7 +57,21 @@ const server=http.createServer((req,res)=>{
       // Some simulation schemas store the first generated roll as the
       // history baseline; a second native roll must permit undo.
       await random.waitFor({state:'visible',timeout:12000});
-      await random.click({timeout:24000});
+      try {
+      await random.click({timeout:14000});
+    } catch(err) {
+      // Animation-heavy WebGL may continuously move an otherwise enabled
+      // button in software Chrome. Retry via a real DOM click, then require
+      // the native undo state to change. Do not mask JS/handler failures.
+      const hit=await random.evaluate(el=>{
+        const box=el.getBoundingClientRect(),top=document.elementFromPoint(box.left+box.width/2,box.top+box.height/2);
+        const unobstructed=top===el||el.contains(top);
+        if(!el.disabled&&unobstructed)el.click();
+        return {unobstructed,disabled:el.disabled,topTag:top?.tagName,topTitle:top?.getAttribute('title')};
+      });
+      if(!hit.unobstructed||hit.disabled)throw err;
+      console.log('MODE_SOFTWARE_GL_CLICK_FALLBACK '+JSON.stringify({slug,hit,reason:String(err).slice(0,140)}));
+    }
       await page.waitForFunction(()=>{
         const prev=document.querySelector('button[title="Previous roll"]');
         return !!prev&&!prev.disabled;
