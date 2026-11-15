@@ -248,7 +248,22 @@
     // repeated guest form appeared before their content, making them seem
     // stuck on the Overview screen. Preserve their original content first.
     if(route!=='/automation'&&route!=='/automation/publish')return null;
-    return automationWarning()?.parentElement||main;
+    const warning=automationWarning();
+    if(warning?.parentElement&&warning.parentElement!==main)
+      return warning.parentElement;
+    // Publish has no legacy warning card. Appending the guest planner to
+    // <main> puts it behind the fixed 280px sidebar because the original
+    // content is nested in a centered page container. Mount next to the
+    // existing Automation tabs/content, not outside their layout.
+    const tabs=main.querySelector('nav[aria-label="Automation"]');
+    if(tabs?.parentElement&&tabs.parentElement!==main&&
+       tabs.parentElement.tagName!=='FORM')
+      return tabs.parentElement;
+    const container=main.querySelector(':scope > .container-page, :scope > div > .container-page');
+    if(container)return container;
+    const content=[...main.children].find(e=>e.tagName==='DIV'&&
+      e.querySelector('nav[aria-label="Automation"]'));
+    return content||main;
   }
   function clarifyAutomationStatus(){
     const main=automationMain();
@@ -270,7 +285,11 @@
       ['Autopilot is not part of your current plan.',
        'Automatic posting is not configured. Set manual posting reminders under Overview or Publish.'],
       ['Autopilot posts for you on a rhythm you set once. Growth, Scale and Max include it, and so do Pro, Elite and Agency.',
-       'Recurring manual posting reminders are available: choose a video, platforms, and a daily or weekly schedule. Your queue saves the next posting dates, but videos are not uploaded automatically.']
+       'Recurring manual posting reminders are available: choose a video, platforms, and a daily or weekly schedule. Your queue saves the next posting dates, but videos are not uploaded automatically.'],
+      ['Set your posting times once and add videos. Autopilot posts them for you, and the calendar shows exactly which video goes out on which day. Open or drag any video to change it.',
+       'Agency / Max guest draft mode: edit and save your posting times in this browser. Automatic uploads are not active until you connect a supported publishing backend. Use Publish to create cloud-backed posting reminders.'],
+      ['Where Autopilot posts and at what times. Each time repeats on the days you pick, and every video in line takes the next free time.',
+       'Choose times for your local draft schedule. No video is automatically published from this guest preview.']
     ]);
     for(const e of main.querySelectorAll('div,p,span')){
       if(e.children.length!==0||e.closest('[data-be-guest-publisher]'))continue;
@@ -283,7 +302,10 @@
       const nativeDescription='Recurring manual posting reminders are available: choose a video, platforms, and a daily or weekly schedule. Your queue saves the next posting dates, but videos are not uploaded automatically.';
       const intro=[...main.querySelectorAll('p,div,span')]
         .find(e=>e.children.length===0&&e.textContent?.trim()===nativeDescription);
-      if(intro&&!main.querySelector('[data-be-autopilot-reminder-link]')){
+      const nativeIntro=[...main.querySelectorAll('p')]
+        .find(e=>e.textContent?.startsWith('Agency / Max guest draft mode:'));
+      const actionAfter=intro||nativeIntro;
+      if(actionAfter&&!main.querySelector('[data-be-autopilot-reminder-link]')){
         const go=button('Set recurring posting reminder',()=>{
           const publish=[...main.querySelectorAll('nav[aria-label="Automation"] button')]
             .find(e=>e.textContent?.trim()==='Publish');
@@ -296,7 +318,7 @@
         },true);
         go.dataset.beAutopilotReminderLink='1';
         go.style.marginTop='12px';
-        intro.insertAdjacentElement('afterend',go);
+        actionAfter.insertAdjacentElement('afterend',go);
       }
     }
     const card=automationWarning();
@@ -335,6 +357,13 @@
     const root=node('section',null,css.box);
     root.dataset.beGuestPublisher='1';
     root.setAttribute('aria-label','Guest publishing planner');
+    if(!studioHost){
+      // Keep the guest panel inside the available Automation content width.
+      root.style.width='100%';
+      root.style.maxWidth='100%';
+      root.style.minWidth='0';
+      root.style.boxSizing='border-box';
+    }
     const heading=node('h3','Guest publishing planner · Manual delivery',css.headline);
     const notice=node('p','Save video drafts, schedule real reminders and organize a posting queue. No social accounts are connected to this guest library, so scheduled videos are NOT automatically posted to YouTube, TikTok, Instagram or Facebook.',css.note);
     const form=node('div');

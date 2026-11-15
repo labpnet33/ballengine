@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/guest-social-publishing
+      - fix/automation-social-production-20261115
     paths:
       - 'cloud-saves/**'
       - 'scripts/ballengine-guest-social.js'
