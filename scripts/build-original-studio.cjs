@@ -249,7 +249,9 @@ const experimentalSlugs=[
   'marble-race-3d','attractor','flow-field','metaballs','galaxy','fireflies',
   'pendulum-basin','slime','crowd-evacuation'
 ];
-if(process.env.BALLENGINE_RELEASE_EXPERIMENTAL==='1'){
+// This feature branch is a testable release candidate; set the variable to
+// '0' to revert to the original metadata without editing the captured app.
+if(process.env.BALLENGINE_RELEASE_EXPERIMENTAL!=='0'){
   let released=0;
   for(const slug of experimentalSlugs){
     const re=new RegExp('(\{mode:"[A-Z0-9_]+",slug:"'+slug+'",[^{}]{0,800},status:)"development"','g');
