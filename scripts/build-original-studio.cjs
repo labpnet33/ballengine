@@ -308,6 +308,37 @@ capturedApp=capturedApp.replace(exportFpsBefore,exportFpsAfter);
 console.log('Software-renderer Domino MP4 adaptive frame-rate enabled; hardware 60fps unaffected.');
 console.log('Standalone local MP4 export enabled using original frame renderer; upstream ticket not requested.');
 
+// ADAPTIVE PREVIEW QUALITY: The captured Stage3D already reports its FPS
+// and scales the real renderer with Mfa.dprFor(), but AUTO stops at DPR=1,
+// and its adaptive controller is disabled on mobile. Extend the existing
+// controller (no new rendering engine, no changes to physics or mode values).
+// On sustained <52fps previews, allow an extra 0.75x DPR rung, cutting
+// GPU fragment/pixel fill by up to 43.75% relative to DPR=1.
+// Once the scene is smooth again, the native controller restores sharpness.
+// Explicit STANDARD/SHARP/MAX settings are unchanged. Recording/offline
+// rendering and software-GPU paths retain their original sizing logic.
+const previewPerformanceAnchors=[
+  ['Ree=[1,1.25,1.5,1.75]','Ree=[.75,1,1.25,1.5,1.75]'],
+  ['class Mfa{constructor(){Q(this,"level",0);',
+   'class Mfa{constructor(){Q(this,"level",1);'],
+  ['dprFor(t){if(iie()!==null||wc())return a2();',
+   'dprFor(t){if(iie()!==null||wc()||typeof window<"u"&&(window.isRecording||window.isOfflineRendering===!0||window.location.search.includes("isWorker=true")))return a2();'],
+  ['const o=a==="AUTO"&&Jx.light3D()?S8n:1;',
+   'const o=a==="AUTO"&&Jx.light3D()?S8n:a==="AUTO"?.75:1;'],
+  ['autoActive(t){return!(bdt(t)!=="AUTO"||iie()!==null||wc()||DP())}',
+   'autoActive(t){return!(bdt(t)!=="AUTO"||iie()!==null||wc()||typeof window<"u"&&(window.isRecording||window.isOfflineRendering===!0||window.location.search.includes("isWorker=true")))}'],
+  ['const o=typeof window<"u"&&window.devicePixelRatio||1,i=this.level<Ree.length-1&&Ree[this.level]<o;',
+   'const o=typeof window<"u"&&window.devicePixelRatio||1,i=this.level<Ree.length-1&&Ree[this.level]<(DP()?Math.min(o,A0e().max3DDpr):o);'],
+  ['reset(){this.level=0,this.belowSince=0,this.aboveSince=0,this.lastChange=performance.now()}',
+   'reset(){this.level=1,this.belowSince=0,this.aboveSince=0,this.lastChange=performance.now()}']
+];
+for(const [before,after] of previewPerformanceAnchors){
+  if(capturedApp.split(before).length!==2)
+    throw new Error('Native Stage3D performance anchor changed: '+before.slice(0,75));
+  capturedApp=capturedApp.replace(before,after);
+}
+console.log('Adaptive AUTO Stage3D preview: 0.75 DPR fallback, mobile FPS feedback, original export quality preserved.');
+
 // QA-gated release of native experimental simulation controls. The captured
 // engines exist already; do not promote them to live until independently
 // verifying animation, controls, and MP4 export on this exact build.
