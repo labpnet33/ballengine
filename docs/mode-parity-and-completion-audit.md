@@ -40,7 +40,7 @@ These groupings describe architectural relationships; they are not assertions th
 
 **Offline Phonk face/hand compatibility** — replace uncaptured realistic WEBP references with 20 deterministic, locally encoded SVG illustrations, keep original bundled illustrated faces and custom uploads, and change the default from missing `bloodshot` texture to `grinface`. SVG fallback appearance is not pixel-identical to missing upstream assets.
 
-**Domino 3D export performance** — reduce NEW scene default from 1,600 to 540 physics bodies. The UI's higher object-count controls remain available. Software-rendered video may still be expensive; separate export regression measures this.
+**Domino 3D export performance** — reduce NEW scene default from 1,600 to 240 physics bodies. The UI's higher object-count controls remain available. Software-rendered video may still be expensive; separate export regression measures this.
 
 **Original UI and build safety** — retain original browser bundle and matching assets, validate unique expected replacements, run Node syntax check on generated JS, preserve 45-mode Home catalog, and guard against accidental changes to unrelated routes.
 
@@ -97,7 +97,7 @@ Every entry below has its own mode-specific native UI, an animated canvas, and a
 | Plinko 3D | 3D | Peg rows, bin count, drop delay, lean angle | None identified |
 | Chladni 3D | 3D | Pattern source, plate shape, sand amount | None identified |
 | Voxels 3D | 3D | Artwork, cube resolution, build order and ending | None identified |
-| Domino 3D | 3D | Run shape, spacing, timing, topple speed | Software renderer can be slow; default reduced from 1,600 to 540 bodies |
+| Domino 3D | 3D | Run shape, spacing, timing, topple speed | Software renderer can be slow; default reduced from 1,600 to 240 bodies |
 | Race 3D | 3D | Track geometry, slope, racers, identities | None identified |
 | Attractor 3D | 3D | Attractor equation, particles, trail length, zoom | High particle settings need device-specific validation |
 | Flow 3D | 3D | Particle count, lifetime, speed, trails | High particle settings need device-specific validation |
