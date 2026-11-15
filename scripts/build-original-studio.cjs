@@ -267,6 +267,39 @@ if(process.env.BALLENGINE_RELEASE_EXPERIMENTAL!=='0'){
   console.log('QA-gated native release enabled for',released,'simulation engines.');
 }
 
+
+// 2D MODE-PARITY FIX: Phonk Drop shares Rhythmic's physics/audio runner, but
+// upstream omitted PHONK_DROP from the curated QP randomizer schema, leaving
+// its Randomize toolbar button disabled despite working mode settings.
+// Extend the ORIGINAL randomizer rather than injecting a fake UI action.
+// The curated ranges respect the original mode's settings and avoid the
+// missing realistic-face images (use bundled illustrated faces instead).
+const randomizeGuard='function Ape(e){return!!e.randomizeChangeMode||!!QP[e.mode]}';
+const phonkSchema=[
+  'QP.PHONK_DROP={...QP.RHYTHMIC,weight:2,supportsSeed:!1,sound:"MELODY",',
+  'fields:{...QP.RHYTHMIC.fields,',
+  'phonkDropBuildLength:{kind:"int",min:10,max:35},',
+  'phonkDropFaceScale:{kind:"range",min:.35,max:.68},',
+  'phonkDropEyeGlow:{kind:"range",min:.4,max:1},',
+  'phonkDropClimaxBurst:{kind:"bool",chance:.85},',
+  'phonkDropEyeColor:{kind:"choice",options:["#ff2b2b","#fb7185","#a855f7","#22d3ee"]},',
+  'phonkDropFace:{kind:"choice",options:["grinface","watcher","oni","cyclops","cinder_imp","hollow_jester"]}',
+  '}};'
+].join('');
+if(capturedApp.split(randomizeGuard).length!==2)
+  throw new Error('Original randomizer guard changed: review native code before patching Phonk Drop.');
+if(capturedApp.includes('QP.PHONK_DROP='))
+  throw new Error('Phonk Drop already has a randomizer schema; update this patch.');
+capturedApp=capturedApp.replace(randomizeGuard,phonkSchema+randomizeGuard);
+// The capture's mode preset defaults to "bloodshot", whose WEBP face and
+// hands images were never captured. Start with a real bundled illustrated
+// skin so preview & export don't render missing image layers.
+const missingDefault='phonkDropFace:"bloodshot",phonkDropFaceScale:.45';
+if(capturedApp.split(missingDefault).length!==2)
+  throw new Error('Phonk Drop missing-image default changed; review capture.');
+capturedApp=capturedApp.replace(missingDefault,'phonkDropFace:"grinface",phonkDropFaceScale:.45');
+console.log('Phonk Drop native randomization and image-safe illustrated default enabled.');
+
 fs.writeFileSync(originalBundle,capturedApp,'utf8');
 // Vercel's static build would otherwise report READY even if the edited 14MB
 // browser bundle had a JavaScript syntax error.
