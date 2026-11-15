@@ -12,7 +12,7 @@ permissions:
 jobs:
   extension:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
@@ -29,6 +29,12 @@ jobs:
         run: |
           node scripts/build-original-studio.cjs
           node scripts/audit-mode-parity-static.cjs
+      - name: Install original Studio browser test controller
+        run: npm install --prefix "$RUNNER_TEMP/legacy-qa" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Verify native Home cards and all 27 added mode canvases
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/legacy-qa/node_modules" node scripts/test-released-mode-registry.cjs
+      - name: Verify six established mode sliders and native Record buttons
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/legacy-qa/node_modules" MODE_RANGE="0:6" node scripts/test-mode-option-interactivity.cjs
       - name: Verify the original captured browser bundle is untouched
         run: |
           git diff --exit-code -- captures/studio-browser/ballengine.app/assets/index-3pf76ICO.js
