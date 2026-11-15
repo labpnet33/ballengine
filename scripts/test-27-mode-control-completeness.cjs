@@ -46,8 +46,13 @@ const server=http.createServer((req,res)=>{
     assert.ok(await random.isEnabled(),'Native Randomize disabled');
     const priorMode=(await title.innerText()).trim();
     await random.click({timeout:12000});
-    await page.waitForTimeout(200);
     const back=page.locator('button[title="Previous roll"]').first();
+    // Native roll/history state is applied asynchronously after the first
+    // render update; do not fail on a transient disabled button.
+    await page.waitForFunction(()=>{
+      const prev=document.querySelector('button[title="Previous roll"]');
+      return !!prev&&!prev.disabled;
+    },{timeout:2800}).catch(()=>{});
     assert.ok(await back.isEnabled(),'Randomize did not create native undo history');
     const recording=page.locator('button[title="Instantly record a clean clip (C)"]').first();
     assert.ok(await recording.isVisible().catch(()=>false),'Record button disappeared');
