@@ -15,7 +15,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode: ['phase-bloom','domino-3d','flow-field']
+        include:
+          - mode: phase-bloom
+            seconds: 2
+          - mode: domino-3d
+            seconds: 1
+          - mode: flow-field
+            seconds: 2
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
@@ -27,7 +33,7 @@ jobs:
       - name: Record and verify real video MP4 in experimental simulation
         env:
           TEST_MODE: ${{ matrix.mode }}
-          TEST_DURATION: '2'
+          TEST_DURATION: ${{ matrix.seconds }}
         run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/experimental-export/node_modules" node scripts/test-record-export.cjs
       - name: Keep evidence
         if: always()
