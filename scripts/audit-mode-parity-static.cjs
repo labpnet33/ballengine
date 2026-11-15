@@ -25,3 +25,25 @@ console.log('MODE_REGISTRY_AUDIT '+JSON.stringify({bundleBytes:text.length,regis
 function imagesAssetsSample(){
  return {count:imageAssets.length,face:imageAssets.filter(x=>/face/i.test(x)).slice(0,35),hands:imageAssets.filter(x=>/hands/i.test(x)).slice(0,35),bloodshot:imageAssets.filter(x=>/bloodshot/i.test(x)).slice(0,15)};
 }
+
+
+// Examine the actual branch conditions and assets used by the original
+// randomizer and picture layers, rather than faking a button click.
+const important=[
+ "Randomize doesn't support this mode yet.",
+ 'Randomize does not support this mode yet.',
+ 'bloodshot.face-DQdTiO_Y.webp',
+ 'bloodshot.hands-BmzUMEQm.webp',
+ '"PHONK_DROP"',
+ 'case"PHONK_DROP"',
+ 'PHONK_DROP:',
+ 'phonkDropStudio',
+ 'phaseBloomStudio'
+];
+for(const needle of important){
+ let index=-1,hits=0,contexts=[];
+ while((index=text.indexOf(needle,index+1))!==-1&&hits++<6){
+   contexts.push({at:index,snippet:text.slice(Math.max(0,index-1200),Math.min(text.length,index+1500))});
+ }
+ console.log('MODE_CODE_CONTEXT '+JSON.stringify({needle,hits,contexts}));
+}
