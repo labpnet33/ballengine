@@ -34,13 +34,17 @@ CREATE TABLE IF NOT EXISTS guest_social_jobs (
   caption TEXT NOT NULL,
   media_id TEXT NOT NULL,
   tiktok_privacy TEXT NOT NULL DEFAULT 'SELF_ONLY',
+  tiktok_allow_comments INTEGER NOT NULL DEFAULT 0,
+  tiktok_allow_duet INTEGER NOT NULL DEFAULT 0,
+  tiktok_allow_stitch INTEGER NOT NULL DEFAULT 0,
   youtube_made_for_kids INTEGER,
   status TEXT NOT NULL DEFAULT 'queued',
   scheduled_at INTEGER NOT NULL,
   repeat_rule TEXT NOT NULL DEFAULT 'none',
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL,
-  completed_at INTEGER
+  completed_at INTEGER,
+  recurrence_spawned INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS idx_social_jobs_library ON guest_social_jobs(library_id,created_at DESC);
 
