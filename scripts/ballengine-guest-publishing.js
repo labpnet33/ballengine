@@ -285,7 +285,11 @@
       ['Autopilot is not part of your current plan.',
        'Automatic posting is not configured. Set manual posting reminders under Overview or Publish.'],
       ['Autopilot posts for you on a rhythm you set once. Growth, Scale and Max include it, and so do Pro, Elite and Agency.',
-       'Recurring manual posting reminders are available: choose a video, platforms, and a daily or weekly schedule. Your queue saves the next posting dates, but videos are not uploaded automatically.']
+       'Recurring manual posting reminders are available: choose a video, platforms, and a daily or weekly schedule. Your queue saves the next posting dates, but videos are not uploaded automatically.'],
+      ['Set your posting times once and add videos. Autopilot posts them for you, and the calendar shows exactly which video goes out on which day. Open or drag any video to change it.',
+       'Agency / Max guest draft mode: edit and save your posting times in this browser. Automatic uploads are not active until you connect a supported publishing backend. Use Publish to create cloud-backed posting reminders.'],
+      ['Where Autopilot posts and at what times. Each time repeats on the days you pick, and every video in line takes the next free time.',
+       'Choose times for your local draft schedule. No video is automatically published from this guest preview.']
     ]);
     for(const e of main.querySelectorAll('div,p,span')){
       if(e.children.length!==0||e.closest('[data-be-guest-publisher]'))continue;
@@ -298,7 +302,10 @@
       const nativeDescription='Recurring manual posting reminders are available: choose a video, platforms, and a daily or weekly schedule. Your queue saves the next posting dates, but videos are not uploaded automatically.';
       const intro=[...main.querySelectorAll('p,div,span')]
         .find(e=>e.children.length===0&&e.textContent?.trim()===nativeDescription);
-      if(intro&&!main.querySelector('[data-be-autopilot-reminder-link]')){
+      const nativeIntro=[...main.querySelectorAll('p')]
+        .find(e=>e.textContent?.startsWith('Agency / Max guest draft mode:'));
+      const actionAfter=intro||nativeIntro;
+      if(actionAfter&&!main.querySelector('[data-be-autopilot-reminder-link]')){
         const go=button('Set recurring posting reminder',()=>{
           const publish=[...main.querySelectorAll('nav[aria-label="Automation"] button')]
             .find(e=>e.textContent?.trim()==='Publish');
@@ -311,7 +318,7 @@
         },true);
         go.dataset.beAutopilotReminderLink='1';
         go.style.marginTop='12px';
-        intro.insertAdjacentElement('afterend',go);
+        actionAfter.insertAdjacentElement('afterend',go);
       }
     }
     const card=automationWarning();

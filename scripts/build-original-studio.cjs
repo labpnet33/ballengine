@@ -185,6 +185,10 @@ const studioDocument=originalStudio
 // /studio.html is also reachable directly and via the Vercel /studio rewrite.
 fs.writeFileSync(path.join(web,'studio.html'),studioDocument,'utf8');
 fs.writeFileSync(path.join(studioDir,'index.html'),studioDocument,'utf8');
+// Syntax-check the guest adapter that resolves missing Autopilot endpoints.
+require('node:child_process').execFileSync(process.execPath,
+  ['--check',path.join(repo,'scripts','studio-guest-preview.js')],
+  {stdio:'pipe',timeout:10000,maxBuffer:1024*1024});
 fs.copyFileSync(path.join(repo,'scripts','studio-guest-preview.js'),path.join(web,'studio-guest-preview.js'));
 fs.copyFileSync(path.join(repo,'scripts','ballengine-cloud-saves.js'),path.join(web,'ballengine-cloud-saves.js'));
 fs.copyFileSync(path.join(repo,'scripts','ballengine-guest-publishing.js'),path.join(web,'ballengine-guest-publishing.js'));

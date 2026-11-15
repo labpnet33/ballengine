@@ -25,6 +25,73 @@
   window.__BALLENGINE_LOCAL_GUEST__=guest;
   // Discard previously cached profiles so existing visitors see Agency / Max local settings.
   try { window.localStorage.removeItem('user_profile_cache'); } catch {}
+
+  // The captured Autopilot tab waits on private APIs absent from this
+  // independent guest deployment. Supply a truthful, browser-local DRAFT
+  // response so the original React editor does not remain a skeleton forever.
+  // This does not connect accounts, upload videos or schedule automatic posts.
+  const guestSchedulePrefix='ballengine_guest_autopilot_draft_v1:';
+  const guestJSON=(data,status=200)=>Promise.resolve(new Response(JSON.stringify(data),{
+    status,headers:{'Content-Type':'application/json','Cache-Control':'no-store'}
+  }));
+  function guestScheduleKey(url){
+    return guestSchedulePrefix+(url.searchParams.get('brand_id')||'default').slice(0,128);
+  }
+  function guestSchedule(url){
+    let timezone='UTC';
+    try{timezone=Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC';}catch{}
+    const defaults={
+      enabled:0,timezone,
+      weekday_slots:['09:00'],weekend_slots:['11:00'],
+      day_slots:Array.from({length:7},(_,day)=>[{
+        at:day===0||day===6?'11:00':'09:00',platforms:[]
+      }]),
+      platforms:[],privacy:'public',platform_settings:{}
+    };
+    try{
+      const stored=JSON.parse(localStorage.getItem(guestScheduleKey(url))||'null');
+      if(stored&&typeof stored==='object'&&!Array.isArray(stored))
+        return {...defaults,...stored,enabled:0,platforms:[]};
+    }catch{}
+    return defaults;
+  }
+  async function guestAutopilotAPI(url,method,input,init){
+    const path=url.pathname;
+    if(path==='/api/me/features'&&method==='GET')
+      return guestJSON({features:{autopilotScheduling:true},
+        guestDraftOnly:true,automaticSocialPosting:false});
+    if(path==='/api/autopilot/schedule'){
+      if(method==='GET')
+        return guestJSON({schedule:guestSchedule(url),guestDraftOnly:true});
+      if(method==='PUT'){
+        try{
+          const raw=init?.body??(typeof input!=='string'&&input?.clone
+            ?await input.clone().text():'{}');
+          if(typeof raw!=='string'||raw.length>10000)throw Error('Invalid schedule');
+          const changes=JSON.parse(raw);
+          if(!changes||typeof changes!=='object'||Array.isArray(changes))
+            throw Error('Invalid schedule');
+          // Never allow the local-only draft to claim an active posting switch
+          // or connected platforms. Save editable times and timezone only.
+          const schedule={...guestSchedule(url),...changes,enabled:0,platforms:[]};
+          localStorage.setItem(guestScheduleKey(url),JSON.stringify(schedule));
+          return guestJSON({schedule,guestDraftOnly:true,
+            message:'Schedule saved in this browser. Automatic posting is not active.'});
+        }catch{
+          return guestJSON({error:'Could not save the local draft schedule.'},400);
+        }
+      }
+    }
+    if(method==='GET'&&path==='/api/autopilot/queue')
+      return guestJSON({videos:[],guestDraftOnly:true});
+    if(method==='GET'&&path==='/api/autopilot/projection')
+      return guestJSON({items:[],guestDraftOnly:true});
+    if(method==='GET'&&path==='/api/scheduler/list')
+      return guestJSON({jobs:[],guestDraftOnly:true});
+    if(path.startsWith('/api/autopilot/')||path.startsWith('/api/scheduler/'))
+      return guestJSON({error:'Automatic posting and media pool require a connected publishing backend. Use Publish to save manual reminders.'},503);
+    return null;
+  }
   const nativeFetch=window.fetch.bind(window);
   window.fetch=function(input,init){
     let url,method;
@@ -32,6 +99,16 @@
       url=new URL(typeof input==='string'?input:input.url,window.location.href);
       method=String((init&&init.method)||(typeof input!=='string'&&input.method)||'GET').toUpperCase();
     } catch {return nativeFetch(input,init);}
+    if(url.origin===window.location.origin &&
+       window.__BALLENGINE_LOCAL_GUEST__?.is_guest &&
+       location.pathname.replace(/\/+$/,'')==='/automation/autopilot'){
+      const guestAutopilotPaths=[
+        '/api/me/features','/api/autopilot/','/api/scheduler/'
+      ];
+      if(guestAutopilotPaths.some(p=>url.pathname===p||url.pathname.startsWith(p))){
+        return guestAutopilotAPI(url,method,input,init);
+      }
+    }
     if(url.origin===window.location.origin &&
        url.pathname==='/api/auth/me' && method==='GET'){
       return Promise.resolve(new Response(JSON.stringify({user:guest}),{
