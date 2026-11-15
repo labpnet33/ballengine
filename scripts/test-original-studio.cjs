@@ -44,7 +44,7 @@ assert.ok(originalStudio.includes('index-3pf76ICO.js')&&originalStudio.includes(
 const directStudio=fs.readFileSync(path.join(root,'studio.html'),'utf8');
 for (const [route,html] of [['/studio',originalStudio],['/studio.html',directStudio]]) {
   assert.ok(html.includes('<script src="/studio-guest-preview.js"></script>'),
-    'Enterprise preview profile bootstrap missing on '+route);
+    'Agency / Max guest bootstrap missing on '+route);
   assert.equal((html.match(/studio-guest-preview\.js/g)||[]).length,1,
     'Guest profile adapter duplicated on '+route);
 }
@@ -150,13 +150,16 @@ async function main(){
      const response=await fetch('/api/auth/me');
      return (await response.json()).user;
    });
-   assert.equal(homeAuth.plan,'ENTERPRISE','/home did not load the local guest profile');
+   assert.equal(homeAuth.plan,'AGENCY','/home did not load the local guest profile');
    assert.equal(homeAuth.can_use_all_modes,true,'/home lost unrestricted local modes');
+   assert.equal(homeAuth.automation_plan,'MAX','/home did not load Max automation tier');
    assert.equal(new URL(page.url()).pathname,'/home','/home redirected to login');
 
    assert.equal(guest.id,'local-preview-guest','guest preview adapter did not activate');
-   assert.equal(guest.plan,'ENTERPRISE','local preview guest must have access to tier-gated UI');
+   assert.equal(guest.plan,'AGENCY','local preview guest must have access to tier-gated UI');
    assert.equal(guest.allModes,true,'all development modes must be selectable in local preview');
+   const automationTier=await page.evaluate(async()=>(await(await fetch('/api/auth/me')).json()).user.automation_tier);
+   assert.equal(automationTier,'MAX','Guest Max automation tier missing');
    assert.equal(locks.status,200,'local UI-lock configuration was not served');
    assert.deepEqual(locks.data,[],'local UI-lock configuration must contain no remote overrides');
    assert.equal(stuckOverlay,0,'Studio is still blocked on account and plan configuration');
