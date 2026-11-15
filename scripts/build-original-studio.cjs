@@ -300,6 +300,17 @@ if(capturedApp.split(missingDefault).length!==2)
 capturedApp=capturedApp.replace(missingDefault,'phonkDropFace:"grinface",phonkDropFaceScale:.45');
 console.log('Phonk Drop native randomization and image-safe illustrated default enabled.');
 
+// Experimental Domino 3D ships with 1,600 physics bodies at startup.
+// On CPU/software-GPU export runners, even two seconds of output can take
+// several minutes. Use a moderate default for NEW simulations while keeping
+// the original settings UI's full count range available to existing projects.
+const dominoDefault='domino3DCount:1600,domino3DLayout:"CIRCUIT_ROUND"';
+if(capturedApp.split(dominoDefault).length!==2)
+  throw new Error('Domino 3D count default changed; review source before applying performance fix.');
+capturedApp=capturedApp.replace(dominoDefault,'domino3DCount:540,domino3DLayout:"CIRCUIT_ROUND"');
+console.log('Domino 3D new-project default reduced to 540 bodies; full control remains available.');
+
+
 fs.writeFileSync(originalBundle,capturedApp,'utf8');
 // Vercel's static build would otherwise report READY even if the edited 14MB
 // browser bundle had a JavaScript syntax error.
