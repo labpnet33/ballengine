@@ -417,6 +417,12 @@ console.log('Restored',uncapturedRealisticAssets.size,'uncaptured Phonk face/han
 
 
 
+// Keep the original physics engine and exporter. Patch only display-oriented
+// native adaptive rendering methods; every expected minified anchor is checked
+// so future upstream bundle changes cannot silently corrupt the application.
+const {applyPerformancePatches}=require('./performance-patches.cjs');
+capturedApp=applyPerformancePatches(capturedApp);
+console.log('Adaptive dense-scene rendering optimizations installed.');
 fs.writeFileSync(originalBundle,capturedApp,'utf8');
 // Vercel's static build would otherwise report READY even if the edited 14MB
 // browser bundle had a JavaScript syntax error.
