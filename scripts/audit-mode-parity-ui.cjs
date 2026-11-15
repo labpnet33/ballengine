@@ -36,12 +36,15 @@ const base=process.env.BALLENGINE_BASE||'https://ballengine.vercel.app';
          const controls=[...root.querySelectorAll('input,select,textarea,[role="slider"],[role="switch"]')].filter(visible)
            .map(e=>({tag:e.tagName,type:e.getAttribute('type'),title:e.getAttribute('title'),name:e.getAttribute('name'),aria:e.getAttribute('aria-label'),value:e.value??e.getAttribute('aria-valuenow'),min:e.min,max:e.max,disabled:e.disabled,outer:e.outerHTML.slice(0,170)}));
          const buttons=[...root.querySelectorAll('button')].filter(visible).map(e=>({text:e.textContent.trim().slice(0,80),title:e.title,disabled:e.disabled,aria:e.getAttribute('aria-label')}));
-         const canvas=[...root.querySelectorAll('canvas')].filter(visible&&((e)=>true)).map(e=>({w:e.width,h:e.height,visible:visible(e)}));
+         const canvas=[...root.querySelectorAll('canvas')].filter(visible).map(e=>({w:e.width,h:e.height,visible:visible(e)}));
          return {activeMode:root.querySelector('button[title="Change mode"]')?.textContent?.trim(),settings:detail,controls,buttons,canvas:canvas.slice(0,12)};
        });
        const randomize=page.getByRole('button',{name:'Randomize',exact:true}).first();
        let after=null;
-       if(await randomize.isVisible().catch(()=>false)){
+       const randomizeVisible=await randomize.isVisible().catch(()=>false);
+       const randomizeEnabled=randomizeVisible&&await randomize.isEnabled().catch(()=>false);
+       const randomizeTooltip=randomizeVisible?await randomize.getAttribute('title'):null;
+       if(randomizeEnabled){
          await randomize.click({timeout:11000});
          clicked=true;await page.waitForTimeout(350);
          after=await page.evaluate(()=>({
@@ -51,7 +54,7 @@ const base=process.env.BALLENGINE_BASE||'https://ballengine.vercel.app';
        }
        const first=before.controls.map(x=>x.value);
        const changed=after?first.some((x,i)=>x!==after.controls[i]):false;
-       const result={slug,category,mode:before.activeMode,settings:before.settings,inputs:before.controls.map(x=>({type:x.type,title:x.title,aria:x.aria,name:x.name,min:x.min,max:x.max,disabled:x.disabled})),inputCount:before.controls.length,disabledInputs:before.controls.filter(x=>x.disabled).length,buttonTitles:before.buttons.filter(x=>x.title).map(x=>x.title).slice(0,50),disabledButtons:before.buttons.filter(x=>x.disabled).map(x=>x.text||x.title).slice(0,35),canvas:before.canvas,randomizePresent:clicked,randomizeControlChanged:changed,errors:errors.slice(0,6),missing:[...new Set(missing)].slice(0,16),ms:Date.now()-started};
+       const result={slug,category,mode:before.activeMode,settings:before.settings,inputs:before.controls.map(x=>({type:x.type,title:x.title,aria:x.aria,name:x.name,min:x.min,max:x.max,disabled:x.disabled})),inputCount:before.controls.length,disabledInputs:before.controls.filter(x=>x.disabled).length,buttonTitles:before.buttons.filter(x=>x.title).map(x=>x.title).slice(0,50),disabledButtons:before.buttons.filter(x=>x.disabled).map(x=>x.text||x.title).slice(0,35),canvas:before.canvas,randomizePresent:randomizeVisible,randomizeEnabled,randomizeTooltip,randomizeControlChanged:changed,errors:errors.slice(0,6),missing:[...new Set(missing)].slice(0,16),ms:Date.now()-started};
        results.push(result);console.log('MODE_PARITY_UI '+JSON.stringify(result));
      }catch(e){uncaught=String(e.stack||e).slice(0,500);const result={slug,category,error:uncaught,errors};results.push(result);console.log('MODE_PARITY_UI '+JSON.stringify(result));}
    }
