@@ -56,6 +56,20 @@ const server=http.createServer((req,res)=>{
    console.log('PARITY_RANDOMIZER_PASS '+JSON.stringify(result));
   }
   assert.ok(!errors.length,'JavaScript errors in native mode randomization: '+JSON.stringify(errors.slice(0,5)));
+  // The source was missing all 20 original realistic texture files. Each
+  // original skin button must now select a working, offline vector fallback.
+  for(const skin of ['Classic Red','Bloodshot','Ghost Blue']){
+    const button=page.getByRole('button',{name:skin,exact:true}).first();
+    await button.waitFor({state:'visible',timeout:14000});
+    await button.click({timeout:10000});
+    await page.waitForTimeout(300);
+    assert.equal(await button.getAttribute('aria-pressed'),'true','Phonk texture selection failed: '+skin);
+    assert.ok(!missing.length,'Phonk asset 404 after selecting '+skin+': '+missing.join(', '));
+    console.log('PHONK_SKIN_FALLBACK_PASS '+JSON.stringify({skin,selected:true,asset404:missing.length}));
+  }
+  const bundle=fs.readFileSync(path.join(root,'assets/index-3pf76ICO.js'),'utf8');
+  const vectorCount=(bundle.match(/data:image\/svg\+xml,/g)||[]).length;
+  assert.ok(vectorCount>=20,'Missing one or more 20 uncaptured Phonk vector fallbacks: '+vectorCount);
   // Default face was changed from missing bloodshot WEBPs to illustrated
   // Grinface. Do not confuse optional user-selected skins with the default.
   assert.ok(!missing.some(p=>p.includes('bloodshot.face')||p.includes('bloodshot.hands')),'Missing bloodshot assets still requested by default');
