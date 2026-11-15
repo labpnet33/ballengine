@@ -125,3 +125,17 @@ test('TikTok uses an error envelope even for successful API responses',async()=>
     await assert.rejects(()=>providerJSON('https://open.tiktokapis.com/v2/post/publish/creator_info/query/'),/Permission not granted/);
   }finally{globalThis.fetch=prior;}
 });
+
+
+test('captured Accounts tab never routes guest Connect through subscription Plan',()=>{
+  const script=fs.readFileSync(resolve(here,'../scripts/ballengine-guest-social.js'),'utf8');
+  assert.match(script,/native\.dataset\.beReplacedByGuestOAuth='1'/);
+  assert.match(script,/native\.hidden=true;native\.style\.display='none'/);
+  assert.match(script,/event\.stopImmediatePropagation\(\)/);
+  assert.match(script,/data-tour="auto-accounts"/);
+  assert.match(script,/window\.location\.replace\('\/automation\/accounts'\)/);
+  assert.match(script,/action\.click\(\)/);
+  assert.match(script,/if\(!configured\)\{/);
+  assert.match(script,/SOCIAL_TOKEN_SECRET/);
+  assert.ok(!script.includes("window.location.assign('/automation/plan')"));
+});
