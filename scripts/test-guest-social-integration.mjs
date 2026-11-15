@@ -83,7 +83,11 @@ test('provider tokens encrypt with random IV and decrypt only using the correct 
   assert.notEqual(a,b);
   assert.ok(!a.includes('PLAINTEXT'));
   assert.equal(await unseal(env,a),'token-MUST-NOT-BE-PLAINTEXT');
-  await assert.rejects(()=>unseal({SOCIAL_TOKEN_SECRET:base64.replace(/.$/,'A')},a));
+  const differentKey=Uint8Array.from(key);
+  differentKey[0]^=1;
+  const differentSecret=btoa(String.fromCharCode(...differentKey))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  await assert.rejects(()=>unseal({SOCIAL_TOKEN_SECRET:differentSecret},a));
 });
 test('OAuth creates a server-side Google consent URL without exposing secrets',async()=>{
   const db=new FakeDB(),key=crypto.getRandomValues(new Uint8Array(32));
