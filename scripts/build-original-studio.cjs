@@ -437,6 +437,44 @@ console.log('Additional public static assets copied:',copied);
 console.log('Already present:',already);
 console.log('Sound effects:',soundCount,'Mode thumbnails:',modeCount);
 console.log('Runtime note: authenticated APIs and server-side rendering are not part of this capture.');
+ 
+// Preserve the captured desktop application, but append a small, cacheable
+// responsive layer to every existing HTML route (including original localized
+// and download pages). This changes no React component or simulation bundle.
+const mobileStylesSource=path.join(repo,'scripts','ballengine-mobile.css');
+const mobileStylesOutput=path.join(web,'ballengine-mobile.css');
+if(!fs.existsSync(mobileStylesSource)||fs.statSync(mobileStylesSource).size<1000)
+  throw new Error('Mobile stylesheet missing or empty.');
+fs.copyFileSync(mobileStylesSource,mobileStylesOutput);
+const mobileLink='<link rel="stylesheet" href="/ballengine-mobile.css" data-ballengine-mobile="v1">';
+let mobileHtmlUpdated=0,mobileHtmlExisting=0;
+function addResponsiveStylesToPages(folder) {
+  for(const entry of fs.readdirSync(folder,{withFileTypes:true})){
+    const filename=path.join(folder,entry.name);
+    if(entry.isDirectory()){
+      // These large directories contain only binary/media assets.
+      if(['assets','fonts','mode-thumbs','sfx'].includes(entry.name))continue;
+      addResponsiveStylesToPages(filename);
+      continue;
+    }
+    if(!entry.isFile()||!/\.html?$/i.test(entry.name))continue;
+    const html=fs.readFileSync(filename,'utf8');
+    if(!/<head(?:\s|>)/i.test(html)||!/<\/head>/i.test(html))continue;
+    if(html.includes('data-ballengine-mobile="v1"')){mobileHtmlExisting++;continue;}
+    fs.writeFileSync(filename,html.replace(/<\/head>/i,mobileLink+'</head>'),'utf8');
+    mobileHtmlUpdated++;
+  }
+}
+addResponsiveStylesToPages(web);
+for(const required of ['index.html','home.html','studio.html','automation.html',
+  'automation/accounts/index.html','automation/publish/index.html',
+  'automation/autopilot/index.html','plans.html']){
+  const html=fs.readFileSync(path.join(web,required),'utf8');
+  if(!html.includes(mobileLink))throw new Error('Missing mobile styles in '+required);
+}
+console.log('Mobile responsive stylesheet installed on',mobileHtmlUpdated,
+  'HTML routes;',mobileHtmlExisting,'already linked.');
+
 
 
 // Vite's entrypoint references extra dynamic JS chunks and simulation workers.
