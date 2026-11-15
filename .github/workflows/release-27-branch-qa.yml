@@ -1,0 +1,21 @@
+name: Test 27-mode release branch
+on:
+  push:
+    branches: [feat/release-all-27-simulations]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-release-branch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install browser driver
+        run: npm install --prefix "$RUNNER_TEMP/27modes" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build release candidate using original BallEngine
+        run: node scripts/build-original-studio.cjs
+      - name: Exercise all 27 released engines and mode controls
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/27modes/node_modules" node scripts/test-released-mode-registry.cjs
