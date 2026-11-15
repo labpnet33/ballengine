@@ -126,12 +126,16 @@ if(!homeHTML.includes('id="root"') || !homeHTML.includes('index-3pf76ICO.js'))
 const guestAdapter='<script src="/studio-guest-preview.js"></script>';
 const cloudAdapter='<script src="/ballengine-cloud-saves.js"></script>';
 const publishingAdapter='<script src="/ballengine-guest-publishing.js"></script>';
+const extensionHomeCss='<link rel="stylesheet" href="/physics-home.css">';
+const extensionHomeJs='<script defer src="/physics-home.js"></script>';
 const homeDocument=homeHTML
+  .replaceAll(extensionHomeCss,'')
+  .replaceAll(extensionHomeJs,'')
   .replaceAll('<base href="/">','')
   .replaceAll(guestAdapter,'')
   .replaceAll(cloudAdapter,'')
   .replaceAll(publishingAdapter,'')
-  .replace('</head>','<base href="/">'+guestAdapter+cloudAdapter+publishingAdapter+'</head>');
+  .replace('</head>','<base href="/">'+guestAdapter+cloudAdapter+publishingAdapter+extensionHomeCss+extensionHomeJs+'</head>');
 // The root entrypoint must behave the same as /home for fresh visitors.
 fs.writeFileSync(homeSource,homeDocument,'utf8');
 const homeDir=path.join(web,'home');
@@ -176,16 +180,24 @@ console.log('Original Automation dashboard and existing tab deep links prepared.
 // Absolute asset paths work both at /studio and /studio/.
 // All original Studio URLs must use the same local preview user entitlement.
 // Keep this idempotent when Vercel retries or reuses a build directory.
+const originalStudioModule='<script type="module" crossorigin src="/assets/index-3pf76ICO.js"></script>';
+const twoModeBootstrap='<script type="module">const mode=new URLSearchParams(location.search).get("mode");if(mode==="neon-zigzag"||mode==="prism-chain")import("/physics-live.js");else import("/assets/index-3pf76ICO.js");</script>';
 const studioDocument=originalStudio
+  .replaceAll(twoModeBootstrap,originalStudioModule)
   .replaceAll('src="assets/', 'src="/assets/')
   .replaceAll('href="assets/', 'href="/assets/')
   .replaceAll("src='assets/", "src='/assets/")
   .replaceAll("href='assets/", "href='/assets/")
+  .replace(originalStudioModule,twoModeBootstrap)
   .replace('</head>', (originalStudio.includes(guestAdapter)?'':guestAdapter)+(originalStudio.includes(cloudAdapter)?'':cloudAdapter)+(originalStudio.includes(publishingAdapter)?'':publishingAdapter)+'</head>');
+if(!studioDocument.includes(twoModeBootstrap)||studioDocument.includes(originalStudioModule))
+  throw new Error('Two-mode module bootstrap was not applied to Studio.');
 // /studio.html is also reachable directly and via the Vercel /studio rewrite.
 fs.writeFileSync(path.join(web,'studio.html'),studioDocument,'utf8');
 fs.writeFileSync(path.join(studioDir,'index.html'),studioDocument,'utf8');
 fs.copyFileSync(path.join(repo,'scripts','studio-guest-preview.js'),path.join(web,'studio-guest-preview.js'));
+fs.copyFileSync(path.join(repo,'scripts','physics-home.js'),path.join(web,'physics-home.js'));
+fs.copyFileSync(path.join(repo,'scripts','physics-home.css'),path.join(web,'physics-home.css'));
 fs.copyFileSync(path.join(repo,'scripts','ballengine-cloud-saves.js'),path.join(web,'ballengine-cloud-saves.js'));
 fs.copyFileSync(path.join(repo,'scripts','ballengine-guest-publishing.js'),path.join(web,'ballengine-guest-publishing.js'));
 // Keep the existing pricing page and UI, but load the shared adapter there too
@@ -440,6 +452,26 @@ async function collectPublicLazyModules() {
     for(const line of failed)console.warn(' - '+line);
   }
 }
+// Bundle only the two new opt-in mode adapters. Existing Studio code is untouched.
+const physicsRoot=path.join(repo,'physics-extension');
+const esbuildLocation=path.join(physicsRoot,'node_modules','esbuild');
+if(!fs.existsSync(esbuildLocation)){
+  console.log('Installing pinned standalone physics dependencies');
+  require('node:child_process').execFileSync('npm',
+    ['install','--prefix',physicsRoot,'--ignore-scripts','--no-audit','--no-fund'],
+    {stdio:'inherit',timeout:180000});
+}
+require(esbuildLocation).buildSync({
+  entryPoints:[path.join(physicsRoot,'src','browser-live.mjs')],
+  outdir:web,entryNames:'physics-live',bundle:true,platform:'browser',
+  format:'esm',target:['chrome110','firefox120','safari16'],
+  minify:true,loader:{'.wasm':'dataurl'},logLevel:'warning'
+});
+for(const output of ['physics-live.js','physics-live.css','physics-home.js','physics-home.css']){
+  if(!fs.existsSync(path.join(web,output))||fs.statSync(path.join(web,output)).size<20)
+    throw new Error('Missing bundled physics runtime asset: '+output);
+}
+console.log('Two additional playable modes bundled in original Studio.');
 collectPublicLazyModules().catch(e=>{
   console.error('Original asset collection failed:',e);
   process.exitCode=1;
