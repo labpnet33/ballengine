@@ -74,7 +74,7 @@ function drawControls(){
  const common=el('be-common-fields');common.replaceChildren(check('glow','Glow and highlights'),check('sound','Impact ding effects'));
  if(slug==='prism-chain')common.append(check('orbit','Slow camera orbit'));
  if(slug==='neon-zigzag')common.append(choose('be-bpm','Visual pulse tempo',[60,90,120,140,160,180].map(n=>[n,n+' BPM']),cfg.bpm,v=>{cfg.bpm=Number(v);}));
- common.append(choose('be-duration','Clip duration',[5,10,15,30].map(n=>[n,n+' seconds']),cfg.seconds,v=>{cfg.seconds=Number(v);}));
+ common.append(choose('be-duration','Clip duration',[2,5,10,15,30].map(n=>[n,n+' seconds']),cfg.seconds,v=>{cfg.seconds=Number(v);}));
  common.append(choose('be-resolution','Video size',[['360x640','360 × 640 quick test'],['720x1280','720 × 1280 portrait'],['1080x1920','1080 × 1920 Shorts']],cfg.resolution,v=>{cfg.resolution=v;}));
  common.append(slider('volume',{type:'integer'}));
 }

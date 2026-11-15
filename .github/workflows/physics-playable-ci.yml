@@ -1,0 +1,38 @@
+name: Verify two new playable physics modes and preserve original Studio
+on:
+  push:
+    branches: [feat/playable-physics-modes]
+    paths:
+      - 'physics-extension/**'
+      - 'scripts/build-original-studio.cjs'
+      - 'scripts/physics-home.*'
+      - 'scripts/test-playable-modes.cjs'
+      - '.github/workflows/physics-playable-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  playable:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Install pinned browser engines and test controller
+        run: |
+          npm install --prefix physics-extension --ignore-scripts --no-audit --no-fund
+          npm install --prefix "$RUNNER_TEMP/browser-tests" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Run original physics adapters
+        run: npm test --prefix physics-extension
+      - name: Build complete original BallEngine plus new mode assets
+        run: node scripts/build-original-studio.cjs
+      - name: Verify original 45-mode static metadata
+        run: node scripts/audit-mode-parity-static.cjs
+      - name: Verify both real playable modes including video recording
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/browser-tests/node_modules" node scripts/test-playable-modes.cjs
+      - name: Verify six established-mode slider controls
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/browser-tests/node_modules" MODE_RANGE=0:6 node scripts/test-mode-option-interactivity.cjs
