@@ -6,6 +6,7 @@ on:
       - feature/guest-social-publishing
       - fix/automation-social-production-20261115
       - main
+      - fix/autopilot-stuck-skeleton-20261115
     paths:
       - 'cloud-saves/**'
       - 'scripts/ballengine-guest-social.js'
@@ -44,3 +45,9 @@ jobs:
           grep -q 'ballengine-guest-social.js' extra/wget/ballengine.app/studio.html
       - name: Run guest OAuth and scheduler regression tests
         run: node --test scripts/test-guest-social-integration.mjs
+
+      - name: Verify original Autopilot resolves to its native editor in a browser
+        run: |
+          npm install --prefix "$RUNNER_TEMP/ballengine-ui" --no-save --no-audit --no-fund playwright-core@1.56.0
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory extra/wget/ballengine.app >/tmp/ballengine-ui-server.log 2>&1 &
+          NODE_PATH="$RUNNER_TEMP/ballengine-ui/node_modules" CHROME_BIN="$(command -v google-chrome)" node scripts/test-local-autopilot-ready.cjs
