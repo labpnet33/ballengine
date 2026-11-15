@@ -59,11 +59,12 @@ const server=http.createServer((req,res)=>{
   // The source was missing all 20 original realistic texture files. Each
   // original skin button must now select a working, offline vector fallback.
   for(const skin of ['Classic Red','Bloodshot','Ghost Blue']){
-    const item=page.getByText(skin,{exact:true}).first();
-    await item.waitFor({state:'visible',timeout:14000});
-    await item.click({timeout:10000});
+    const select=page.locator('#root select:has(option[value="classic_red"])').first();
+    await select.waitFor({state:'visible',timeout:14000});
+    await select.selectOption({label:skin},{timeout:10000});
     await page.waitForTimeout(350);
-    const selected=await item.evaluate(e=>e.closest('button,[aria-pressed]')?.getAttribute('aria-pressed')||null);
+    const selected=await select.inputValue();
+    assert.ok(selected,'Phonk skin select failed: '+skin);
     assert.ok(!missing.length,'Phonk asset 404 after selecting '+skin+': '+missing.join(', '));
     console.log('PHONK_SKIN_FALLBACK_PASS '+JSON.stringify({skin,selected,asset404:missing.length}));
   }
