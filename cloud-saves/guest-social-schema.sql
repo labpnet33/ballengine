@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS guest_social_jobs (
   caption TEXT NOT NULL,
   media_id TEXT NOT NULL,
   tiktok_privacy TEXT NOT NULL DEFAULT 'SELF_ONLY',
+  youtube_made_for_kids INTEGER,
   status TEXT NOT NULL DEFAULT 'queued',
   scheduled_at INTEGER NOT NULL,
   repeat_rule TEXT NOT NULL DEFAULT 'none',
