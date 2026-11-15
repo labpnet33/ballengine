@@ -248,7 +248,22 @@
     // repeated guest form appeared before their content, making them seem
     // stuck on the Overview screen. Preserve their original content first.
     if(route!=='/automation'&&route!=='/automation/publish')return null;
-    return automationWarning()?.parentElement||main;
+    const warning=automationWarning();
+    if(warning?.parentElement&&warning.parentElement!==main)
+      return warning.parentElement;
+    // Publish has no legacy warning card. Appending the guest planner to
+    // <main> puts it behind the fixed 280px sidebar because the original
+    // content is nested in a centered page container. Mount next to the
+    // existing Automation tabs/content, not outside their layout.
+    const tabs=main.querySelector('nav[aria-label="Automation"]');
+    if(tabs?.parentElement&&tabs.parentElement!==main&&
+       tabs.parentElement.tagName!=='FORM')
+      return tabs.parentElement;
+    const container=main.querySelector(':scope > .container-page, :scope > div > .container-page');
+    if(container)return container;
+    const content=[...main.children].find(e=>e.tagName==='DIV'&&
+      e.querySelector('nav[aria-label="Automation"]'));
+    return content||main;
   }
   function clarifyAutomationStatus(){
     const main=automationMain();
@@ -335,6 +350,13 @@
     const root=node('section',null,css.box);
     root.dataset.beGuestPublisher='1';
     root.setAttribute('aria-label','Guest publishing planner');
+    if(!studioHost){
+      // Keep the guest panel inside the available Automation content width.
+      root.style.width='100%';
+      root.style.maxWidth='100%';
+      root.style.minWidth='0';
+      root.style.boxSizing='border-box';
+    }
     const heading=node('h3','Guest publishing planner · Manual delivery',css.headline);
     const notice=node('p','Save video drafts, schedule real reminders and organize a posting queue. No social accounts are connected to this guest library, so scheduled videos are NOT automatically posted to YouTube, TikTok, Instagram or Facebook.',css.note);
     const form=node('div');
