@@ -308,6 +308,18 @@ capturedApp=capturedApp.replace(exportFpsBefore,exportFpsAfter);
 console.log('Software-renderer Domino MP4 adaptive frame-rate enabled; hardware 60fps unaffected.');
 console.log('Standalone local MP4 export enabled using original frame renderer; upstream ticket not requested.');
 
+// Keep physics states and collisions untouched; trim VISUAL-ONLY effects on
+// sustained poor preview FPS using the original dynamic-LOD tiers (tier 4/5).
+// The native getter returns tier=0 during recording/offline export, so videos
+// retain the full requested trails, collision effects and particle density.
+// Restore full preview effects automatically when native FPS recovery occurs.
+const previewEffectsBefore='trailStride(){return 1}maxCollisionEffects(){return 1/0}collisionParticleScale(){return 1}';
+const previewEffectsAfter='trailStride(){return this.tier>=fre?3:this.tier>=$U?2:1}maxCollisionEffects(){return this.tier>=fre?36:this.tier>=$U?96:1/0}collisionParticleScale(){return this.tier>=fre?.5:this.tier>=$U?.75:1}';
+if(capturedApp.split(previewEffectsBefore).length!==2)
+  throw new Error('Native dynamic-LOD effects methods changed; review existing engine before optimizing.');
+capturedApp=capturedApp.replace(previewEffectsBefore,previewEffectsAfter);
+console.log('Dynamic preview LOD reduces trail overdraw and decorative collision particles on stressed scenes; simulation state and exports untouched.');
+
 // ADAPTIVE PREVIEW QUALITY: The captured Stage3D already reports its FPS
 // and scales the real renderer with Mfa.dprFor(), but AUTO stops at DPR=1,
 // and its adaptive controller is disabled on mobile. Extend the existing

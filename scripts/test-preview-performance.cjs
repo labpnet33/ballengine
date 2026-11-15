@@ -69,6 +69,43 @@ assert.equal(desktop.dprFor(auto),.75,'Desktop Auto preview needs a low-FPS fall
 state.software=true;
 assert.equal(desktop.dprFor(auto),state.outputDpr,'Software renderer must retain its original resolution branch');
 assert.equal(desktop.autoActive(auto),false,'Software renderer auto-adjustment must stay disabled');
+// The original dynamic LOD controller already receives measured FPS; its
+// visual-effect helper methods were previously no-ops. Validate that they
+// reduce only preview overdraw at high-pressure tiers and reset for export.
+const lodStart=bundle.indexOf('const qRt=1,YRt=2,RPe=3,$U=4,fre=5');
+const lodEnd=bundle.indexOf('const Jx=new _8n',lodStart);
+assert.ok(lodStart>0&&lodEnd>lodStart,'Native scene LOD controller not found');
+const {Engine}=vm.runInNewContext(bundle.slice(lodStart,lodEnd)+';({Engine:_8n})',{
+  Q:(obj,key,value)=>{obj[key]=value;},
+  a0:()=>state.window.isRecording||state.window.isOfflineRendering===true
+},{timeout:3000});
+const lod=new Engine;
+assert.equal(lod.trailStride(),1,'Normal FPS should preserve full trail detail');
+assert.equal(lod.maxCollisionEffects(),Infinity,'Normal FPS should draw all collision effects');
+assert.equal(lod.collisionParticleScale(),1,'Normal FPS should use full particle counts');
+lod.live=4;
+assert.equal(lod.trailStride(),2,'High pressure should draw every second trail point');
+assert.equal(lod.maxCollisionEffects(),96,'High pressure should limit decorative effects');
+assert.equal(lod.collisionParticleScale(),.75,'High pressure should reduce decorative particles');
+lod.live=5;
+assert.equal(lod.trailStride(),3,'Very low FPS should skip additional trail points');
+assert.equal(lod.maxCollisionEffects(),36,'Very low FPS should further limit visual collisions');
+assert.equal(lod.collisionParticleScale(),.5,'Very low FPS should use half as many particles');
+state.window.isRecording=true;
+assert.equal(lod.trailStride(),1,'Export must preserve every trail point');
+assert.equal(lod.maxCollisionEffects(),Infinity,'Export must retain all collision effects');
+assert.equal(lod.collisionParticleScale(),1,'Export must retain full particle density');
+state.window.isRecording=false;
+state.window.isOfflineRendering=true;
+assert.equal(lod.trailStride(),1,'Offline MP4 rendering must retain full trail quality');
+state.window.isOfflineRendering=false;
+lod.live=0;
+assert.equal(lod.maxCollisionEffects(),Infinity,'Recovered FPS must restore full effects');
+console.log('ADAPTIVE_2D_EFFECTS_PASS '+JSON.stringify({
+  collisionEffectCaps:[Infinity,96,36],trailStrides:[1,2,3],
+  particleDensity:[1,.75,.5],exportUnaffected:true
+}));
+
 console.log('ADAPTIVE_3D_CONTROLLER_PASS '+JSON.stringify({
   initialDpr:1,slowSceneDpr:.75,restoredDpr:1,
   pixelFillReductionPct:43.75,
