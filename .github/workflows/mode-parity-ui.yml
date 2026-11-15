@@ -1,0 +1,29 @@
+name: Compare all 45 mode option panels
+on:
+  push:
+    branches: [feat/27-mode-parity-audit]
+    paths:
+      - scripts/audit-mode-parity-ui.cjs
+      - .github/workflows/mode-parity-ui.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare-ui-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        range: ["0:9","9:18","18:27","27:36","36:45"]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install Playwright
+        run: npm install --prefix "$RUNNER_TEMP/mode-parity" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Audit mode option panels on existing production
+        env:
+          MODE_RANGE: ${{ matrix.range }}
+          BALLENGINE_BASE: https://ballengine.vercel.app
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/mode-parity/node_modules" node scripts/audit-mode-parity-ui.cjs
