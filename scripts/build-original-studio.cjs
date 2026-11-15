@@ -221,6 +221,23 @@ let capturedApp=fs.readFileSync(originalBundle,'utf8');
 if (capturedApp.split(homeRouteBefore).length!==2)
   throw new Error('Expected exactly one original /home auth guard. Review frontend version before changing routes.');
 capturedApp=capturedApp.replace(homeRouteBefore,homeRouteAfter);
+
+// The original Autopilot page starts with a skeleton while waiting for the
+// *original* private entitlement backend. This independent local guest site
+// supports schedule drafts and guest social publishing through our own Worker.
+// Never wait on the unavailable upstream entitlement endpoint to show the UI.
+const autopilotEntitlementBefore='c=o("/api/me/features"),[d,u]=E.useState(()=>{var H;return c?!!((H=c==null?void 0:c.features)!=null&&H.autopilotScheduling):null})';
+const autopilotEntitlementAfter='c=o("/api/me/features"),[d,u]=E.useState(()=>{var H;return c?!!((H=c==null?void 0:c.features)!=null&&H.autopilotScheduling):window.__BALLENGINE_LOCAL_GUEST__?.is_guest?true:null})';
+if(capturedApp.split(autopilotEntitlementBefore).length!==2)
+  throw new Error('Autopilot guest entitlement anchor changed; review the source before patching.');
+capturedApp=capturedApp.replace(autopilotEntitlementBefore,autopilotEntitlementAfter);
+const autopilotLoadingBefore='[v,w]=E.useState(()=>!c),[A,S]=E.useState(null)';
+const autopilotLoadingAfter='[v,w]=E.useState(()=>!c&&!window.__BALLENGINE_LOCAL_GUEST__?.is_guest),[A,S]=E.useState(null)';
+if(capturedApp.split(autopilotLoadingBefore).length!==2)
+  throw new Error('Autopilot guest loading anchor changed; review the source before patching.');
+capturedApp=capturedApp.replace(autopilotLoadingBefore,autopilotLoadingAfter);
+console.log('Guest Autopilot loads its original editor immediately; OAuth publishing remains separately gated.');
+
 // The existing Studio duration selector is rendered by qda(), which already
 // receives onReset:i from the same parent as the original Saves-section button.
 // Reuse that exact React callback in the top toolbar (not a DOM-cloned click),

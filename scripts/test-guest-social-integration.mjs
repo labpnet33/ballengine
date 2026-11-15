@@ -36,6 +36,9 @@ test('new worker entrypoints retain existing original site integrations',()=>{
   assert.match(worker,/isPrivateMusic/);
   assert.match(build,/ballengine-guest-publishing\.js/);
   assert.match(build,/ballengine-guest-social\.js/);
+  assert.match(build,/autopilotEntitlementBefore/);
+  assert.match(build,/autopilotLoadingBefore/);
+  assert.match(build,/window\\.__BALLENGINE_LOCAL_GUEST__/);
   assert.match(proxy,/guest-social/);
   assert.ok(!build.includes("fs.writeFileSync(path.join(web,'new-automation.html')"));
 });

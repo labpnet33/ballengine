@@ -365,6 +365,16 @@
     const tab=route(),main=host();if(!tab||!main)return;
     let panel=main.querySelector('[data-be-social-panel]');
     if(!panel){panel=create('section',null,css.panel);panel.dataset.beSocialPanel='1';main.append(panel);}
+    // Show the working guest queue beside the ORIGINAL Autopilot editor,
+    // not after a tall loading skeleton at the far bottom of the page.
+    if(tab==='autopilot'){
+      const native=main.querySelector('[aria-label="Loading Autopilot"]')||
+        main.querySelector('[data-tour="autopilot-switch"]')?.closest('section');
+      if(native?.parentElement&&panel.parentElement!==native.parentElement)
+        native.insertAdjacentElement('beforebegin',panel);
+    }else if(panel.parentElement!==main){
+      main.append(panel);
+    }
     retireNativePlanControls(tab,main,panel);
     try{
       await refresh();
