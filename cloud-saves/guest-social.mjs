@@ -78,6 +78,7 @@ async function createSocialJob(req,env,library){
   }
   if(accounts.some(x=>!platforms.has(x.platform)))throw invalid('Unsupported social account',422);
   const yt=accounts.some(x=>x.platform==='youtube');
+  if(yt&&title.length>100)throw invalid('YouTube titles are limited to 100 characters');
   if(yt&&typeof input.youtubeMadeForKids!=='boolean')
     throw invalid('Choose the YouTube audience: made for kids or not made for kids',400);
   const tk=accounts.some(x=>x.platform==='tiktok');
