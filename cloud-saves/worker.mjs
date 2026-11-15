@@ -96,6 +96,10 @@ function fail(message,status,origin){
 export default {
   async fetch(req,env){
     const url=new URL(req.url),origin=req.headers.get('Origin')||'';
+    // OAuth provider redirects are top-level navigations, not CORS API calls.
+    // Their one-time D1 state supplies the authorization instead of Origin.
+    if(req.method==='GET'&&isGuestSocialCallback(url.pathname))
+      return env.DB?oauthCallback(req,env):fail('Cloud database is not configured',503);
     if(req.method==='OPTIONS')return ALLOW_ORIGIN(origin)?options(origin):fail('Origin is not allowed',403);
     if(origin&&!ALLOW_ORIGIN(origin))return fail('Origin is not allowed',403);
     // Public script used by the existing BallEngine frontend while Vercel
@@ -110,9 +114,6 @@ export default {
     if(isPublicMusic(url.pathname))return publicMusic(req);
     if(url.pathname.startsWith('/api/assets/')&&(req.method==='GET'||req.method==='HEAD'))return env.DB?serveAsset(req,env):fail('Cloud database is not configured',503,origin);
     if(!env.DB)return fail('Cloud database is not configured',503,origin);
-    // Provider redirects do not include a cloud-library bearer header; they
-    // authenticate via a short-lived, single-use state stored in D1.
-    if(isGuestSocialCallback(url.pathname))return oauthCallback(req,env);
     const auth=req.headers.get('Authorization')||'';
     const key=auth.startsWith('Bearer ')?auth.slice(7):'';
     if(!/^be1_[A-Za-z0-9_-]{43}$/.test(key))return fail('Missing or invalid cloud recovery key',401,origin);
