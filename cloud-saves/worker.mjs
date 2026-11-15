@@ -10,6 +10,7 @@ import {isPublicMusic,publicMusic} from './music-bank.mjs';
 import {isPrivateMusic,privateMusic,serveAsset,musicUsage} from './music-media.mjs';
 import {isGuestPublishing,guestPublishing} from './guest-publishing.mjs';
 import {GUEST_PUBLISHING_CLIENT_SCRIPT} from './guest-publishing-client.mjs';
+import {isGuestSocial,isGuestSocialCallback,guestSocial,oauthCallback,runSocialSchedule} from './guest-social.mjs';
 const MAX_CONFIG_BYTES=250000;
 const MAX_SAVES=50;
 const MAX_LIBRARY_BYTES=10000000;
@@ -95,6 +96,10 @@ function fail(message,status,origin){
 export default {
   async fetch(req,env){
     const url=new URL(req.url),origin=req.headers.get('Origin')||'';
+    // OAuth provider redirects are top-level navigations, not CORS API calls.
+    // Their one-time D1 state supplies the authorization instead of Origin.
+    if(req.method==='GET'&&isGuestSocialCallback(url.pathname))
+      return env.DB?oauthCallback(req,env):fail('Cloud database is not configured',503);
     if(req.method==='OPTIONS')return ALLOW_ORIGIN(origin)?options(origin):fail('Origin is not allowed',403);
     if(origin&&!ALLOW_ORIGIN(origin))return fail('Origin is not allowed',403);
     // Public script used by the existing BallEngine frontend while Vercel
@@ -113,6 +118,7 @@ export default {
     const key=auth.startsWith('Bearer ')?auth.slice(7):'';
     if(!/^be1_[A-Za-z0-9_-]{43}$/.test(key))return fail('Missing or invalid cloud recovery key',401,origin);
     const library=await sha256(key);
+    if(isGuestSocial(url.pathname))return guestSocial(req,env,library,origin,json,fail,rateLimit);
     if(isGuestPublishing(url.pathname))return guestPublishing(req,env,library,origin,json,fail,rateLimit);
     if(isPrivateMusic(url.pathname))return privateMusic(req,env,library,origin,json,fail,rateLimit);
     const db=env.DB;
@@ -218,5 +224,8 @@ export default {
       console.error('Cloud saves request failed:',status,error?.name||'Error');
       return fail(status===500?'Cloud database operation failed':error.message,status,origin);
     }
+  },
+  async scheduled(_event,env,ctx){
+    ctx.waitUntil(runSocialSchedule(env));
   }
 };
