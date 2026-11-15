@@ -1,0 +1,29 @@
+name: Verify 27 mode setting interactions
+on:
+  push:
+    branches: [feat/27-mode-parity-audit]
+    paths:
+      - scripts/test-mode-option-interactivity.cjs
+      - .github/workflows/mode-option-interactions.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  settings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        range: ['0:7','7:14','14:21','21:27','27:33']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install browser
+        run: npm install --prefix "$RUNNER_TEMP/options" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Verify live mode settings
+        env:
+          MODE_RANGE: ${{ matrix.range }}
+          BALLENGINE_BASE: https://ballengine.vercel.app
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/options/node_modules" node scripts/test-mode-option-interactivity.cjs
