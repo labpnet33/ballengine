@@ -54,3 +54,9 @@ for(const name of ['Ape','I1','rpn','Op','ss','be','randomizeOnly','randomVideo'
  const matches=[...text.matchAll(re)].slice(0,8);
  console.log('MODE_HELPER_CONTEXT '+JSON.stringify({name,matches:matches.map(m=>({at:m.index,snippet:text.slice(Math.max(0,m.index-500),m.index+2700)}))}));
 }
+
+for(const term of ['const QP=','QP=','QP={','A.derive','A.derive?.','randomizeChangeMode','phonkDropBuildLength']){
+ let indices=[],at=-1;
+ while((at=text.indexOf(term,at+1))>=0&&indices.length<8)indices.push(at);
+ console.log('MODE_RANDOM_SCHEMA '+JSON.stringify({term,indices,contexts:indices.map(i=>text.slice(Math.max(0,i-1050),i+2300))}));
+}
