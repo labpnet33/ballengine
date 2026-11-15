@@ -1,0 +1,38 @@
+name: Guest social publishing safety checks
+
+on:
+  push:
+    branches:
+      - feature/guest-social-publishing
+    paths:
+      - 'cloud-saves/**'
+      - 'scripts/ballengine-guest-social.js'
+      - 'scripts/ballengine-cloud-saves.js'
+      - 'scripts/build-original-studio.cjs'
+      - 'scripts/test-guest-social-integration.mjs'
+      - '.github/workflows/guest-social-publishing.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  guest-social-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check independent Worker and UI syntax
+        run: |
+          node --check cloud-saves/worker.mjs
+          node --check cloud-saves/guest-social.mjs
+          node --check cloud-saves/social-oauth.mjs
+          node --check cloud-saves/social-publish.mjs
+          node --check scripts/ballengine-guest-social.js
+          node --check scripts/ballengine-cloud-saves.js
+          node --check scripts/build-original-studio.cjs
+      - name: Run guest OAuth and scheduler regression tests
+        run: node --test scripts/test-guest-social-integration.mjs
