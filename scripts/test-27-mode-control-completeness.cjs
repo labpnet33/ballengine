@@ -25,6 +25,30 @@ const server=http.createServer((req,res)=>{
     const chosen=await title.innerText();
     const confirm=page.getByRole('button',{name:'Load 3D',exact:true}).first();
     if(await confirm.isVisible().catch(()=>false))await confirm.click({timeout:12000});
+    // First test native Randomize/history on an untouched initial mode.
+    // Manual setting changes may intentionally clear roll history.
+    const random=page.getByRole('button',{name:'Randomize',exact:true}).first();
+    await random.waitFor({state:'visible',timeout:9000});
+    assert.ok(await random.isEnabled(),'Native Randomize disabled');
+    const priorMode=(await title.innerText()).trim();
+    await random.click({timeout:12000});
+    const back=page.locator('button[title="Previous roll"]').first();
+    // Native roll/history state is applied asynchronously after the first
+    // render update; do not fail on a transient disabled button.
+    await page.waitForFunction(()=>{
+      const prev=document.querySelector('button[title="Previous roll"]');
+      return !!prev&&!prev.disabled;
+    },null,{timeout:2800}).catch(()=>{});
+    if(!(await back.isEnabled())){
+      // Some simulation schemas store the first generated roll as the
+      // history baseline; a second native roll must permit undo.
+      await random.click({timeout:12000});
+      await page.waitForFunction(()=>{
+        const prev=document.querySelector('button[title="Previous roll"]');
+        return !!prev&&!prev.disabled;
+      },null,{timeout:2000}).catch(()=>{});
+    }
+    assert.ok(await back.isEnabled(),'Randomize history unavailable even after two rolls');
     // Exercise an ORIGINAL alternate option, not an added demo control.
     const selectors=page.locator('#root select:visible:not([disabled])');
     const n=await selectors.count();
@@ -50,28 +74,6 @@ const server=http.createServer((req,res)=>{
       after=await sel.inputValue();changed=after!==before;editedLabel=titleText;if(changed)break;
     }
     assert.ok(changed,'No editable dropdown value changed');
-    const random=page.getByRole('button',{name:'Randomize',exact:true}).first();
-    await random.waitFor({state:'visible',timeout:9000});
-    assert.ok(await random.isEnabled(),'Native Randomize disabled');
-    const priorMode=(await title.innerText()).trim();
-    await random.click({timeout:12000});
-    const back=page.locator('button[title="Previous roll"]').first();
-    // Native roll/history state is applied asynchronously after the first
-    // render update; do not fail on a transient disabled button.
-    await page.waitForFunction(()=>{
-      const prev=document.querySelector('button[title="Previous roll"]');
-      return !!prev&&!prev.disabled;
-    },null,{timeout:2800}).catch(()=>{});
-    if(!(await back.isEnabled())){
-      // Some simulation schemas store the first generated roll as the
-      // history baseline; a second native roll must permit undo.
-      await random.click({timeout:12000});
-      await page.waitForFunction(()=>{
-        const prev=document.querySelector('button[title="Previous roll"]');
-        return !!prev&&!prev.disabled;
-      },null,{timeout:2000}).catch(()=>{});
-    }
-    assert.ok(await back.isEnabled(),'Randomize history unavailable even after two rolls');
     const recording=page.locator('button[title="Instantly record a clean clip (C)"]').first();
     assert.ok(await recording.isVisible().catch(()=>false),'Record button disappeared');
     assert.equal((await title.innerText()).trim(),priorMode,'Randomize moved to another mode unexpectedly');
