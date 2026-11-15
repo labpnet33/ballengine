@@ -1,0 +1,31 @@
+name: Complete mode-control validation for all 27 engines
+on:
+  push:
+    branches: [dev/complete-27-mode-engines]
+    paths:
+      - scripts/test-27-mode-control-completeness.cjs
+      - scripts/build-original-studio.cjs
+      - .github/workflows/27-mode-controls-complete.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mode-controls-complete:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        range: ['0:9','9:18','18:27']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install browser controller
+        run: npm install --prefix "$RUNNER_TEMP/control-validation" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original application
+        run: node scripts/build-original-studio.cjs
+      - name: Test dropdown interaction, Randomize, history, and Record
+        env:
+          MODE_RANGE: ${{ matrix.range }}
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/control-validation/node_modules" node scripts/test-27-mode-control-completeness.cjs
