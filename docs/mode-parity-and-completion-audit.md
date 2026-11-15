@@ -73,3 +73,37 @@ node scripts/test-phonk-mode-parity.cjs
 TEST_MODE=domino-3d TEST_DURATION=2 node scripts/test-record-export.cjs
 ```
 The Playwright tests require a browser executable and the `playwright-core` dependency; CI sets those automatically. Keep production untouched until the preview passes and an explicit deployment decision is made.
+
+## Per-mode reverse-engineering inventory
+
+Every entry below has its own mode-specific native UI, an animated canvas, and at least one responsive editable control. The limitations column is **not** proof of full correctness; it lists issues identified in the current audit. MP4 was sampled for selected modes rather than exhaustively exported for all 27.
+
+| Mode | Engine type | Original mode-specific settings inspected | Issues / follow-up |
+|---|---|---|---|
+| Bloom | 2D | Lane count, alignment time, lane shape | None identified |
+| Phonk Drop | 2D | Face, beat-drop timing, ball movement, playback speed | Native randomizer and 20 face/hand fallbacks fixed |
+| Marble | 2D | Course shape, bounce style, playback speed, song matching | None identified |
+| Race | 2D | Obstacle layout, racers, length, gravity | None identified |
+| Targets | 2D | Target layout/size/count, bounce, gravity | None identified |
+| Sand | 2D | Sand mode, grid detail, particle flow, material | None identified |
+| Plinko | 2D | Peg layout, drop mode, bins, gravity | None identified |
+| Colors | 2D | Brick rings, colours, speed changes | None identified |
+| Spin | 2D | Win threshold, ball multipliers, spin/steal odds | None identified |
+| Lava | 2D | Platform layout, rising lava, skill gap | None identified |
+| Slice 3D | 3D | Fruit, slice pattern, timing, gravity, geometry | None identified |
+| Flood 3D | 3D | Container, ending, ball count, gravity | None identified |
+| Disks 3D | 3D | Formation, disks, drop timing | None identified |
+| Drum 3D | 3D | Rotation, colour bands, object count | None identified |
+| Plinko 3D | 3D | Peg rows, bin count, drop delay, lean angle | None identified |
+| Chladni 3D | 3D | Pattern source, plate shape, sand amount | None identified |
+| Voxels 3D | 3D | Artwork, cube resolution, build order and ending | None identified |
+| Domino 3D | 3D | Run shape, spacing, timing, topple speed | Software renderer can be slow; default reduced from 1,600 to 540 bodies |
+| Race 3D | 3D | Track geometry, slope, racers, identities | None identified |
+| Attractor 3D | 3D | Attractor equation, particles, trail length, zoom | High particle settings need device-specific validation |
+| Flow 3D | 3D | Particle count, lifetime, speed, trails | High particle settings need device-specific validation |
+| Blobs 3D | 3D | Movement, material, blob count, thickness | None identified |
+| Galaxy 3D | 3D | Gravity, spin, particle count, cloud thickness | High particle settings need device-specific validation |
+| Fireflies 3D | 3D | Pull strength, frequency, formation, agent count | None identified |
+| Basin 3D | 3D | Magnet count, friction, sampling resolution | High sampling settings need device-specific validation |
+| Slime 3D | 3D | Agent count, sensor angle, trails, food nodes | High agent settings need device-specific validation |
+| Evacuate 3D | 3D | Exits, people, personal space, door width | None identified |
