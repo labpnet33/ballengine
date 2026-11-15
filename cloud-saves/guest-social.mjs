@@ -3,7 +3,7 @@
  * Intentionally distinct from the original manual guest planner so it never
  * changes or corrupts existing drafts, queue rows, or saved Studio projects.
  */
-import {providerReadiness,beginOAuth,oauthCallback,listAccounts,disconnectAccount,invalid} from './social-oauth.mjs';
+import {providerReadiness,beginOAuth,oauthCallback,listAccounts,disconnectAccount,accessToken,providerJSON,invalid} from './social-oauth.mjs';
 import {runSocialSchedule} from './social-publish.mjs';
 const ID=/^[0-9a-f-]{36}$/i;
 const platforms=new Set(['youtube','instagram','facebook','tiktok']);
@@ -82,14 +82,17 @@ async function createSocialJob(req,env,library){
     throw invalid('Choose the YouTube audience: made for kids or not made for kids',400);
   const tk=accounts.some(x=>x.platform==='tiktok');
   if(tk&&!privacies.has(input.tiktokPrivacy))throw invalid('Choose a valid TikTok privacy level',400);
+  if(tk&&['tiktokAllowComment','tiktokAllowDuet','tiktokAllowStitch'].some(k=>typeof input[k]!=='boolean'))
+    throw invalid('Choose the TikTok interaction permissions',400);
   if(!repeats.has(input.repeat||'none'))throw invalid('Invalid Autopilot repeat setting');
   const count=(await env.DB.prepare('SELECT COUNT(*) n FROM guest_social_jobs WHERE library_id=?').bind(library).first())?.n||0;
   if(Number(count)>=60)throw invalid('Guest auto-publishing history is full (60 entries)',409);
   const at=scheduled(input.scheduleAt),now=Date.now(),jobId=crypto.randomUUID();
   const query=[env.DB.prepare(
-    'INSERT INTO guest_social_jobs(id,library_id,title,caption,media_id,tiktok_privacy,youtube_made_for_kids,status,scheduled_at,repeat_rule,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)')
+    'INSERT INTO guest_social_jobs(id,library_id,title,caption,media_id,tiktok_privacy,tiktok_allow_comments,tiktok_allow_duet,tiktok_allow_stitch,youtube_made_for_kids,status,scheduled_at,repeat_rule,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
     .bind(jobId,library,title,caption,media.id,
-      tk?input.tiktokPrivacy:'SELF_ONLY',yt?(input.youtubeMadeForKids?1:0):null,
+      tk?input.tiktokPrivacy:'SELF_ONLY',tk&&input.tiktokAllowComment?1:0,tk&&input.tiktokAllowDuet?1:0,
+      tk&&input.tiktokAllowStitch?1:0,yt?(input.youtubeMadeForKids?1:0):null,
       'queued',at,input.repeat||'none',now,now)];
   for(const a of accounts)query.push(env.DB.prepare(
     'INSERT INTO guest_social_deliveries(id,job_id,library_id,account_id,platform,status,next_attempt_at,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)')
@@ -141,6 +144,20 @@ export async function guestSocial(req,env,library,origin,json,fail,rateLimit){
     }
     if(p==='/api/guest-social/accounts'&&method==='GET')
       return json({accounts:await listAccounts(env,library)},200,origin);
+    const creator=/^\/api\/guest-social\/tiktok\/creator-info\/([0-9a-f-]{36})$/.exec(p);
+    if(creator&&method==='GET'){
+      const a=await env.DB.prepare("SELECT * FROM guest_social_accounts WHERE id=? AND library_id=? AND platform='tiktok'")
+        .bind(creator[1],library).first();
+      if(!a)throw invalid('TikTok account is not connected',404);
+      const result=await providerJSON('https://open.tiktokapis.com/v2/post/publish/creator_info/query/',{
+        method:'POST',headers:{Authorization:'Bearer '+await accessToken(env,a),'Content-Type':'application/json'},body:'{}'});
+      const info=result.data||{};
+      return json({name:info.creator_nickname||a.display_name,
+        privacyOptions:info.privacy_level_options||[],
+        commentDisabled:!!info.comment_disabled,duetDisabled:!!info.duet_disabled,
+        stitchDisabled:!!info.stitch_disabled,
+        maxVideoSeconds:info.max_video_post_duration_sec||null},200,origin);
+    }
     const connect=/^\/api\/guest-social\/connect\/(youtube|instagram|facebook|tiktok)$/.exec(p);
     if(connect&&method==='POST')
       return json(await beginOAuth(req,env,library,connect[1],origin),200,origin);
