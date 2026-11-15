@@ -1,0 +1,50 @@
+name: Verify 27 simulation engine parity
+on:
+  push:
+    branches: [dev/complete-27-mode-engines]
+    paths:
+      - scripts/build-original-studio.cjs
+      - scripts/test-mode-option-interactivity.cjs
+      - scripts/test-phonk-mode-parity.cjs
+      - scripts/audit-mode-parity-static.cjs
+      - .github/workflows/verify-27-mode-parity.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  settings-and-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        mode_range: ['0:7','7:14','14:21','21:27','27:33']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install Playwright
+        run: npm install --prefix "$RUNNER_TEMP/parity" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original BallEngine with native mode enhancements
+        run: node scripts/build-original-studio.cjs
+      - name: Check native settings actually respond to input
+        env:
+          MODE_RANGE: ${{ matrix.mode_range }}
+          BALLENGINE_BASE: http://not-used
+        run: |
+          unset BALLENGINE_BASE
+          node scripts/audit-mode-parity-static.cjs > /tmp/parity-static.log
+          CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/parity/node_modules" node scripts/test-mode-option-interactivity.cjs
+  phonk-native-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install Playwright
+        run: npm install --prefix "$RUNNER_TEMP/parity" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original BallEngine
+        run: node scripts/build-original-studio.cjs
+      - name: Verify Phonk, Bloom, Rhythmic Randomize/history/skins
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/parity/node_modules" node scripts/test-phonk-mode-parity.cjs
