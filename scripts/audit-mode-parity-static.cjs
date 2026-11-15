@@ -1,0 +1,62 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const built=path.join(root,'extra/wget/ballengine.app/assets/index-3pf76ICO.js');
+const original=path.join(root,'captures/studio-browser/ballengine.app/assets/index-3pf76ICO.js');
+const text=fs.readFileSync(fs.existsSync(original)?original:built,'utf8');
+const names=[
+  'rhythmic','escape','drawer','spawner','ghost-escape','breaker','glass-tower','flag-battle','weapon-battle','merge-evolution','glass-rush','grid-merge','wave-3d','marble-run-3d','ball-crush','jelly-3d','cut-count','magnet',
+  'phase-bloom','phonk-drop','marble-run','ball-race','target-hit','falling-sand','plinko','color-match','spin-battle','lava-survival','glass-slice','flood-fill','eulers-disk','drum-sort','plinko-3d','chladni','voxel','domino-3d','marble-race-3d','attractor','flow-field','metaballs','galaxy','fireflies','pendulum-basin','slime','crowd-evacuation'
+];
+const active=new Set(names.slice(0,18));
+const entries=[];
+for(const slug of names){
+  const needle='slug:"'+slug+'"',idx=text.indexOf(needle);
+  const left=idx===-1?-1:text.lastIndexOf('{mode:',idx);
+  const right=left<0?-1:text.indexOf('}',idx);
+  const info=left>=0&&right>=0&&right-left<2500?text.slice(left,right+1):'';
+  const settingsKeys=Array.from(info.matchAll(/(?:label|kind|group|status|mode|slug|name|category|description|tier|access|default|supports|engine):(?:"([^"]+)"|([a-zA-Z0-9.]+))/g)).slice(0,45).map(m=>[m[0].split(':')[0],m[1]||m[2]]);
+  entries.push({slug,category:active.has(slug)?'established':'experimental',registryAt:idx,entryLength:info.length,entry:info.slice(0,1600),settingsKeys});
+}
+const files=fs.readdirSync(path.join(root,'extra/wget/ballengine.app/assets'));
+const imageAssets=files.filter(n=>/\.(png|webp|avif|svg|jpe?g)$/i.test(n));
+const missingRefs=['bloodshot.face-DQdTiO_Y.webp','bloodshot.hands-BmzUMEQm.webp'].map(name=>({name,present:files.includes(name),references:text.split(name).length-1}));
+console.log('MODE_REGISTRY_AUDIT '+JSON.stringify({bundleBytes:text.length,registryEntries:entries,images:imagesAssetsSample(),missingRefs}));
+function imagesAssetsSample(){
+ return {count:imageAssets.length,face:imageAssets.filter(x=>/face/i.test(x)).slice(0,35),hands:imageAssets.filter(x=>/hands/i.test(x)).slice(0,35),bloodshot:imageAssets.filter(x=>/bloodshot/i.test(x)).slice(0,15)};
+}
+
+
+// Examine the actual branch conditions and assets used by the original
+// randomizer and picture layers, rather than faking a button click.
+const important=[
+ "Randomize doesn't support this mode yet.",
+ 'Randomize does not support this mode yet.',
+ 'bloodshot.face-DQdTiO_Y.webp',
+ 'bloodshot.hands-BmzUMEQm.webp',
+ '"PHONK_DROP"',
+ 'case"PHONK_DROP"',
+ 'PHONK_DROP:',
+ 'phonkDropStudio',
+ 'phaseBloomStudio'
+];
+for(const needle of important){
+ let index=-1,hits=0,contexts=[];
+ while((index=text.indexOf(needle,index+1))!==-1&&hits++<6){
+   contexts.push({at:index,snippet:text.slice(Math.max(0,index-1200),Math.min(text.length,index+1500))});
+ }
+ console.log('MODE_CODE_CONTEXT '+JSON.stringify({needle,hits,contexts}));
+}
+
+// Resolve the named helper bodies used by the ORIGINAL Randomize toolbar.
+for(const name of ['Ape','I1','rpn','Op','ss','be','randomizeOnly','randomVideo','Shuffle this mode']){
+ const re=new RegExp('(?:(?:const|let|var)\\s+|function\\s+)'+name+'\\b','g');
+ const matches=[...text.matchAll(re)].slice(0,8);
+ console.log('MODE_HELPER_CONTEXT '+JSON.stringify({name,matches:matches.map(m=>({at:m.index,snippet:text.slice(Math.max(0,m.index-500),m.index+2700)}))}));
+}
+
+for(const term of ['const QP=','QP=','QP={','A.derive','A.derive?.','randomizeChangeMode','phonkDropBuildLength']){
+ let indices=[],at=-1;
+ while((at=text.indexOf(term,at+1))>=0&&indices.length<8)indices.push(at);
+ console.log('MODE_RANDOM_SCHEMA '+JSON.stringify({term,indices,contexts:indices.map(i=>text.slice(Math.max(0,i-1050),i+2300))}));
+}
