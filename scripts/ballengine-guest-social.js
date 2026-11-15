@@ -77,7 +77,7 @@
   function summary(parent){
     const pending=state.jobs.filter(j=>['queued','running'].includes(j.status)).length;
     const success=state.jobs.filter(j=>j.status==='published').length;
-    const failed=state.jobs.filter(j=>['partial','failed'].includes(j.status)).length;
+    const failed=state.jobs.filter(j=>['partial','failed','needs_review'].includes(j.status)).length;
     const bar=create('div',null,css.row);
     for(const [label,count] of [['Connected accounts',state.accounts.length],['Queued',pending],['Published',success],['Needs attention',failed]]){
       const tile=create('div',null,'flex:1 1 105px;padding:12px;border:1px solid #3f3f46;border-radius:10px;min-width:95px;');
@@ -162,20 +162,55 @@
     for(const [val,text] of [['none','One time'],['daily','Every day'],['weekly','Every week']]){
       const op=create('option',text);op.value=val;repeat.input.append(op);
     }
-    const privacy=field('TikTok visibility','select');
-    for(const [val,text] of [['SELF_ONLY','Only me'],['PUBLIC_TO_EVERYONE','Public'],['FOLLOWER_OF_CREATOR','Followers'],['MUTUAL_FOLLOW_FRIENDS','Friends']]){
-      const op=create('option',text);op.value=val;privacy.input.append(op);
+    const privacy=field('TikTok visibility (choose explicitly)','select');
+    const creatorInfo=line('Select a TikTok account to load its latest posting permissions.');
+    const effects=create('div',null,css.row+';margin:10px 0;');
+    const interactions={};
+    for(const key of ['comment','duet','stitch']){
+      const label=create('label',null,'font-size:12px;display:flex;gap:6px;align-items:center;');
+      const input=create('input');input.type='checkbox';input.checked=false;
+      label.append(input,create('span','Allow '+key));effects.append(label);interactions[key]=input;
     }
     const made=field('YouTube audience','select');
     for(const [val,text] of [['','Select the audience'],['no','Not made for kids'],['yes','Made for kids']]){
       const op=create('option',text);op.value=val;made.input.append(op);
     }
-    privacy.wrap.hidden=true;made.wrap.hidden=true;
-    const updateDestinations=()=>{
-      privacy.wrap.hidden=!checks.some(c=>c.input.checked&&c.account.platform==='tiktok');
-      made.wrap.hidden=!checks.some(c=>c.input.checked&&c.account.platform==='youtube');
+    privacy.wrap.hidden=true;effects.hidden=true;creatorInfo.hidden=true;made.wrap.hidden=true;
+    let activeTikTokInfo=[],lookupVersion=0;
+    const fillPrivacy=(values)=>{
+      privacy.input.replaceChildren();
+      const empty=create('option','Choose visibility');empty.value='';privacy.input.append(empty);
+      for(const value of values){
+        const label={SELF_ONLY:'Only me',PUBLIC_TO_EVERYONE:'Public',FOLLOWER_OF_CREATOR:'Followers',MUTUAL_FOLLOW_FRIENDS:'Friends'}[value]||value;
+        const op=create('option',label);op.value=value;privacy.input.append(op);
+      }
+      privacy.input.value='';
     };
-    for(const c of checks)c.input.addEventListener('change',updateDestinations);
+    fillPrivacy([]);
+    const updateDestinations=async()=>{
+      const tik=checks.filter(c=>c.input.checked&&c.account.platform==='tiktok');
+      const on=!!tik.length;
+      privacy.wrap.hidden=!on;effects.hidden=!on;creatorInfo.hidden=!on;
+      made.wrap.hidden=!checks.some(c=>c.input.checked&&c.account.platform==='youtube');
+      for(const control of Object.values(interactions))control.checked=false;
+      const version=++lookupVersion;
+      activeTikTokInfo=[];fillPrivacy([]);
+      if(!on)return;
+      creatorInfo.textContent='Checking latest TikTok creator settings…';
+      try{
+        const infos=await Promise.all(tik.map(c=>request('/tiktok/creator-info/'+c.account.id)));
+        if(version!==lookupVersion)return;
+        activeTikTokInfo=infos;
+        const options=infos.map(x=>x.privacyOptions||[]);
+        const shared=options[0].filter(x=>options.every(array=>array.includes(x)));
+        fillPrivacy(shared);
+        interactions.comment.disabled=infos.some(x=>x.commentDisabled);
+        interactions.duet.disabled=infos.some(x=>x.duetDisabled);
+        interactions.stitch.disabled=infos.some(x=>x.stitchDisabled);
+        creatorInfo.textContent='TikTok creator: '+infos.map(x=>x.name).join(', ')+'. Choose a visibility level and optional interactions; none are selected by default.';
+      }catch(e){if(version===lookupVersion){creatorInfo.textContent='Could not retrieve creator permissions: '+standardError(e);activeTikTokInfo=[];}}
+    };
+    for(const c of checks)c.input.addEventListener('change',()=>{void updateDestinations();});
     const approval=create('label',null,'display:flex;align-items:start;gap:9px;font-size:12px;margin:16px 0;');
     const consent=create('input');consent.type='checkbox';
     approval.append(consent,create('span','I authorize BallEngine to post this video to the selected social accounts at the requested time and recurrence.'));
@@ -190,6 +225,23 @@
         if(!title.input.value.trim())throw new Error('Enter a video title');
         if(chosen.some(c=>c.account.platform==='youtube')&&!made.input.value)
           throw new Error('Choose the YouTube audience');
+        const tk=chosen.some(c=>c.account.platform==='tiktok');
+        if(tk&&(!activeTikTokInfo.length||!privacy.input.value))
+          throw new Error('Choose TikTok visibility from the latest creator settings');
+        if(tk){
+          const maxDuration=Math.min(...activeTikTokInfo.map(x=>Number(x.maxVideoSeconds)||Infinity));
+          if(Number.isFinite(maxDuration)){
+            const duration=await new Promise(resolve=>{
+              const v=document.createElement('video'),url=URL.createObjectURL(video.input.files[0]);
+              let settled=false;
+              const done=value=>{if(settled)return;settled=true;URL.revokeObjectURL(url);v.removeAttribute('src');v.load();resolve(value);};
+              v.preload='metadata';v.onloadedmetadata=()=>done(v.duration);v.onerror=()=>done(null);
+              setTimeout(()=>done(null),8000);v.src=url;
+            });
+            if(Number.isFinite(duration)&&duration>maxDuration)
+              throw new Error('Video exceeds the TikTok creator duration limit of '+maxDuration+' seconds');
+          }
+        }
         if(!consent.checked)throw new Error('Approve direct publishing before continuing');
         submit.disabled=true;submit.textContent='Uploading and scheduling…';
         const upload=new FormData();upload.set('file',video.input.files[0]);
@@ -199,6 +251,8 @@
           title:title.input.value.trim(),caption:caption.input.value,
           videoAssetId:asset.key,accountIds:chosen.map(c=>c.account.id),scheduleAt,
           repeat:repeat.input.value,tiktokPrivacy:privacy.input.value,
+          tiktokAllowComment:!!interactions.comment.checked,tiktokAllowDuet:!!interactions.duet.checked,
+          tiktokAllowStitch:!!interactions.stitch.checked,
           youtubeMadeForKids:made.input.value==='yes',consent:true
         });
         window.alert('Video added to the automatic posting queue for '+new Date(job.scheduledAt).toLocaleString()+'.');
@@ -206,7 +260,7 @@
       }catch(e){window.alert('Could not queue video: '+standardError(e));}
       finally{submit.disabled=false;submit.textContent='Queue automatic post';}
     },true);
-    for(const part of [title.wrap,caption.wrap,video.wrap,accountsLabel,options,sched.wrap,repeat.wrap,privacy.wrap,made.wrap,approval,submit])form.append(part);
+    for(const part of [title.wrap,caption.wrap,video.wrap,accountsLabel,options,sched.wrap,repeat.wrap,creatorInfo,privacy.wrap,effects,made.wrap,approval,submit])form.append(part);
     parent.append(form);
   }
   function queue(parent,onlyRecurring=false){
