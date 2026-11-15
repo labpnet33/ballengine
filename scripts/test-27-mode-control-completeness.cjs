@@ -52,7 +52,7 @@ const server=http.createServer((req,res)=>{
     await page.waitForFunction(()=>{
       const prev=document.querySelector('button[title="Previous roll"]');
       return !!prev&&!prev.disabled;
-    },{timeout:2800}).catch(()=>{});
+    },null,{timeout:2800}).catch(()=>{});
     assert.ok(await back.isEnabled(),'Randomize did not create native undo history');
     const recording=page.locator('button[title="Instantly record a clean clip (C)"]').first();
     assert.ok(await recording.isVisible().catch(()=>false),'Record button disappeared');
