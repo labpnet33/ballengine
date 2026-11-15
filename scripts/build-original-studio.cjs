@@ -236,6 +236,8 @@ if(exportBegin<0||exportFinish<0||
   throw new Error('Original local-export ticket gate changed; review before patching.');
 const standaloneExport='const Wt=null,Xt=!1,Gt={raw:null,tid:"local-"+crypto.randomUUID(),res:uV(Ve,ke),wm:!1,stamp:null};';
 
+capturedApp=capturedApp.slice(0,exportBegin)+standaloneExport+
+  capturedApp.slice(exportFinish+remoteExportEnd.length);
 // Native 3D MP4 pipeline is CPU-bound on SwiftShader/llvmpipe: 120 GPU
 // readback frames for a 2s / 60fps Domino clip take >270s in CI.
 // Keep the original simulator and audio mixer, but choose a cinematic
@@ -255,9 +257,6 @@ if(capturedApp.split(exportFpsBefore).length!==2)
   throw new Error('Native offline video FPS anchor changed; no automatic patch.');
 capturedApp=capturedApp.replace(exportFpsBefore,exportFpsAfter);
 console.log('Software-renderer Domino MP4 adaptive frame-rate enabled; hardware 60fps unaffected.');
-
-capturedApp=capturedApp.slice(0,exportBegin)+standaloneExport+
-  capturedApp.slice(exportFinish+remoteExportEnd.length);
 console.log('Standalone local MP4 export enabled using original frame renderer; upstream ticket not requested.');
 
 // QA-gated release of native experimental simulation controls. The captured
