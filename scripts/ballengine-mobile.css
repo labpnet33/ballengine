@@ -1,0 +1,207 @@
+/*
+ * BallEngine mobile enhancements, layered after the captured original CSS.
+ * Keep the native React routes, simulations, canvas gestures and desktop layout.
+ * The original stylesheet already handles broad grid breakpoints. These rules
+ * address narrow device widths and the locally implemented publishing panels.
+ */
+@media (max-width: 767.98px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Prevent a single wide panel from widening the whole page. Do not clip
+     nested horizontal tab rails, dropdowns or the Studio simulation canvas. */
+  body {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  #root,
+  #root > div,
+  #root main {
+    min-width: 0;
+    max-width: 100%;
+  }
+  #root main :where(h1, h2, h3, p) {
+    overflow-wrap: break-word;
+  }
+  #root main :where(img, video) {
+    max-width: 100%;
+  }
+
+  /* The original Automation tabs are a real scrolling rail on phones. */
+  #root nav[aria-label="Automation"] {
+    max-width: 100%;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-inline: 16px;
+    scroll-snap-type: x proximity;
+  }
+  #root nav[aria-label="Automation"] > button {
+    min-height: 44px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+
+  /* Keep guest OAuth, uploads and reminders inside their existing host
+     sections; their controls are assembled with inline styles at runtime. */
+  #root :is([data-be-social-panel], [data-be-guest-publisher]) {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px !important;
+    overflow-wrap: anywhere;
+  }
+  #root :is([data-be-social-panel], [data-be-guest-publisher])
+    :where([style*="display:flex"], [style*="display: flex"]) {
+    min-width: 0;
+    flex-wrap: wrap !important;
+  }
+  #root :is([data-be-social-panel], [data-be-guest-publisher])
+    :where(input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]), select, textarea) {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+    font-size: 16px !important; /* iOS: prevent automatic focus zoom */
+  }
+  #root :is([data-be-social-panel], [data-be-guest-publisher])
+    :where(button, input[type="submit"], input[type="file"], select) {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+  #root :is([data-be-social-panel], [data-be-guest-publisher]) :where(textarea) {
+    resize: vertical;
+  }
+  #root :is([data-be-social-panel], [data-be-guest-publisher]) :where(table) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #root :is([data-be-social-panel], [data-be-guest-publisher])
+    :where(a, button, label) {
+    overflow-wrap: anywhere;
+  }
+
+  /* The captured app positions popups over the Studio; never allow a modal
+     to become wider or taller than the phone's visual viewport. */
+  #root :where([role="dialog"], [role="alertdialog"]) {
+    box-sizing: border-box;
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  [data-radix-popper-content-wrapper] {
+    max-width: calc(100vw - 16px);
+  }
+  [data-radix-popper-content-wrapper] > * {
+    max-width: 100%;
+  }
+
+  /* Keep the added native Reset control and duration selector reachable
+     without causing the Studio toolbar to overflow its available width. */
+  #root [data-tour="capture-duration"] {
+    min-width: 0;
+    max-width: 100%;
+    gap: 4px;
+    flex-shrink: 1;
+  }
+  #root [data-tour="capture-duration"] > :where(button, select) {
+    min-width: 0;
+    min-height: 40px;
+  }
+  #root [data-tour="capture-duration"] select {
+    max-width: min(36vw, 128px);
+  }
+
+  /* Game canvas is deliberately excluded: touch-action:none is necessary
+     for dragging objects. Only HUD/buttons become easier to touch. */
+  .game-root {
+    --game-pad: 12px;
+  }
+  .game-hud {
+    gap: 8px;
+  }
+  .game-stats {
+    gap: 12px;
+  }
+  .game-stat-value {
+    font-size: clamp(18px, 5vw, 26px);
+  }
+  .game-icons {
+    gap: 6px;
+  }
+  .game-icon {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .game-controls {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* Preserve bottom navigation and content above the iPhone home indicator. */
+  html[data-app-shell] .shell-lift {
+    margin-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (max-width: 380px) {
+  #root [data-tour="capture-duration"] select {
+    max-width: 104px;
+  }
+  .game-root {
+    --game-pad: 8px;
+  }
+  .game-stats {
+    gap: 8px;
+  }
+  .game-stat-label {
+    letter-spacing: .08em;
+  }
+  .game-stat-value {
+    font-size: 19px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  /* Small tablets have less horizontal room than desktop dashboards. */
+  #root :is([data-be-social-panel], [data-be-guest-publisher]) {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  #root nav[aria-label="Automation"] {
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
+  .game-root {
+    --game-pad: 8px;
+  }
+  .game-hud {
+    gap: 6px;
+  }
+  .game-stats {
+    gap: 8px;
+  }
+  .game-stat-value {
+    font-size: 18px;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  #root :is([data-be-social-panel], [data-be-guest-publisher]) button {
+    min-height: 44px;
+  }
+  #root :is([data-be-social-panel], [data-be-guest-publisher])
+    :where(a, button, select) {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}
