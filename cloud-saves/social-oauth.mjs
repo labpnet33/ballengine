@@ -47,7 +47,12 @@ export async function unseal(env,blob){
 async function providerJSON(url,init={}){
   const r=await fetch(url,{...init,redirect:'error',signal:AbortSignal.timeout(30000)});
   const body=await r.json().catch(()=>({}));
-  if(!r.ok||body.error && (typeof body.error==='object'||body.error.code && body.error.code!=='ok')){
+  // TikTok always includes an {error:{code:'ok'}} envelope on success.
+  // Google and Meta use an error object only when a call actually fails.
+  const providerError=body.error;
+  const providerFailed=!!providerError && (typeof providerError!=='object'||
+    providerError.code!=='ok');
+  if(!r.ok||providerFailed){
     const msg=body.error?.message||body.error_description||('Provider HTTP '+r.status);
     throw invalid('Social platform rejected this request: '+String(msg).slice(0,190),
       [400,401,403,422,429].includes(r.status)?r.status:502);
