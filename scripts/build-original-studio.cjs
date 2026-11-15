@@ -450,6 +450,9 @@ fs.writeFileSync(originalBundle,capturedApp,'utf8');
 // Change only the existing HTML entry script URL, using the ACTUAL final JS
 // content hash; do not rename bundles or replace/create application pages.
 const agencyBundleVersion=digest(originalBundle).slice(0,16);
+// Browser caches may preserve an old guest profile after an otherwise good deploy.
+// Version the existing guest bootstrap script along with the captured app bundle.
+const agencyGuestVersion=digest(path.join(web,'studio-guest-preview.js')).slice(0,16);
 const agencyEntrypoints=[
   'index.html','home.html','home/index.html','studio.html','studio/index.html',
   'automation.html','automation/index.html','automation/accounts/index.html',
@@ -463,7 +466,9 @@ for(const rel of agencyEntrypoints){
   if(!fs.existsSync(file))continue;
   const html=fs.readFileSync(file,'utf8');
   const updated=html.replaceAll('assets/index-3pf76ICO.js"',
-    'assets/index-3pf76ICO.js?v='+agencyBundleVersion+'"');
+    'assets/index-3pf76ICO.js?v='+agencyBundleVersion+'"')
+    .replaceAll('src="/studio-guest-preview.js"',
+      'src="/studio-guest-preview.js?v='+agencyGuestVersion+'"');
   if(updated!==html){
     fs.writeFileSync(file,updated,'utf8');
     versionedEntrypoints++;

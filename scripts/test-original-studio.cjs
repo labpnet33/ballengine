@@ -32,7 +32,7 @@ assert.ok(rootHome.includes('<base href="/">'),'Homepage must use root assets');
 for(const route of ['index.html','home.html','home/index.html']){
   const html=fs.readFileSync(path.join(root,route),'utf8');
   assert.ok(html.includes('<base href="/">'),'Missing root asset base on '+route);
-  assert.ok(html.includes('<script src="/studio-guest-preview.js"></script>'),
+  assert.ok(/<script src="\/studio-guest-preview\.js\?v=[a-f0-9]{16}"><\/script>/.test(html),
     'Guest authentication adapter missing on '+route);
   assert.equal((html.match(/studio-guest-preview\.js/g)||[]).length,1,
     'Duplicate guest adapter on '+route);
@@ -43,7 +43,7 @@ assert.ok(originalStudio.includes('index-3pf76ICO.js')&&originalStudio.includes(
   'Original captured React Studio replaced or damaged');
 const directStudio=fs.readFileSync(path.join(root,'studio.html'),'utf8');
 for (const [route,html] of [['/studio',originalStudio],['/studio.html',directStudio]]) {
-  assert.ok(html.includes('<script src="/studio-guest-preview.js"></script>'),
+  assert.ok(/<script src="\/studio-guest-preview\.js\?v=[a-f0-9]{16}"><\/script>/.test(html),
     'Agency / Max guest bootstrap missing on '+route);
   assert.equal((html.match(/studio-guest-preview\.js/g)||[]).length,1,
     'Guest profile adapter duplicated on '+route);
@@ -60,6 +60,8 @@ assert.ok(patchedBundle.includes('const Wt=null,Xt=!1,Gt={raw:null,tid:"local-"+
 assert.ok(!patchedBundle.includes('let Ot=null,Wt=null,Xt=!1;try{const jt=crypto.randomUUID()'),
   'Original export ticket request is still present');
 const adapter=fs.readFileSync(path.join(root,'studio-guest-preview.js'),'utf8');
+assert.ok(adapter.includes("plan:'ENTERPRISE'")&&adapter.includes("agency_plan:'AGENCY'")&&adapter.includes("automation_plan:'MAX'"),
+  'Guest must use native unlocked Studio tier with Agency / Max local labels');
 assert.ok(adapter.includes('window.__BALLENGINE_LOCAL_GUEST__=guest'),
   'Local guest fallback is missing from the shared homepage/Studio bootstrap');
 assert.ok(adapter.includes("url.pathname==='/api/studio/video-export' && method==='POST'"),
@@ -150,13 +152,14 @@ async function main(){
      const response=await fetch('/api/auth/me');
      return (await response.json()).user;
    });
-   assert.equal(homeAuth.plan,'AGENCY','/home did not load the local guest profile');
+   assert.equal(homeAuth.plan,'ENTERPRISE','/home must use the native unlocked guest Studio plan');
+   assert.equal(homeAuth.agency_plan,'AGENCY','/home lost Agency guest access');
    assert.equal(homeAuth.can_use_all_modes,true,'/home lost unrestricted local modes');
    assert.equal(homeAuth.automation_plan,'MAX','/home did not load Max automation tier');
    assert.equal(new URL(page.url()).pathname,'/home','/home redirected to login');
 
    assert.equal(guest.id,'local-preview-guest','guest preview adapter did not activate');
-   assert.equal(guest.plan,'AGENCY','local preview guest must have access to tier-gated UI');
+   assert.equal(guest.plan,'ENTERPRISE','local preview guest must use the native top Studio tier');
    assert.equal(guest.allModes,true,'all development modes must be selectable in local preview');
    const automationTier=await page.evaluate(async()=>(await(await fetch('/api/auth/me')).json()).user.automation_tier);
    assert.equal(automationTier,'MAX','Guest Max automation tier missing');

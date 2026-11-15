@@ -12,7 +12,9 @@
     email:'guest@preview.invalid',
     public_id:'local-preview-guest',
     // Local guest-only tier. Not a purchased subscription or server entitlement.
-    plan:'AGENCY',
+    // Use the native captured Studio top tier; Agency / Max remains the local offering.
+    plan:'ENTERPRISE',
+    agency_plan:'AGENCY',
     automation_plan:'MAX',
     automation_tier:'MAX',
     is_guest:true,
