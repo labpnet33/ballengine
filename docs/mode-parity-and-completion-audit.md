@@ -107,3 +107,19 @@ Every entry below has its own mode-specific native UI, an animated canvas, and a
 | Basin 3D | 3D | Magnet count, friction, sampling resolution | High sampling settings need device-specific validation |
 | Slime 3D | 3D | Agent count, sensor angle, trails, food nodes | High agent settings need device-specific validation |
 | Evacuate 3D | 3D | Exits, people, personal space, door width | None identified |
+
+## Deeper integration test findings — not yet complete
+
+A second browser regression attempted an **actual alternate native dropdown, Randomize, undo history and Record** in every experimental mode, rather than simply checking that widgets exist. It passed **24/27** in a software-GPU runner. The remaining three require further engine-level work or hardware-specific reproduction:
+
+| Mode | Observed issue | Implication |
+|---|---|---|
+| Slice 3D | Randomize click did not become actionable within the 12-second stress-test timeout | Possible heavy-renderer interaction latency; test on hardware GPU |
+| Flood 3D | Previous-roll history remained unavailable after two randomizations | Native Randomize undo integration needs investigation |
+| Drum 3D | Randomize click did not become actionable within the 12-second stress-test timeout | Possible heavy-renderer interaction latency; test on hardware GPU |
+
+The extended test passed the other 24 modes, including Phonk Drop. Tests also confirmed that manually editing dropdowns can clear randomization history, so undo/redo checks should first be done without a manual edit. Do not interpret a disabled Previous-roll control as proof the simulation itself cannot animate.
+
+**Export stress result:** a 2-second Domino 3D export remained around 60% after 270 seconds even with a trial 240-body default. The trial was reverted to the moderate 540-body default because it did not measurably speed up this CPU/software-GL workload. Short 1-second Domino, 2-second Phonk, Bloom and Flow 3D MP4 samples were verified elsewhere. Native video export needs optimization separately rather than claiming complete video support for every 3D scene.
+
+**Deployment status:** all work in this report stays on `dev/complete-27-mode-engines`; the latest preview attempt was rejected by Vercel's free daily deployment limit (402). A previous READY preview contains the same functional build-script changes but not this audit's latest tests. No production changes were requested or made.
