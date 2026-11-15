@@ -1,0 +1,30 @@
+name: Reverse engineer 18 versus 27 simulation mode options
+on:
+  push:
+    branches: [dev/complete-27-mode-engines]
+    paths:
+      - scripts/audit-all-mode-options.cjs
+      - .github/workflows/audit-mode-controls.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mode-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        portion: ['0:15','15:30','30:45']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install Playwright
+        run: npm install --prefix "$RUNNER_TEMP/audit" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original app with 45 mode registry
+        run: node scripts/build-original-studio.cjs
+      - name: Audit original controls for each simulation
+        env:
+          MODE_RANGE: ${{ matrix.portion }}
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/audit/node_modules" node scripts/audit-all-mode-options.cjs
