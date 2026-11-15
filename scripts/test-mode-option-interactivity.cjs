@@ -5,7 +5,7 @@ const root=path.resolve(__dirname,'..','extra','wget','ballengine.app');
 const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.wav':'audio/wav','.woff2':'font/woff2','.wasm':'application/wasm'};
 const server=http.createServer((req,res)=>{
  try{
-  const u=new URL(req.url,'http://localhost');let p=u.pathname==='/studio'?'studio/index.html':decodeURIComponent(u.pathname).replace(/^\\/+/, '');
+  const u=new URL(req.url,'http://localhost');let p=u.pathname==='/studio'?'studio/index.html':decodeURIComponent(u.pathname).replace(/^[/]+/, '');
   if(!p||p.endsWith('/'))p+='index.html';
   const file=path.resolve(root,p);
   if(!file.startsWith(root+path.sep))return res.writeHead(403).end();
