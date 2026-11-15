@@ -1,0 +1,33 @@
+name: Adaptive simulation preview performance QA
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/build-original-studio.cjs'
+      - 'scripts/test-preview-performance.cjs'
+      - '.github/workflows/preview-performance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  simulation-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Install browser controller
+        run: npm install --prefix "$RUNNER_TEMP/perf-qa" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original Studio
+        run: |
+          node --check scripts/build-original-studio.cjs
+          node --check scripts/test-preview-performance.cjs
+          node scripts/build-original-studio.cjs
+      - name: Validate adaptive 3D performance and smoke-test 2D / 3D
+        env:
+          PERF_BROWSER_SMOKE: '1'
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/perf-qa/node_modules" node scripts/test-preview-performance.cjs
