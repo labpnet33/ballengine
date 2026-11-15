@@ -10,6 +10,6 @@ for(const mode of ['RHYTHMIC','PHONK_DROP','DRUM_SORT','METABALLS','CROWD_EVACUA
  });
  console.log('HISTORY_QP_MODE '+JSON.stringify({mode,matches:matches.slice(0,6)}));
 }
-for(const phrase of ['Previous roll','Next roll','randomizeHistory','randomizationHistory','randomizeRolls','rollHistory','randomizeChangeMode']){
+for(const phrase of ['Previous roll','Next roll','randomizeHistory','randomizationHistory','randomizeRolls','rollHistory','randomizeChangeMode','canRollBack','rollBack:','rollBack(','canRollForward','randomizeOnly:']){
  const at=s.indexOf(phrase);console.log('HISTORY_UI_CONTEXT '+JSON.stringify({phrase,index:at,context:at>=0?s.slice(at-850,at+1500):''}));
 }
