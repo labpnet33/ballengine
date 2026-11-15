@@ -150,8 +150,24 @@ const server=http.createServer((request,response)=>{
       const response=await page.goto(base+'/studio?mode='+options.mode,{
         waitUntil:'domcontentloaded',timeout:50000});
       assert.equal(response.status(),200,'Original Studio route not served');
-      await page.locator('button[title="Change mode"]').first()
-        .waitFor({state:'visible',timeout:30000});
+      // The original mobile Studio collapses or hides some desktop toolbar
+      // controls. An attached native canvas + populated React root is the
+      // stable cross-device signal that the actual simulation has mounted.
+      try{
+        await page.waitForFunction(()=>{
+          const root=document.querySelector('#root');
+          return !!root&&root.innerHTML.length>1500;
+        },null,{timeout:30000});
+      }catch(error){
+        const diag=await page.evaluate(()=>({
+          route:location.pathname+location.search,
+          rootHtmlLength:document.querySelector('#root')?.innerHTML.length,
+          bodyExcerpt:document.body?.innerText.slice(0,700),
+          canvasCount:document.querySelectorAll('#root canvas').length
+        })).catch(()=>({}));
+        throw Error('Original Studio did not mount on '+options.mode+
+          ' / '+options.width+': '+JSON.stringify(diag)+' '+String(error));
+      }
       const load3D=page.getByRole('button',{name:'Load 3D',exact:true}).first();
       if(await load3D.isVisible().catch(()=>false))
         await load3D.click({timeout:15000});
