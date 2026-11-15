@@ -1,0 +1,36 @@
+name: Verify isolated physics extension and original 45 modes
+on:
+  push:
+    branches: [feat/isolated-physics-engines]
+    paths:
+      - 'physics-extension/**'
+      - '.github/workflows/physics-extension-ci.yml'
+      - 'scripts/build-original-studio.cjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  extension:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Use Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Install pinned isolated engines
+        run: npm install --prefix physics-extension --ignore-scripts --no-audit --no-fund
+      - name: Exercise real Planck and Rapier physics
+        run: npm test --prefix physics-extension
+      - name: Verify original Studio builds without loading extension
+        run: |
+          node scripts/build-original-studio.cjs
+          node scripts/audit-mode-parity-static.cjs
+      - name: Verify the original captured browser bundle is untouched
+        run: |
+          git diff --exit-code -- captures/studio-browser/ballengine.app/assets/index-3pf76ICO.js
+          test -f extra/wget/ballengine.app/studio.html
+          test ! -f extra/wget/ballengine.app/physics-extension.js
