@@ -332,14 +332,14 @@ function offlinePhonkVector(skin,part){
   const seed=Object.keys(offlineFaceColours).indexOf(skin);
   const eyes=seed%3===0?'#fef9c3':seed%3===1?'#e0f2fe':'#ffffff';
   if(part==='hands')return [
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">',
     '<g fill="'+base+'" stroke="'+dark+'" stroke-width="15" stroke-linejoin="round">',
     '<path d="M83 475L33 390Q15 355 47 341Q66 331 87 351L58 281Q45 247 72 236Q96 230 112 265L116 205Q117 170 146 173Q166 178 167 208L180 254Q189 222 214 231Q236 245 224 273L217 363Q219 438 179 472Z"/>',
     '<path d="M429 475L479 390Q497 355 465 341Q446 331 425 351L454 281Q467 247 440 236Q416 230 400 265L396 205Q395 170 366 173Q346 178 345 208L332 254Q323 222 298 231Q276 245 288 273L295 363Q293 438 333 472Z"/>',
     '</g><path d="M109 395L172 420M403 395L340 420" stroke="'+bright+'" stroke-width="9" stroke-linecap="round"/></svg>'
   ].join('');
   return [
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">',
     '<defs><radialGradient id="skin" cx="43%" cy="30%" r="73%">',
     '<stop offset="0" stop-color="'+bright+'"/><stop offset=".48" stop-color="'+base+'"/>',
     '<stop offset="1" stop-color="'+dark+'"/></radialGradient></defs>',
