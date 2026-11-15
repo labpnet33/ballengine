@@ -337,6 +337,11 @@ const previewPerformanceAnchors=[
    'dprFor(t){if(iie()!==null||wc()||typeof window<"u"&&(window.isRecording||window.isOfflineRendering===!0||window.location.search.includes("isWorker=true")))return a2();'],
   ['const o=a==="AUTO"&&Jx.light3D()?S8n:1;',
    'const o=a==="AUTO"&&Jx.light3D()?S8n:a==="AUTO"?.75:1;'],
+  // Existing light3D() path deliberately forces 0.75 DPR for the severest
+  // performance tier. Keep that cap ONLY at that tier; otherwise the new
+  // 0.75 AUTO fallback is a floor, not the starting/maximum resolution.
+  ['o<1&&(r=Math.min(r,o));',
+   'o<1&&Jx.light3D()&&(r=Math.min(r,o));'],
   ['autoActive(t){return!(bdt(t)!=="AUTO"||iie()!==null||wc()||DP())}',
    'autoActive(t){return!(bdt(t)!=="AUTO"||iie()!==null||wc()||typeof window<"u"&&(window.isRecording||window.isOfflineRendering===!0||window.location.search.includes("isWorker=true")))}'],
   ['const o=typeof window<"u"&&window.devicePixelRatio||1,i=this.level<Ree.length-1&&Ree[this.level]<o;',
