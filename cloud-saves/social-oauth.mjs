@@ -49,7 +49,8 @@ async function providerJSON(url,init={}){
   const body=await r.json().catch(()=>({}));
   if(!r.ok||body.error && (typeof body.error==='object'||body.error.code && body.error.code!=='ok')){
     const msg=body.error?.message||body.error_description||('Provider HTTP '+r.status);
-    throw invalid('Social platform rejected this request: '+String(msg).slice(0,190),r.status===429?429:502);
+    throw invalid('Social platform rejected this request: '+String(msg).slice(0,190),
+      [400,401,403,422,429].includes(r.status)?r.status:502);
   }
   return body;
 }
@@ -62,7 +63,7 @@ export async function beginOAuth(req,env,library,platform,origin){
   if(!config(env,platform)||!env.SOCIAL_TOKEN_SECRET||!env.SOCIAL_WORKER_URL)
     throw invalid('Platform OAuth is not configured by the site administrator',503);
   const state=random(),expires=Date.now()+10*60000,callback=callbackURL(env,platform);
-  const verifier=platform==='tiktok'?random():null;
+  const verifier=null; // TikTok Login Kit Web: confidential-client authorization code flow.
   await env.DB.prepare('DELETE FROM guest_social_oauth_states WHERE expires_at<?').bind(Date.now()).run();
   await env.DB.prepare('INSERT INTO guest_social_oauth_states(id,library_id,platform,code_verifier,redirect_origin,expires_at) VALUES(?,?,?,?,?,?)')
     .bind(state,library,platform,verifier,origin||String(env.SOCIAL_APP_ORIGIN||'https://ballengine.vercel.app'),expires).run();
@@ -74,9 +75,8 @@ export async function beginOAuth(req,env,library,platform,origin){
       access_type:'offline',prompt:'consent',state}).forEach(([k,v])=>url.searchParams.set(k,v));
   }else if(platform==='tiktok'){
     url=new URL('https://www.tiktok.com/v2/auth/authorize/');
-    const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',encoder.encode(verifier)));
     Object.entries({client_key:env.TIKTOK_CLIENT_KEY,redirect_uri:callback,response_type:'code',
-      scope:'user.info.basic,video.publish',state,code_challenge:base64url(digest),code_challenge_method:'S256'})
+      scope:'user.info.basic,video.publish',state})
       .forEach(([k,v])=>url.searchParams.set(k,v));
   }else{
     url=new URL('https://www.facebook.com/'+(env.META_GRAPH_VERSION||META_VERSION)+'/dialog/oauth');
@@ -103,7 +103,7 @@ async function recordsFromOAuth(env,platform,code,verifier){
   if(platform==='tiktok'){
     const token=await postForm('https://open.tiktokapis.com/v2/oauth/token/',{
       client_key:env.TIKTOK_CLIENT_KEY,client_secret:env.TIKTOK_CLIENT_SECRET,
-      code,grant_type:'authorization_code',redirect_uri:callback,code_verifier:verifier});
+      code,grant_type:'authorization_code',redirect_uri:callback});
     const info=await providerJSON('https://open.tiktokapis.com/v2/user/info/?fields=open_id,display_name',{
       headers:{Authorization:'Bearer '+token.access_token}});
     const user=info.data?.user||{};
