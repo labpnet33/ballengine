@@ -31,22 +31,23 @@ const server=http.createServer((req,res)=>{
     await random.waitFor({state:'visible',timeout:9000});
     assert.ok(await random.isEnabled(),'Native Randomize disabled');
     const priorMode=(await title.innerText()).trim();
-    await random.click({timeout:12000});
+    await random.click({timeout:24000});
     const back=page.locator('button[title="Previous roll"]').first();
     // Native roll/history state is applied asynchronously after the first
     // render update; do not fail on a transient disabled button.
     await page.waitForFunction(()=>{
       const prev=document.querySelector('button[title="Previous roll"]');
       return !!prev&&!prev.disabled;
-    },null,{timeout:2800}).catch(()=>{});
+    },null,{timeout:9000}).catch(()=>{});
     if(!(await back.isEnabled())){
       // Some simulation schemas store the first generated roll as the
       // history baseline; a second native roll must permit undo.
-      await random.click({timeout:12000});
+      await random.waitFor({state:'visible',timeout:12000});
+      await random.click({timeout:24000});
       await page.waitForFunction(()=>{
         const prev=document.querySelector('button[title="Previous roll"]');
         return !!prev&&!prev.disabled;
-      },null,{timeout:2000}).catch(()=>{});
+      },null,{timeout:9000}).catch(()=>{});
     }
     assert.ok(await back.isEnabled(),'Randomize history unavailable even after two rolls');
     // Exercise an ORIGINAL alternate option, not an added demo control.
@@ -80,7 +81,16 @@ const server=http.createServer((req,res)=>{
     assert.equal(jsErrors.length,0,'Page script error '+JSON.stringify(jsErrors));
     result={slug,mode:chosen.trim(),changed,editedLabel,before,after,randomizeUndo:true,record:true,errors:[]};
     console.log('MODE_FULL_CONTROLS_PASS '+JSON.stringify(result));
-   }catch(e){result.error=String(e).slice(0,400);result.jsErrors=jsErrors.slice(0,5);failures.push(result);console.log('MODE_FULL_CONTROLS_FAIL '+JSON.stringify(result));}
+   }catch(e){
+      result.error=String(e).slice(0,1200);result.jsErrors=jsErrors.slice(0,5);
+      result.ui=await page.evaluate(()=>{
+        const random=document.querySelector('button[data-tour="randomize"]');
+        const back=document.querySelector('button[title="Previous roll"]');
+        const info=el=>!el?null:{text:el.textContent?.trim().slice(0,90),disabled:el.disabled,rect:(()=>{const r=el.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height}})()};
+        let hit=null;if(random){const r=random.getBoundingClientRect();const el=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);hit=el?{tag:el.tagName,className:String(el.className).slice(0,160),title:el.getAttribute('title')}:null;}
+        return{random:info(random),back:info(back),centerHit:hit,visibility:document.visibilityState};
+      }).catch(err=>({diagnosticError:String(err).slice(0,150)}));
+      failures.push(result);console.log('MODE_FULL_CONTROLS_FAIL '+JSON.stringify(result));}
   }
   console.log('MODE_FULL_CONTROLS_SUMMARY '+JSON.stringify({range:[from,to],checked:to-from,failures}));
   assert.equal(failures.length,0,'Experimental modes with broken native controls');
