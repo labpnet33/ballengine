@@ -442,6 +442,36 @@ console.log('Restored',uncapturedRealisticAssets.size,'uncaptured Phonk face/han
 
 
 fs.writeFileSync(originalBundle,capturedApp,'utf8');
+
+
+// The original capture reused a fixed, hashed-looking JS URL even after we
+// patched its contents. In the browser that can keep OLD locks alive via HTTP
+// and Service Worker caches after successful production deployments.
+// Change only the existing HTML entry script URL, using the ACTUAL final JS
+// content hash; do not rename bundles or replace/create application pages.
+const agencyBundleVersion=digest(originalBundle).slice(0,16);
+const agencyEntrypoints=[
+  'index.html','home.html','home/index.html','studio.html','studio/index.html',
+  'automation.html','automation/index.html','automation/accounts/index.html',
+  'automation/publish/index.html','automation/autopilot/index.html',
+  'automation/plan/index.html','automation/queue/index.html',
+  'automation/brands/index.html','plans.html'
+];
+let versionedEntrypoints=0;
+for(const rel of agencyEntrypoints){
+  const file=path.join(web,rel);
+  if(!fs.existsSync(file))continue;
+  const html=fs.readFileSync(file,'utf8');
+  const updated=html.replaceAll('assets/index-3pf76ICO.js"',
+    'assets/index-3pf76ICO.js?v='+agencyBundleVersion+'"');
+  if(updated!==html){
+    fs.writeFileSync(file,updated,'utf8');
+    versionedEntrypoints++;
+  }
+}
+if(versionedEntrypoints<5)
+  throw new Error('Could not apply Studio entrypoint cache busting; review original HTML.');
+console.log('Versioned existing Studio app entry in',versionedEntrypoints,'HTML documents:',agencyBundleVersion);
 // Vercel's static build would otherwise report READY even if the edited 14MB
 // browser bundle had a JavaScript syntax error.
 require('node:child_process').execFileSync(process.execPath,
