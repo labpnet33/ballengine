@@ -108,6 +108,13 @@
       top.append(create('strong',label,'font-size:13px;flex:1 1 110px;'));
       const configured=state.status?.providers?.[platform]?.configured;
       const connect=btn('Connect '+label,async()=>{
+        if(!configured){
+          const keys={youtube:'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET',instagram:'META_APP_ID and META_APP_SECRET',facebook:'META_APP_ID and META_APP_SECRET',tiktok:'TIKTOK_CLIENT_KEY and TIKTOK_CLIENT_SECRET'};
+          const message='Guest access is free. '+label+' requires official OAuth authorization. Configure '+keys[platform]+' and SOCIAL_TOKEN_SECRET in your Cloudflare Worker, then reconnect.';
+          card.querySelector('[data-be-connect-help]')?.remove();
+          const help=line(message);help.dataset.beConnectHelp='1';help.setAttribute('role','status');card.append(help);
+          return;
+        }
         try{
           connect.disabled=true;connect.textContent='Opening authorization…';
           const data=await request('/connect/'+platform,'POST',{});
@@ -115,8 +122,7 @@
           window.location.assign(data.authorizationUrl);
         }catch(e){window.alert('Could not connect '+label+': '+standardError(e));connect.disabled=false;connect.textContent='Connect '+label;}
       },true);
-      connect.disabled=!configured;
-      if(!configured)connect.title='Administrator must configure the platform OAuth app and encrypted token storage';
+      if(!configured)connect.title='Click for official OAuth configuration requirements; guests do not need a subscription.';
       top.append(connect);card.append(top);
       const linked=state.accounts.filter(a=>a.platform===platform);
       if(!linked.length)card.append(line(configured?'No account connected':'Platform application credentials need to be configured.'));
@@ -137,6 +143,55 @@
     if(new URLSearchParams(location.search).get('social')==='connected')
       parent.append(line('Account authorization completed. You can now select it under Publish.'));
   }
+  // The captured React Accounts tab still uses the original subscription
+  // backend. Its platform cards lead to /automation/plan. Hide those cards
+  // when OUR guest OAuth controls render and keep the existing page shell.
+  function retireNativePlanControls(tab,main,panel){
+    const nav=main?.querySelector('nav[aria-label="Automation"]');
+    if(nav)for(const button of nav.querySelectorAll('button')){
+      if(button.getAttribute('data-tour')==='auto-tab-plan'||button.textContent.trim()==='Plan'){
+        button.hidden=true;button.style.display='none';
+      }
+    }
+    for(const button of main?.querySelectorAll('header button')||[]){
+      if(/^(See plans|Change plan)$/i.test(button.textContent.trim())){
+        button.hidden=true;button.style.display='none';
+      }
+    }
+    if(tab!=='accounts')return;
+    const native=main.querySelector('[data-tour="auto-accounts"]');
+    if(native){
+      native.hidden=true;native.style.display='none';
+      native.setAttribute('aria-hidden','true');
+      native.dataset.beReplacedByGuestOAuth='1';
+      if(native.parentElement&&panel!==native.previousElementSibling)
+        native.insertAdjacentElement('beforebegin',panel);
+    }
+    for(const el of main.querySelectorAll('p,div,span')){
+      if(el.children.length||el.closest('[data-be-social-panel]'))continue;
+      if(/^(Connecting an account is part of an automation plan|Social account connections require official authorization and a publishing backend)/.test(el.textContent.trim()))
+        el.textContent='Guest accounts are free. Connect platforms below using official OAuth authorization.';
+    }
+  }
+  // Capture-phase fallback: an original Connect click must not reach the
+  // upstream React subscription navigation before our panel replaces it.
+  document.addEventListener('click',event=>{
+    if(location.pathname.replace(/\/+$/,'')!=='/automation/accounts')return;
+    const target=event.target;
+    if(!(target instanceof Element))return;
+    const native=target.closest('[data-tour="auto-accounts"]');
+    const originalButton=target.closest('button');
+    if(!native||!originalButton||!/^(Connect|Reconnect|No slots left)$/i.test(originalButton.textContent.trim()))return;
+    event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+    const row=[...native.children].find(el=>el.contains(originalButton));
+    const name=(row?.querySelector('p.t-h4')?.textContent||'').toLowerCase();
+    const platform=Object.keys(PLATFORMS).find(key=>name.includes(key));
+    const panel=document.querySelector('#root main [data-be-social-panel]');
+    const action=platform&&[...(panel?.querySelectorAll('button')||[])]
+      .find(b=>b.textContent.trim()==='Connect '+PLATFORMS[platform]);
+    if(action)action.click();
+    else panel?.scrollIntoView({behavior:'smooth',block:'start'});
+  },true);
   function publish(parent){
     parent.append(heading('Publish directly or schedule automatically'));
     parent.append(line('Upload an MP4 (up to 10 MB), select your connected accounts, and explicitly approve publishing. The existing manual draft planner remains available below.'));
@@ -303,6 +358,7 @@
     else if(tab==='publish'){publish(panel);queue(panel);}
     else if(tab==='autopilot')queue(panel,true);
     else{summary(panel);queue(panel);}
+    retireNativePlanControls(tab,host(),panel);
     banner();
   }
   async function reloadPanel(){
@@ -321,8 +377,14 @@
   }
   let prev='',loading=false;
   async function check(){
+    if(location.pathname.replace(/\/+$/,'')==='/automation/plan'){
+      window.location.replace('/automation/accounts');
+      return;
+    }
     const tab=route(),main=host();
     if(!tab||!main){prev='';return;}
+    const panel=main.querySelector('[data-be-social-panel]');
+    if(panel&&state.status)retireNativePlanControls(tab,main,panel);
     const key=tab+'|'+(main.querySelector('[data-be-social-panel]')?'ready':'missing');
     if(key===prev||loading)return;
     prev=key;loading=true;
