@@ -35,6 +35,14 @@ const server=http.createServer((req,res)=>{
    assert.ok(changed>0,'Native randomization did not modify real settings for '+slug);
    const prior=page.locator('button[title="Previous roll"]').first();
    assert.ok(await prior.isEnabled(),'No Randomize history for '+slug);
+   const overlayInfo=await page.evaluate(()=>[...document.querySelectorAll('.fixed.inset-0')].filter(e=>e.getClientRects().length).map(e=>e.innerText.slice(0,750)));
+   console.log('PARITY_RANDOMIZE_OVERLAY '+JSON.stringify({slug,overlays:overlayInfo}));
+   if(overlayInfo.length){
+     await page.keyboard.press('Escape');
+     await page.waitForTimeout(400);
+     const close=page.locator('.fixed.inset-0 button').filter({hasText:/Close|Got it|Skip|Done|Continue|Not now/i}).first();
+     if(await close.isVisible().catch(()=>false))await close.click({timeout:3000}).catch(()=>{});
+   }
    await prior.click({timeout:12000});
    await page.waitForTimeout(400);
    const next=page.locator('button[title="Next roll"]').first();
