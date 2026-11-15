@@ -1,0 +1,25 @@
+name: Verify native Phonk Drop feature parity
+on:
+  push:
+    branches: [feat/27-mode-parity-audit]
+    paths:
+      - scripts/build-original-studio.cjs
+      - scripts/test-phonk-mode-parity.cjs
+      - .github/workflows/phonk-mode-parity.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install browser driver
+        run: npm install --prefix "$RUNNER_TEMP/phonk-parity" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original Studio with native mode additions
+        run: node scripts/build-original-studio.cjs
+      - name: Check native physics randomize, controls and history
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/phonk-parity/node_modules" node scripts/test-phonk-mode-parity.cjs
