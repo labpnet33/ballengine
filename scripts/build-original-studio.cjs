@@ -222,6 +222,30 @@ if (capturedApp.split(homeRouteBefore).length!==2)
   throw new Error('Expected exactly one original /home auth guard. Review frontend version before changing routes.');
 capturedApp=capturedApp.replace(homeRouteBefore,homeRouteAfter);
 
+
+// LOCAL AGENCY MAX DEFAULT: The captured plan normalizer does not recognize
+// the local "AGENCY" profile and silently downgrades it to FREE, leaving
+// Advanced Studio controls locked. Preserve the captured plan taxonomy for
+// required-plan labels, while mapping our explicit Agency guest plan to the
+// highest available client-side Studio entitlement.
+const localAgencyNormalizerBefore='So=e=>{const t=(e||"").toUpperCase();return t.startsWith("AUTO_")?';
+const localAgencyNormalizerAfter='So=e=>{const t=(e||"").toUpperCase();return t==="AGENCY"?"ENTERPRISE":t.startsWith("AUTO_")?';
+if(capturedApp.split(localAgencyNormalizerBefore).length!==2)
+  throw new Error('Original Studio plan normalizer changed; review before changing entitlements.');
+capturedApp=capturedApp.replace(localAgencyNormalizerBefore,localAgencyNormalizerAfter);
+
+// Every visitor to this independent host receives the locally configured
+// Agency / Max guest tier, including those with older FREE profile caches.
+// Fix the shared effective-plan calculation used by mode settings, Advanced,
+// frames, look, audio, randomizer and other existing Studio controls.
+// No upstream subscription, paid credits, or third-party API is granted.
+const localAgencyEffectiveBefore='eT=e=>{if(e.subscriptionStatus==="expired")return"FREE";';
+const localAgencyEffectiveAfter='eT=e=>{if(window.__BALLENGINE_LOCAL_GUEST__?.automation_tier==="MAX")return"ENTERPRISE";if(e.subscriptionStatus==="expired")return"FREE";';
+if(capturedApp.split(localAgencyEffectiveBefore).length!==2)
+  throw new Error('Original Studio effective-plan calculator changed; review before editing entitlements.');
+capturedApp=capturedApp.replace(localAgencyEffectiveBefore,localAgencyEffectiveAfter);
+console.log('Agency / Max enabled for every local visitor; original Studio feature gates use the top client-side tier.');
+
 // The original Autopilot page starts with a skeleton while waiting for the
 // *original* private entitlement backend. This independent local guest site
 // supports schedule drafts and guest social publishing through our own Worker.
