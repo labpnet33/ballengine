@@ -26,7 +26,7 @@ async function videoBytes(db,library,id){
 }
 async function mark(db,row,status,external=null,error=null,pause=0){
   const timestamp=now();
-  await db.prepare('UPDATE guest_social_deliveries SET status=?,external_id=COALESCE(?,external_id),last_error=?,next_attempt_at=?,updated_at=?,published_at=CASE WHEN ?="published" THEN ? ELSE published_at END WHERE id=?')
+  await db.prepare("UPDATE guest_social_deliveries SET status=?,external_id=COALESCE(?,external_id),last_error=?,next_attempt_at=?,updated_at=?,published_at=CASE WHEN ?='published' THEN ? ELSE published_at END WHERE id=?")
     .bind(status,external,error?String(error).replace(/(?:Bearer\s+|access_token[=:]\s*)\S+/gi,'[redacted]').slice(0,250):null,
       timestamp+pause,timestamp,status,timestamp,row.id).run();
 }
@@ -78,14 +78,15 @@ async function sendInstagram(env,job,account,token){
 async function sendTikTok(env,job,account,token,bytes,db,row){
   const creator=await providerJSON('https://open.tiktokapis.com/v2/post/publish/creator_info/query/',{
     method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:'{}'});
-  const options=creator.data?.creator_info?.privacy_level_options||[];
+  const options=creator.data?.privacy_level_options||[];
   const privacy=job.tiktok_privacy||'SELF_ONLY';
   if(!options.includes(privacy))throw invalid('TikTok privacy level unavailable for this account; edit and retry',422);
   const initial=await providerJSON('https://open.tiktokapis.com/v2/post/publish/video/init/',{
     method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
     body:JSON.stringify({
       post_info:{title:(job.caption||job.title).slice(0,2200),privacy_level:privacy,
-        disable_comment:true,disable_duet:true,disable_stitch:true,video_cover_timestamp_ms:1000},
+        disable_comment:!job.tiktok_allow_comments,disable_duet:!job.tiktok_allow_duet,
+        disable_stitch:!job.tiktok_allow_stitch,video_cover_timestamp_ms:1000},
       source_info:{source:'FILE_UPLOAD',video_size:bytes.length,chunk_size:bytes.length,total_chunk_count:1}
     })});
   const publishId=initial.data?.publish_id,uploadURL=initial.data?.upload_url;
@@ -130,12 +131,13 @@ async function finalize(env,id){
   const rows=(await db.prepare('SELECT * FROM guest_social_deliveries WHERE job_id=?').bind(id).all()).results||[];
   if(!rows.length)return;
   if(rows.some(r=>['queued','retry','processing','uploading'].includes(r.status)))return;
-  const result=rows.every(r=>r.status==='published')?'published':
+  const uncertain=rows.some(r=>r.status==='unknown');
+  const result=uncertain?'needs_review':rows.every(r=>r.status==='published')?'published':
     rows.some(r=>r.status==='published')?'partial':'failed';
   const t=now();
-  const updated=await db.prepare("UPDATE guest_social_jobs SET status=?,completed_at=?,updated_at=? WHERE id=? AND status IN ('queued','running')")
-    .bind(result,t,t,id).run();
-  if(!updated.meta?.changes||job.repeat_rule==='none')return;
+  const updated=await db.prepare("UPDATE guest_social_jobs SET status=?,completed_at=?,updated_at=?,recurrence_spawned=CASE WHEN repeat_rule!='none' AND ?!='needs_review' THEN 1 ELSE recurrence_spawned END WHERE id=? AND status IN ('queued','running')")
+    .bind(result,t,t,result,id).run();
+  if(!updated.meta?.changes||job.repeat_rule==='none'||job.recurrence_spawned||uncertain)return;
   const step=job.repeat_rule==='daily'?86400000:604800000;
   let next=job.scheduled_at;
   for(let i=0;i<400&&next<=t+60000;i++)next+=step;
@@ -149,8 +151,9 @@ async function finalize(env,id){
     if(current)valid.push(current);
   }
   if(!valid.length)return;
-  const actions=[db.prepare('INSERT INTO guest_social_jobs(id,library_id,title,caption,media_id,tiktok_privacy,youtube_made_for_kids,status,scheduled_at,repeat_rule,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)')
-    .bind(nextId,job.library_id,job.title,job.caption,job.media_id,job.tiktok_privacy,job.youtube_made_for_kids,
+  const actions=[db.prepare('INSERT INTO guest_social_jobs(id,library_id,title,caption,media_id,tiktok_privacy,tiktok_allow_comments,tiktok_allow_duet,tiktok_allow_stitch,youtube_made_for_kids,status,scheduled_at,repeat_rule,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
+    .bind(nextId,job.library_id,job.title,job.caption,job.media_id,job.tiktok_privacy,
+      job.tiktok_allow_comments,job.tiktok_allow_duet,job.tiktok_allow_stitch,job.youtube_made_for_kids,
       'queued',next,job.repeat_rule,t,t)];
   for(const a of valid)actions.push(db.prepare('INSERT INTO guest_social_deliveries(id,job_id,library_id,account_id,platform,status,next_attempt_at,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)')
     .bind(crypto.randomUUID(),nextId,job.library_id,a.id,a.platform,'queued',next,t,t));
@@ -181,7 +184,8 @@ async function processOne(env,delivery){
       if(!done)await mark(db,delivery,'processing',null,null,60000);
     }catch(e){
       // Keep the provider operation ID for investigating delayed processing.
-      await mark(db,delivery,e?.status===422?'failed':'unknown',null,textError(e));
+      if([429,502,503].includes(e?.status))await mark(db,delivery,'processing',null,textError(e),180000);
+      else await mark(db,delivery,'failed',null,textError(e));
     }
     await finalize(env,job.id);return;
   }
@@ -220,7 +224,7 @@ async function processOne(env,delivery){
       await mark(db,delivery,'processing',null,problem,60000);
     }else if(!madeCall&&e?.status===429&&delivery.attempts<3){
       await mark(db,delivery,'retry',null,problem,300000);
-    }else await mark(db,delivery,madeCall?'unknown':'failed',null,problem);
+    }else await mark(db,delivery,madeCall&&!([400,401,403,422].includes(e?.status))?'unknown':'failed',null,problem);
   }
   await finalize(env,job.id);
 }
