@@ -11,7 +11,10 @@
     username:'Local Studio Guest',
     email:'guest@preview.invalid',
     public_id:'local-preview-guest',
-    plan:'ENTERPRISE',
+    // Local guest-only tier. Not a purchased subscription or server entitlement.
+    plan:'AGENCY',
+    automation_plan:'MAX',
+    automation_tier:'MAX',
     is_guest:true,
     can_use_all_modes:true,
     legacy_music_catalog:true,
@@ -20,7 +23,7 @@
   // The captured /home route reads this synchronously so it never redirects
   // to /login while the local guest auth request is still initializing.
   window.__BALLENGINE_LOCAL_GUEST__=guest;
-  // Discard previously cached FREE profile so existing preview visitors see the new local settings.
+  // Discard previously cached profiles so existing visitors see Agency / Max local settings.
   try { window.localStorage.removeItem('user_profile_cache'); } catch {}
   const nativeFetch=window.fetch.bind(window);
   window.fetch=function(input,init){
@@ -164,5 +167,5 @@
   walkthroughObserver.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
   if(document.body)scheduleWalkthroughCheck(document.body);
   else document.addEventListener('DOMContentLoaded',()=>scheduleWalkthroughCheck(document.body),{once:true});
-  console.info('[BallEngine preview] Local unrestricted UI guest enabled; backend-dependent premium services are not available from this static capture.');
+  console.info('[BallEngine preview] Local Agency / Max UI guest enabled; paid subscriptions and backend-dependent services are not provided by this static capture.');
 })();
