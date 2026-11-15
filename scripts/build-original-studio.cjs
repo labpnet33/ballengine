@@ -302,13 +302,13 @@ console.log('Phonk Drop native randomization and image-safe illustrated default 
 
 // Experimental Domino 3D ships with 1,600 physics bodies at startup.
 // On CPU/software-GPU export runners, even two seconds of output can take
-// several minutes. Use a low-cost default for NEW simulations while keeping
+// several minutes. Use a moderate default for NEW simulations while keeping
 // the original settings UI's full count range available to existing projects.
 const dominoDefault='domino3DCount:1600,domino3DLayout:"CIRCUIT_ROUND"';
 if(capturedApp.split(dominoDefault).length!==2)
   throw new Error('Domino 3D count default changed; review source before applying performance fix.');
-capturedApp=capturedApp.replace(dominoDefault,'domino3DCount:240,domino3DLayout:"CIRCUIT_ROUND"');
-console.log('Domino 3D new-project default reduced to 240 bodies; full density control remains available.');
+capturedApp=capturedApp.replace(dominoDefault,'domino3DCount:540,domino3DLayout:"CIRCUIT_ROUND"');
+console.log('Domino 3D new-project default reduced to 540 bodies; full density control remains available.');
 
 // The original public capture omitted all realistic Phonk Drop WEBP skins.
 // In the independent deployed site, substitute small self-contained vector
