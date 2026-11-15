@@ -7,14 +7,32 @@ BallEngine subscription backend. **Every guest gets access to the independent
 publishing controls without a subscription**, but each guest must separately
 authorize their own social accounts through the providers.
 
-## Current production readiness
+## Current deployment status — November 15, 2026
 
-At implementation time the existing Cloudflare Worker
-`ballengine-project-saves` had a **D1 binding only**, no listed social OAuth
-secrets, and **zero Cron Triggers**. The new code is committed to a development
-branch, and a GitHub Actions syntax/integration check runs there. It is not
-valid to describe production social posting as enabled until the following
-configuration and provider end-to-end tests are complete.
+The existing **production frontend** at `https://ballengine.vercel.app` includes guest-friendly
+Automation tabs and the separate social account/publishing panels. The original
+React pages remain in place, and the independent Worker/API implementation is
+merged into the repository default branch `main`.
+
+The Cloudflare Worker `ballengine-project-saves` has the social OAuth,
+publishing and cron modules deployed. Its D1 database includes
+`guest_social_accounts`, `guest_social_jobs`, `guest_social_deliveries`,
+and `guest_social_oauth_states`. A one-minute Cron Trigger exists.
+`SOCIAL_TOKEN_SECRET` is configured as a secret (do not log or export it).
+
+**Not activated:** OAuth app credentials (`GOOGLE_CLIENT_ID`,
+`GOOGLE_CLIENT_SECRET`, `META_APP_ID`, `META_APP_SECRET`,
+`TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`) are not present,
+`SOCIAL_CRON_ENABLED` is deliberately `false`, no guest social accounts
+are linked, and no real provider posts have been tested.
+Do not label automatic publishing as working until official provider
+authorization and a controlled private upload test succeed.
+
+The original frontend uses local guest profile settings for guest-facing
+UI; the independent social backend authenticates every private request with
+the Cloud Saves recovery key and verifies OAuth consent per connected platform.
+The guest flag `automaticSocialPosting: false` is therefore expected until
+the site owner enables the audited integrations.
 
 ## Required Cloudflare Worker configuration
 
