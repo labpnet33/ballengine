@@ -39,10 +39,21 @@ const server=http.createServer((req,res)=>{
   assert.equal(homeLinks,45,'All 45 mode links should appear after toggling on');
   assert.equal(new Set(slugs).size,45,'Duplicate promoted Home mode links');
   assert.equal(await section.getByText('In development',{exact:false}).count(),0,'Promoted Home still calls the modes unfinished');
-  for(const [slug,title] of [['phase-bloom','Bloom'],['flow-field','Flow 3D'],['domino-3d','Domino 3D']]){
+  const allExperimentalModes=[
+    ['phase-bloom','Bloom'],['phonk-drop','Phonk Drop'],['marble-run','Marble'],
+    ['ball-race','Race'],['target-hit','Targets'],['falling-sand','Sand'],
+    ['plinko','Plinko'],['color-match','Colors'],['spin-battle','Spin'],
+    ['lava-survival','Lava'],['glass-slice','Slice 3D'],['flood-fill','Flood 3D'],
+    ['eulers-disk','Disks 3D'],['drum-sort','Drum 3D'],['plinko-3d','Plinko 3D'],
+    ['chladni','Chladni 3D'],['voxel','Voxels 3D'],['domino-3d','Domino 3D'],
+    ['marble-race-3d','Race 3D'],['attractor','Attractor 3D'],['flow-field','Flow 3D'],
+    ['metaballs','Blobs 3D'],['galaxy','Galaxy 3D'],['fireflies','Fireflies 3D'],
+    ['pendulum-basin','Basin 3D'],['slime','Slime 3D'],['crowd-evacuation','Evacuate 3D']
+  ];
+  for(const [slug,title] of allExperimentalModes){
    errors=[];
    await page.goto(base+'/studio?mode='+slug,{waitUntil:'domcontentloaded',timeout:45000});
-   await page.waitForTimeout(2400);
+   await page.waitForTimeout(1400);
    const mode=await page.locator('button[title="Change mode"]').first().innerText().catch(()=>'');
    assert.equal(mode,title,'Released native mode failed to select '+title);
    const dev=await page.getByRole('button',{name:/^In development/}).count();
