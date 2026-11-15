@@ -1,0 +1,70 @@
+name: Guest Agency Max access regression guard
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '21 4 * * *'
+permissions:
+  contents: read
+jobs:
+  guest-access-build:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Install Playwright browser controller
+        run: npm install --prefix "$RUNNER_TEMP/guest-guard" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original website and validate guest patches
+        run: |
+          node --check scripts/build-original-studio.cjs
+          node --check scripts/studio-guest-preview.js
+          node --check scripts/test-guest-access-regression.cjs
+          node scripts/build-original-studio.cjs
+      - name: Check actual guest UI in browser
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory extra/wget/ballengine.app >/tmp/guest-guard-http.log 2>&1 &
+          CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/guest-guard/node_modules" node scripts/test-guest-access-regression.cjs
+      - name: Upload screenshot if check fails
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: guest-access-regression-failure
+          path: test-results/guest-access-failure.png
+          if-no-files-found: ignore
+          retention-days: 7
+  guest-access-production:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Install Playwright browser controller
+        run: npm install --prefix "$RUNNER_TEMP/guest-guard" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Check deployed guest version and browser behavior
+        env:
+          BALLENGINE_BASE_URL: https://ballengine.vercel.app
+          BALLENGINE_WAIT_SECONDS: 240
+        run: |
+          CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/guest-guard/node_modules" node scripts/test-guest-access-regression.cjs
+      - name: Upload screenshot if check fails
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: guest-access-production-failure
+          path: test-results/guest-access-failure.png
+          if-no-files-found: ignore
+          retention-days: 7
