@@ -365,11 +365,13 @@
     const tab=route(),main=host();if(!tab||!main)return;
     let panel=main.querySelector('[data-be-social-panel]');
     if(!panel){panel=create('section',null,css.panel);panel.dataset.beSocialPanel='1';main.append(panel);}
+    retireNativePlanControls(tab,main,panel);
     try{
       await refresh();
       if(!panel.isConnected||route()!==tab)return;
       render(panel,tab);
     }catch(e){
+      retireNativePlanControls(tab,main,panel);
       panel.replaceChildren(heading('Guest social publishing'));
       panel.append(line('Publishing backend is not ready: '+standardError(e)));
       panel.append(line('The existing manual draft and reminder functionality remains available.'));
@@ -384,7 +386,7 @@
     const tab=route(),main=host();
     if(!tab||!main){prev='';return;}
     const panel=main.querySelector('[data-be-social-panel]');
-    if(panel&&state.status)retireNativePlanControls(tab,main,panel);
+    if(panel)retireNativePlanControls(tab,main,panel);
     const key=tab+'|'+(main.querySelector('[data-be-social-panel]')?'ready':'missing');
     if(key===prev||loading)return;
     prev=key;loading=true;
