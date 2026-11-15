@@ -1,0 +1,27 @@
+name: Benchmark 2-second Domino 3D export
+on:
+  push:
+    branches: [feat/27-mode-parity-audit]
+    paths:
+      - scripts/build-original-studio.cjs
+      - .github/workflows/domino-performance-qa.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  domino-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install browser
+        run: npm install --prefix "$RUNNER_TEMP/domino" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original Studio with tuned 3D defaults
+        run: node scripts/build-original-studio.cjs
+      - name: Render real two-second Domino 3D MP4
+        env:
+          TEST_MODE: domino-3d
+          TEST_DURATION: '2'
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/domino/node_modules" node scripts/test-record-export.cjs
