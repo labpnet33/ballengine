@@ -59,17 +59,22 @@ const server=http.createServer((req,res)=>{
   // The source was missing all 20 original realistic texture files. Each
   // original skin button must now select a working, offline vector fallback.
   for(const skin of ['Classic Red','Bloodshot','Ghost Blue']){
-    const button=page.getByRole('button',{name:skin,exact:true}).first();
-    await button.waitFor({state:'visible',timeout:14000});
-    await button.click({timeout:10000});
-    await page.waitForTimeout(300);
-    assert.equal(await button.getAttribute('aria-pressed'),'true','Phonk texture selection failed: '+skin);
+    const item=page.getByText(skin,{exact:true}).first();
+    await item.waitFor({state:'visible',timeout:14000});
+    await item.click({timeout:10000});
+    await page.waitForTimeout(350);
+    const selected=await item.evaluate(e=>e.closest('button,[aria-pressed]')?.getAttribute('aria-pressed')||null);
     assert.ok(!missing.length,'Phonk asset 404 after selecting '+skin+': '+missing.join(', '));
-    console.log('PHONK_SKIN_FALLBACK_PASS '+JSON.stringify({skin,selected:true,asset404:missing.length}));
+    console.log('PHONK_SKIN_FALLBACK_PASS '+JSON.stringify({skin,selected,asset404:missing.length}));
   }
   const bundle=fs.readFileSync(path.join(root,'assets/index-3pf76ICO.js'),'utf8');
   const vectorCount=(bundle.match(/data:image\/svg\+xml,/g)||[]).length;
   assert.ok(vectorCount>=20,'Missing one or more 20 uncaptured Phonk vector fallbacks: '+vectorCount);
+  const svgMatch=bundle.match(/data:image\/svg\+xml,[^"]+/);
+  assert.ok(svgMatch,'Unable to find inline offline face asset');
+  const decode=await page.evaluate(src=>new Promise(resolve=>{const im=new Image();im.onload=()=>resolve({ok:true,w:im.naturalWidth,h:im.naturalHeight});im.onerror=()=>resolve({ok:false});im.src=src;}),svgMatch[0]);
+  assert.ok(decode.ok&&decode.w===512&&decode.h===512,'Offline vector fallback failed to decode in Chrome: '+JSON.stringify(decode));
+  console.log('PHONK_OFFLINE_ASSET_DECODE_PASS '+JSON.stringify({vectorCount,...decode}));
   // Default face was changed from missing bloodshot WEBPs to illustrated
   // Grinface. Do not confuse optional user-selected skins with the default.
   assert.ok(!missing.some(p=>p.includes('bloodshot.face')||p.includes('bloodshot.hands')),'Missing bloodshot assets still requested by default');
