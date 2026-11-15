@@ -1,0 +1,36 @@
+name: Benchmark experimental 3D export after parity fixes
+on:
+  push:
+    branches: [dev/complete-27-mode-engines]
+    paths:
+      - scripts/build-original-studio.cjs
+      - scripts/test-record-export.cjs
+      - .github/workflows/benchmark-mode-export.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mode-export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mode: domino-3d
+            seconds: 2
+          - mode: phonk-drop
+            seconds: 2
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install Playwright
+        run: npm install --prefix "$RUNNER_TEMP/export-test" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Build original Studio
+        run: node scripts/build-original-studio.cjs
+      - name: Verify actual MP4 file download
+        env:
+          TEST_MODE: ${{ matrix.mode }}
+          TEST_DURATION: ${{ matrix.seconds }}
+        run: CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/export-test/node_modules" node scripts/test-record-export.cjs
