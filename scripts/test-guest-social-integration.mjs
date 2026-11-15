@@ -3,7 +3,7 @@ import {test} from 'node:test';
 import fs from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {resolve,dirname} from 'node:path';
-import {seal,unseal,beginOAuth,providerReadiness} from '../cloud-saves/social-oauth.mjs';
+import {seal,unseal,beginOAuth,providerReadiness,providerJSON} from '../cloud-saves/social-oauth.mjs';
 import {guestSocial,isGuestSocialCallback,runSocialSchedule} from '../cloud-saves/guest-social.mjs';
 
 const here=dirname(fileURLToPath(import.meta.url));
@@ -108,4 +108,20 @@ test('no hardcoded platform passwords or paid subscription bypasses',()=>{
   const ui=fs.readFileSync(resolve(here,'../scripts/ballengine-guest-social.js'),'utf8');
   for(const word of ['authorizationUrl','TikTok','Autopilot','consent','Connected accounts','Queue automatic post'])
     assert.ok(ui.includes(word),'UI missing '+word);
+});
+
+test('TikTok uses an error envelope even for successful API responses',async()=>{
+  const prior=globalThis.fetch;
+  try{
+    globalThis.fetch=async()=>new Response(JSON.stringify({
+      data:{privacy_level_options:['SELF_ONLY']},
+      error:{code:'ok',message:'',log_id:'example'}
+    }),{status:200,headers:{'Content-Type':'application/json'}});
+    const result=await providerJSON('https://open.tiktokapis.com/v2/post/publish/creator_info/query/');
+    assert.deepEqual(result.data.privacy_level_options,['SELF_ONLY']);
+    globalThis.fetch=async()=>new Response(JSON.stringify({
+      data:{},error:{code:'scope_not_authorized',message:'Permission not granted'}
+    }),{status:200,headers:{'Content-Type':'application/json'}});
+    await assert.rejects(()=>providerJSON('https://open.tiktokapis.com/v2/post/publish/creator_info/query/'),/Permission not granted/);
+  }finally{globalThis.fetch=prior;}
 });
