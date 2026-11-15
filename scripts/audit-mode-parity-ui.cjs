@@ -25,7 +25,14 @@ const base=process.env.BALLENGINE_BASE||'https://ballengine.vercel.app';
      try{
        await page.goto(base+'/studio?mode='+slug,{waitUntil:'domcontentloaded',timeout:45000});
        await page.locator('button[title="Change mode"]').first().waitFor({state:'visible',timeout:22000});
-       await page.waitForTimeout(550);
+       const load3D=page.getByRole('button',{name:'Load 3D',exact:true}).first();
+       if(await load3D.isVisible().catch(()=>false)){
+         await load3D.click({timeout:12000});
+         await page.waitForTimeout(500);
+       }
+       const gotIt=page.getByRole('button',{name:'Got it',exact:true}).first();
+       if(await gotIt.isVisible().catch(()=>false))await gotIt.click({timeout:8000});
+       await page.waitForTimeout(300);
        const before=await page.evaluate(()=>{
          const root=document.querySelector('#root');
          const body=root?.innerText||'';
@@ -47,6 +54,7 @@ const base=process.env.BALLENGINE_BASE||'https://ballengine.vercel.app';
        if(randomizeEnabled){
          await randomize.click({timeout:11000});
          clicked=true;await page.waitForTimeout(350);
+         if(await gotIt.isVisible().catch(()=>false))await gotIt.click({timeout:8000});
          after=await page.evaluate(()=>({
            settings:document.querySelector('#root')?.innerText?.split('Mode settings').pop()?.slice(0,1200),
            controls:[...document.querySelectorAll('#root input,#root select,#root [role="slider"]')].filter(e=>e.getClientRects().length).map(e=>e.value??e.getAttribute('aria-valuenow'))
