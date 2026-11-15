@@ -1,0 +1,20 @@
+name: Reverse engineer 18 vs 27 mode implementations
+on:
+  push:
+    branches: [feat/27-mode-parity-audit]
+    paths:
+      - scripts/audit-mode-parity-static.cjs
+      - .github/workflows/mode-parity-static.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  registry-and-assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Inspect original mode registry and captured assets
+        run: node scripts/audit-mode-parity-static.cjs
