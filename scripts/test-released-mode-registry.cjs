@@ -16,8 +16,9 @@ const server=http.createServer((req,res)=>{
  }catch{res.writeHead(400).end();}
 });
 (async()=>{
- await new Promise(r=>server.listen(0,'127.0.0.1',r));
- const base='http://127.0.0.1:'+server.address().port;
+ const remote=process.env.BALLENGINE_BASE||'';
+ if(!remote)await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const base=remote||'http://127.0.0.1:'+server.address().port;
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  try{
   const page=await browser.newPage({viewport:{width:1440,height:900},serviceWorkers:'block'});
@@ -65,4 +66,4 @@ const server=http.createServer((req,res)=>{
    console.log('RELEASED_MODE_STUDIO '+JSON.stringify({slug,mode,canvas,devCount:dev,errors:errors.slice(0,8)}));
   }
  }finally{await browser.close();}
-})().finally(()=>new Promise(ok=>server.close(ok))).catch(e=>{console.error('RELEASED_MODE_QA_FAIL '+String(e.stack||e));process.exitCode=1;});
+})().finally(()=>server.listening?new Promise(ok=>server.close(ok)):undefined).catch(e=>{console.error('RELEASED_MODE_QA_FAIL '+String(e.stack||e));process.exitCode=1;});
