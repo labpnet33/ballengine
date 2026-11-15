@@ -1,5 +1,17 @@
 'use strict';
 const {chromium}=require('playwright-core');
+const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
+const root=path.resolve(__dirname,'..','extra','wget','ballengine.app');
+const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.wav':'audio/wav','.woff2':'font/woff2','.wasm':'application/wasm'};
+const server=http.createServer((req,res)=>{
+ try{
+  const u=new URL(req.url,'http://localhost');let p=u.pathname==='/studio'?'studio/index.html':decodeURIComponent(u.pathname).replace(/^\\/+/, '');
+  if(!p||p.endsWith('/'))p+='index.html';
+  const file=path.resolve(root,p);
+  if(!file.startsWith(root+path.sep))return res.writeHead(403).end();
+  fs.readFile(file,(err,b)=>err?res.writeHead(404).end():res.writeHead(200,{'content-type':mime[path.extname(file)]||'application/octet-stream'}).end(b));
+ }catch{res.writeHead(400).end()}
+});
 const assert=require('node:assert/strict');
 const list=[
  'rhythmic','escape','glass-tower','wave-3d','ball-crush','magnet',
@@ -7,8 +19,9 @@ const list=[
  'glass-slice','flood-fill','eulers-disk','drum-sort','plinko-3d','chladni','voxel','domino-3d','marble-race-3d','attractor','flow-field','metaballs','galaxy','fireflies','pendulum-basin','slime','crowd-evacuation'
 ];
 const [start,end]=(process.env.MODE_RANGE||'0:33').split(':').map(Number);
-const base=process.env.BALLENGINE_BASE||'https://ballengine.vercel.app';
+let base=process.env.BALLENGINE_BASE||'';
 (async()=>{
+ if(!base){await new Promise(ok=>server.listen(0,'127.0.0.1',ok));base='http://127.0.0.1:'+server.address().port;}
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  try{
   const ctx=await browser.newContext({viewport:{width:1440,height:900},serviceWorkers:'block'});
@@ -52,4 +65,4 @@ const base=process.env.BALLENGINE_BASE||'https://ballengine.vercel.app';
   assert.equal(failures.length,0,'Some mode controls failed to update');
   await ctx.close();
  }finally{await browser.close();}
-})().catch(e=>{console.error('MODE_SETTING_INTERACTIVE_FATAL '+String(e.stack||e));process.exitCode=1;});
+})().catch(e=>{console.error('MODE_SETTING_INTERACTIVE_FATAL '+String(e.stack||e));process.exitCode=1;}).finally(()=>{if(server.listening)server.close();});
