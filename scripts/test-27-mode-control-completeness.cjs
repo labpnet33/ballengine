@@ -31,14 +31,23 @@ const server=http.createServer((req,res)=>{
     let changed=false,editedLabel=null,before=null,after=null;
     for(let i=n-1;i>=0;i--){
       const sel=selectors.nth(i);
-      const choices=await sel.evaluate(el=>[...el.options].filter(o=>!o.disabled&&o.value!=='').map(o=>o.value));
+      const choices=await sel.evaluate(el=>[...el.options].map((o,i)=>({index:i,value:o.value,disabled:o.disabled})).filter(o=>!o.disabled&&o.value!==''));
       if(choices.length<2)continue;
       before=await sel.inputValue();
-      const alternative=choices.find(o=>o!==before);
+      const alternative=choices.find(o=>o.value!==before);
       if(!alternative)continue;
       const titleText=await sel.evaluate(el=>el.closest('label')?.innerText?.slice(0,110)||el.parentElement?.parentElement?.innerText?.slice(0,110));
-      await sel.selectOption(alternative,{timeout:12000});await page.waitForTimeout(100);
-      after=await sel.inputValue();changed=after!==before;editedLabel=titleText;break;
+      // The original React UI can replace <option> nodes between inspection
+      // and input (notably GPU-heavy 3D scenes). Select the currently valid
+      // index rather than asking Playwright to wait for an obsolete value.
+      try{await sel.selectOption({index:alternative.index},{timeout:4000});}
+      catch(err){
+        const snapshot=await sel.evaluate(el=>({value:el.value,options:[...el.options].map((o,i)=>({i,value:o.value}))})).catch(()=>null);
+        console.log('MODE_SELECT_TRANSIENT '+JSON.stringify({slug,title:titleText,attempt:alternative,snapshot,error:String(err).slice(0,180)}));
+        continue;
+      }
+      await page.waitForTimeout(100);
+      after=await sel.inputValue();changed=after!==before;editedLabel=titleText;if(changed)break;
     }
     assert.ok(changed,'No editable dropdown value changed');
     const random=page.getByRole('button',{name:'Randomize',exact:true}).first();
