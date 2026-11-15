@@ -47,3 +47,10 @@ for(const needle of important){
  }
  console.log('MODE_CODE_CONTEXT '+JSON.stringify({needle,hits,contexts}));
 }
+
+// Resolve the named helper bodies used by the ORIGINAL Randomize toolbar.
+for(const name of ['Ape','I1','rpn','Op','ss','be','randomizeOnly','randomVideo','Shuffle this mode']){
+ const re=new RegExp('(?:(?:const|let|var)\\s+|function\\s+)'+name+'\\b','g');
+ const matches=[...text.matchAll(re)].slice(0,8);
+ console.log('MODE_HELPER_CONTEXT '+JSON.stringify({name,matches:matches.map(m=>({at:m.index,snippet:text.slice(Math.max(0,m.index-500),m.index+2700)}))}));
+}
