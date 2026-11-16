@@ -59,6 +59,28 @@ assert.ok(patchedBundle.includes('const Wt=null,Xt=!1,Gt={raw:null,tid:"local-"+
   'Native local MP4 export still requires the private upstream export ticket');
 assert.ok(!patchedBundle.includes('let Ot=null,Wt=null,Xt=!1;try{const jt=crypto.randomUUID()'),
   'Original export ticket request is still present');
+// Preview-quality optimization must affect only the live drawing buffers.
+// Native frame-by-frame MP4 export continues using selected width/height.
+assert.ok(patchedBundle.includes('return window.isOfflineRendering===!0?r:Math.max(.35,r*.75)'),
+  '2D live preview is not scaled independently from offline rendering');
+assert.ok(patchedBundle.includes('nCt()*(window.isOfflineRendering===!0?1:.75);return this.applied=i,i'),
+  '3D adaptive preview lost its separate reduced pixel ratio');
+assert.ok(patchedBundle.includes('d=Opt(t.width),u=Opt(t.height)'),
+  'MP4 encoder no longer uses selected output width and height');
+assert.ok(patchedBundle.includes('MWe(re>1?Math.max(te,Math.min(te*re,3)):te)'),
+  'Offline high-resolution render DPR override missing');
+const vm=require('node:vm');
+const previewFnBody=patchedBundle.split('function a2(e)')[1]?.split('function hrn(')[0];
+assert.ok(previewFnBody,'Preview DPR implementation missing');
+const mockPreview=(isOfflineRendering)=>vm.runInNewContext(
+  'const oie=null,ZTe=null,Bae=1;'+
+  'function wc(){return false}function nCt(){return 1}function urn(){return 1}'+
+  'function DP(){return false}function A0e(){return {dprCap:1}}'+
+  'function a2(e)'+previewFnBody+';a2(false)',
+  {window:{isOfflineRendering}}
+);
+assert.equal(mockPreview(false),0.75,'Live preview should render at 75% DPR');
+assert.equal(mockPreview(true),1,'Offline export must not inherit reduced preview DPR');
 const adapter=fs.readFileSync(path.join(root,'studio-guest-preview.js'),'utf8');
 assert.ok(adapter.includes("plan:'ENTERPRISE'")&&adapter.includes("agency_plan:'AGENCY'")&&adapter.includes("automation_plan:'MAX'"),
   'Guest must use native unlocked Studio tier with Agency / Max local labels');
