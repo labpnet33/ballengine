@@ -25,6 +25,22 @@ const server=http.createServer((req,res)=>{
     const chosen=await title.innerText();
     const confirm=page.getByRole('button',{name:'Load 3D',exact:true}).first();
     if(await confirm.isVisible().catch(()=>false))await confirm.click({timeout:12000});
+    // Capture what the actual Studio controls show: native Randomize must
+    // change simulation options, not an unrelated publishing reminder.
+    const controlSnapshot=()=>page.evaluate(()=>{
+      const visible=e=>!!e.getClientRects().length;
+      const all=[...document.querySelectorAll('#root select,#root input[type="range"],#root input[type="number"],#root input[type="checkbox"]')].filter(visible);
+      return {
+        controls:all.map((e,index)=>{
+          const parent=e.closest('label')||e.parentElement?.parentElement;
+          const label=(parent?.innerText||'').replace(/\\s+/g,' ').trim().slice(0,135);
+          return {index,kind:e.tagName.toLowerCase()+':'+e.type,value:e.type==='checkbox'?String(e.checked):e.value,label,choices:e.tagName==='SELECT'?[...e.options].map(x=>x.textContent.trim()).slice(0,8):undefined};
+        }),
+        headings:[...document.querySelectorAll('#root h1,#root h2,#root h3,#root h4,#root h5')].filter(visible).map(x=>x.innerText.trim()).filter(x=>/mode settings|advanced|publish|reminder/i.test(x)).slice(0,16),
+        modeHeading:[...document.querySelectorAll('#root *')].find(e=>e.childElementCount===0&&e.textContent?.trim()==='Mode settings')?.parentElement?.parentElement?.outerHTML.slice(0,650)
+      };
+    });
+    const valuesBeforeRoll=await controlSnapshot();
     // First test native Randomize/history on an untouched initial mode.
     // Manual setting changes may intentionally clear roll history.
     const random=page.getByRole('button',{name:'Randomize',exact:true}).first();
@@ -78,6 +94,9 @@ const server=http.createServer((req,res)=>{
       },null,{timeout:9000}).catch(()=>{});
     }
     assert.ok(await back.isEnabled(),'Randomize history unavailable even after two rolls');
+    const valuesAfterRoll=await controlSnapshot();
+    const changedControls=valuesAfterRoll.controls.filter((c,i)=>valuesBeforeRoll.controls[i]?.value!==c.value).map(c=>({label:c.label,kind:c.kind,before:valuesBeforeRoll.controls[c.index]?.value,after:c.value}));
+    console.log('MODE_RANDOMIZE_BEHAVIOR_DIAGNOSTIC '+JSON.stringify({slug,changedCount:changedControls.length,changes:changedControls.slice(0,24),initialHeadings:valuesBeforeRoll.headings,modeHeading:valuesBeforeRoll.modeHeading,firstControls:valuesBeforeRoll.controls.slice(0,28)}));
     // Exercise an ORIGINAL alternate option, not an added demo control.
     const selectors=page.locator('#root select:visible:not([disabled])');
     const n=await selectors.count();
