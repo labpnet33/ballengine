@@ -5,6 +5,7 @@ on:
     branches: [fix/27-modes-native-controls-preview]
     paths:
       - scripts/test-18-original-mode-regression.cjs
+      - scripts/build-original-studio.cjs
       - .github/workflows/18-mode-regression.yml
 permissions:
   contents: read
