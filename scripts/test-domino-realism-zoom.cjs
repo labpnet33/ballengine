@@ -26,6 +26,14 @@ const server=http.createServer((req,res)=>{
  assert.equal(mode.trim(),'Domino 3D');
  const load=page.getByRole('button',{name:'Load 3D',exact:true}).first();
  if(await load.isVisible().catch(()=>false))await load.click({timeout:9000}).catch(()=>{});
+ console.log('DOMINO_UI_DEBUG '+JSON.stringify(await page.evaluate(()=>{
+ const root=document.querySelector('#root');
+ return {url:location.href,mode:document.querySelector('button[title="Change mode"]')?.innerText,
+ titles:[...root.querySelectorAll('button')].filter(x=>/zoom|camera/i.test(x.title||'')).map(x=>({title:x.title,visible:!!x.getClientRects().length,html:x.outerHTML.slice(0,150)})).slice(0,25),
+ headings:[...root.querySelectorAll('button,span,div')].filter(x=>x.children.length===0&&/^(Camera|Zoom|Domino 3D settings)$/i.test(x.textContent?.trim()||'')).slice(0,12).map(x=>({tag:x.tagName,text:x.textContent?.trim(),parent:x.parentElement?.outerHTML.slice(0,500)})),
+ range:[...root.querySelectorAll('input[type="range"]')].map(x=>({min:x.min,max:x.max,value:x.value,visible:!!x.getClientRects().length})).slice(-20),
+ bodyEnd:root.innerText.slice(-1300)};
+ })));
  await page.getByRole('button',{name:/Zoom in/i}).first().waitFor({timeout:25000});
  const zoomIn=page.locator('button[title="Zoom in"]').first(),zoomOut=page.locator('button[title="Zoom out"]').first(),reset=page.locator('button[title="Reset camera zoom"]').first();
  assert.equal(await zoomIn.count(),1);assert.equal(await zoomOut.count(),1);assert.equal(await reset.count(),1);
