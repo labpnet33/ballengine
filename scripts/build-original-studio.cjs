@@ -652,6 +652,13 @@ const beDominoCameraUi=[
  ']})]}),'
 ].join('');
 beReplaceOnce(beDominoLookAnchor,beDominoCameraUi+beDominoLookAnchor,'existing settings camera UI');
+
+beReplaceOnce(
+  'DOMINO_3D:[{kind:"select",key:"domino3DLayout",label:"Run shape"',
+  'DOMINO_3D:[{kind:"slider",key:"domino3DManualZoom",label:"Camera zoom",min:.3,max:2.2,step:.05},{kind:"select",key:"domino3DLayout",label:"Run shape"',
+  'visible Simple-mode camera zoom slider'
+);
+
 console.log('Domino 3D: native ceramic pips, rounded tiles and responsive camera zoom enabled.');
 
 fs.writeFileSync(originalBundle,capturedApp,'utf8');
