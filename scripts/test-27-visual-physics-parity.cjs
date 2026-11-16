@@ -223,6 +223,12 @@ const records=[];
     await page.waitForTimeout(450);
     const conf2=await state(page);
     const roll2=await screenshot(page,slug,'random-2');
+    // This fixed observation interval is deliberate: some original renderer
+    // loading overlays are canvas/composited UI, not detectable in body text.
+    // Do not count a dark "Loading 3D scene" as a simulation frame.
+    await page.waitForTimeout(6500);
+    const roll2Late=await screenshot(page,slug,'random-2-late');
+    result.checks.secondRollRecoveryDiff=frameDiff(roll2.buf,roll2Late.buf);
     const delta2=Object.keys({...conf1,...conf2}).filter(k=>conf1[k]!==conf2[k]);
     result.checks.randomizeChangedControls=[delta1.length,delta2.length];
     result.checks.visualRollDiff=[frameDiff(stable0.buf,roll1.buf),frameDiff(roll1.buf,roll2.buf)];
@@ -260,7 +266,12 @@ const records=[];
     if(afterHistoryReady.loading)result.warnings.push('Scene remains loading after undo/redo sequence');
     await page.waitForTimeout(750);
     const finalFrame=await screenshot(page,slug,'post-roll-play');
+    await page.waitForTimeout(10500);
+    const finalLate=await screenshot(page,slug,'post-roll-late');
     result.checks.postRollMotion=frameDiff(roll2.buf,finalFrame.buf);
+    result.checks.postRollLateMotion=frameDiff(finalFrame.buf,finalLate.buf);
+    if(result.checks.postRollLateMotion.ratio<0.0005)
+      result.warnings.push('No visible scene progression during 10.5-second recovery window (may be loading or completed)');
     if(result.checks.postRollMotion.ratio<0.0005)result.warnings.push('Post-randomize scene appears static');
     const bodyText=await page.locator('#root').innerText();
     if(/\bNaN\b|Infinity|Uncaught|Cannot read properties/i.test(bodyText))
@@ -269,7 +280,7 @@ const records=[];
     result.checks.missingAssets=[...new Set(missing)].slice(0,6);
     if(errors.length)result.warnings.push('Page JavaScript errors occurred');
     if(missing.length)result.warnings.push('Missing captured assets');
-    result.metrics={hashes:[f0,f1,f2,stable0,roll1,roll2,finalFrame].map(x=>({file:x.file,hash:x.hash}))};
+    result.metrics={hashes:[f0,f1,f2,stable0,roll1,roll2,roll2Late,finalFrame,finalLate].map(x=>({file:x.file,hash:x.hash}))};
    }catch(err){result.errors.push(String(err).slice(0,900));}
    result.durationMs=Date.now()-begin;
    result.status=result.errors.length?'FAIL':result.warnings.length?'REVIEW':'PASS';
