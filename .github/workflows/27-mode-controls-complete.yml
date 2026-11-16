@@ -1,7 +1,7 @@
 name: Complete mode-control validation for all 27 engines
 on:
   push:
-    branches: [dev/complete-27-mode-engines]
+    branches: [dev/complete-27-mode-engines, fix/27-modes-native-controls-preview]
     paths:
       - scripts/test-27-mode-control-completeness.cjs
       - scripts/build-original-studio.cjs
