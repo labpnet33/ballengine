@@ -49,7 +49,7 @@ const server=http.createServer((req,res)=>{
       const root=document.querySelector('#root');
       const selects=[...root.querySelectorAll('select')].filter(visible).filter(e=>{
         const labels=[...e.options].map(o=>o.textContent.trim()).join('|');
-        return !(/Once\\|Daily\\|Weekly/.test(labels) || /15s\\|30s\\|59s/.test(labels) || labels.includes('Instagram Reels'));
+        return !(labels.includes('Once|Daily|Weekly') || labels.includes('15s|30s|59s') || labels.includes('Instagram Reels'));
       });
       const ranges=[...root.querySelectorAll('input[type="range"]')].filter(visible).slice(1);
       const result={};
@@ -141,7 +141,7 @@ const server=http.createServer((req,res)=>{
       const titleText=await sel.evaluate(el=>el.closest('label')?.innerText?.slice(0,110)||el.parentElement?.parentElement?.innerText?.slice(0,110));
       const labelOptions=await sel.evaluate(el=>[...el.options].map(o=>o.textContent.trim()).join('|'));
       // Never pass a simulation-control test by changing Publish or shared UI.
-      if(/Once\\|Daily\\|Weekly|15s\\|30s\\|59s|Instagram Reels/.test(labelOptions))continue;
+      if(labelOptions.includes('Once|Daily|Weekly')||labelOptions.includes('15s|30s|59s')||labelOptions.includes('Instagram Reels'))continue;
       // The original React UI can replace <option> nodes between inspection
       // and input (notably GPU-heavy 3D scenes). Select the currently valid
       // index rather than asking Playwright to wait for an obsolete value.
