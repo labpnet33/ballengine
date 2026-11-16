@@ -434,6 +434,58 @@ if(capturedApp.split(nativeHistoryBefore).length!==2)
 capturedApp=capturedApp.replace(nativeHistoryBefore,nativeHistoryAfter);
 console.log('Flood 3D native roll undo/redo survives heavy renderer remounts.');
 
+// Keep live previews in sync with native settings for the 27 released engines.
+// The captured Studio's existing simulation restart effect (ending with
+// b.glassTowerRandomLaunch,cf]) covers the established engine settings but
+// leaves new mode-specific fields such as floodFillGravity and pbloomLayout
+// out of its dependency array. Those fields persist immediately but can
+// remain absent from the active simulation until a full webpage refresh.
+// Reuse the ORIGINAL cf(true) simulation restart, never window.location.reload.
+// Debounce slider drags and skip Randomize, recording and offline rendering.
+// The original 18 modes have no extra hook activity beyond an inert signature.
+const nativeLiveModes=[
+  'PHASE_BLOOM','PHONK_DROP','MARBLE_RUN','BALL_RACE','TARGET_HIT',
+  'FALLING_SAND','PLINKO','COLOR_MATCH','SPIN_BATTLE','LAVA_SURVIVAL',
+  'GLASS_SLICE','FLOOD_FILL','EULERS_DISK','DRUM_SORT','PLINKO_3D',
+  'CHLADNI','VOXEL_CA','DOMINO_3D','MARBLE_RACE_3D','ATTRACTOR',
+  'FLOW_FIELD','METABALLS','NBODY','KURAMOTO','PENDULUM_BASIN',
+  'PHYSARUM','CROWD_EVAC'
+];
+if(nativeLiveModes.length!==27||new Set(nativeLiveModes).size!==27)
+  throw new Error('Live preview mode registry must contain 27 unique engines');
+const nativeSyncVarsBefore='vX=E.useRef(null),Hv=(b.customMelodies||[]).find(';
+const nativeSyncVarsAfter=[
+  'vX=E.useRef(null),',
+  'bePreviewSyncRef=E.useRef({mode:b.mode,signature:null}),',
+  'bePreviewSyncSignature='+JSON.stringify(nativeLiveModes)+'.includes(b.mode)?',
+  'JSON.stringify(Hme(b.mode).map(beField=>[beField.key,b[beField.key]])):null,',
+  'Hv=(b.customMelodies||[]).find('
+].join('');
+if(capturedApp.split(nativeSyncVarsBefore).length!==2)
+  throw new Error('Native live-preview state anchor changed; no fix applied');
+capturedApp=capturedApp.replace(nativeSyncVarsBefore,nativeSyncVarsAfter);
+const nativeSyncEffectBefore='b.glassTowerRandomLaunch,cf]),E.useEffect(()=>{const yt=JSON.stringify({mode:b.ballPlacementMode';
+const nativeSyncEffectAfter=[
+  'b.glassTowerRandomLaunch,cf]),',
+  'E.useEffect(()=>{',
+  'const beBefore=bePreviewSyncRef.current;',
+  'bePreviewSyncRef.current={mode:b.mode,signature:bePreviewSyncSignature};',
+  'if(bePreviewSyncSignature===null||beBefore.mode!==b.mode||beBefore.signature===null||',
+  'beBefore.signature===bePreviewSyncSignature||hX.current||em.isBusy||',
+  'Nn.isRecording||Nn.isOfflineRendering)return;',
+  'const beTimer=window.setTimeout(()=>{',
+  'if(!hX.current&&!em.isBusy&&!Nn.isRecording&&!Nn.isOfflineRendering)cf(!0)',
+  '},300);',
+  'return()=>window.clearTimeout(beTimer)',
+  '},[b.mode,bePreviewSyncSignature]),',
+  'E.useEffect(()=>{const yt=JSON.stringify({mode:b.ballPlacementMode'
+].join('');
+if(capturedApp.split(nativeSyncEffectBefore).length!==2)
+  throw new Error('Original reset dependency anchor changed; no live-preview patch applied');
+capturedApp=capturedApp.replace(nativeSyncEffectBefore,nativeSyncEffectAfter);
+console.log('Released 27 mode-specific Studio controls now schedule native, debounced live scene rebuilds; original 18 unchanged.');
+
+
 
 // Experimental Domino 3D ships with 1,600 physics bodies at startup.
 // On CPU/software-GPU export runners, even two seconds of output can take
