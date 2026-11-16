@@ -605,7 +605,7 @@ const beDominoMaterialGeometry=[
   'function beDominoRoundedGeometry(a){',
   'const g=new a.BoxGeometry(1,1,1,3,3,3),p=g.attributes.position,n=g.attributes.normal,uv=g.attributes.uv,r=.065;',
   'for(let i=0;i<p.count;i++){',
-  'if(Math.abs(n.getZ(i))<.5)uv.setXY(i,.035,.035);',
+  'if(Math.abs(n.getZ(i))<.5)uv.setXY(i,.5,.66);',
   'const x=p.getX(i),y=p.getY(i),z=p.getZ(i),',
   'cx=Math.max(-.5+r,Math.min(.5-r,x)),',
   'cy=Math.max(-.5+r,Math.min(.5-r,y)),',
