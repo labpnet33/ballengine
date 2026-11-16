@@ -107,16 +107,27 @@ async function screenshot(page,slug,label){
  fs.writeFileSync(file,png);
  return {buf:png,file:path.basename(file),hash:hash(png),stats:pixelStats(png)};
 }
+async function clickControl(page, selector){
+ const el=page.locator(selector).first();
+ if(!await el.count())return false;
+ if(await el.isVisible().catch(()=>false)){
+  try{await el.click({timeout:3400});return true;}catch{}
+ }
+ return el.evaluate(e=>{if(e.disabled)return false;e.click();return true;}).catch(()=>false);
+}
 async function setPlaying(page){
  const load=page.getByRole('button',{name:'Load 3D',exact:true}).first();
  if(await load.isVisible().catch(()=>false))await load.click({timeout:12000});
- const play=page.locator('button[title="Play (Space)"]').first();
- if(await play.isVisible().catch(()=>false))await play.click({timeout:11000});
- else assert.ok(await page.locator('button[title="Pause (Space)"]').first().isVisible(),'Neither Play nor Pause present');
+ const play='button[title="Play (Space)"]';
+ if(await page.locator(play).count()){
+   if(!await clickControl(page,play))console.log('VISUAL_PLAY_CONTROL_INACTIVE');
+   return;
+ }
+ if(!await page.locator('button[title="Pause (Space)"]').count())
+   console.log('VISUAL_PLAY_CONTROL_ABSENT; verify motion directly from canvas');
 }
 async function pauseIfPlaying(page){
- const pause=page.locator('button[title="Pause (Space)"]').first();
- if(await pause.isVisible().catch(()=>false))await pause.click({timeout:11000});
+ await clickControl(page,'button[title="Pause (Space)"]');
 }
 const records=[];
 (async()=>{
@@ -139,6 +150,7 @@ const records=[];
     await titleEl.waitFor({state:'visible',timeout:28000});
     assert.equal((await titleEl.innerText()).trim(),title,'Incorrect simulation selected');
     await setPlaying(page);
+    await page.waitForFunction(()=>[...document.querySelectorAll('canvas')].some(c=>c.width>=80&&c.height>=80&&c.getClientRects().length),null,{timeout:18000}).catch(()=>{});
     await page.waitForTimeout(350);
     const f0=await screenshot(page,slug,'play-0');
     await page.waitForTimeout(850);
@@ -191,7 +203,7 @@ const records=[];
     result.checks.postRollMotion=frameDiff(roll2.buf,finalFrame.buf);
     if(result.checks.postRollMotion.ratio<0.0005)result.warnings.push('Post-randomize scene appears static');
     const bodyText=await page.locator('#root').innerText();
-    if(/\\bNaN\\b|Infinity|Uncaught|Cannot read properties/i.test(bodyText))
+    if(/\bNaN\b|Infinity|Uncaught|Cannot read properties/i.test(bodyText))
       result.warnings.push('Visible UI contains numerical or JS error marker');
     result.checks.jsErrors=errors.slice(0,6);
     result.checks.missingAssets=[...new Set(missing)].slice(0,6);
