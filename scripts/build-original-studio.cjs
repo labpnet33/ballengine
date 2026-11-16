@@ -559,6 +559,101 @@ console.log('Restored',uncapturedRealisticAssets.size,'uncaptured Phonk face/han
 
 
 
+
+// Domino 3D only: give every instanced tile a lightweight ceramic face with
+// traditional divider/pips and rounded corners, plus live manual camera zoom.
+// This deliberately keeps the native cascade physics, instancing, audio and
+// all 18 established modes unchanged.
+function beReplaceOnce(from,to,label){
+  if(capturedApp.split(from).length!==2)
+    throw new Error('Original Domino 3D '+label+' anchor changed; no unsafe patch applied');
+  capturedApp=capturedApp.replace(from,to);
+}
+beReplaceOnce(
+  'domino3DColorMode:"GRADIENT",domino3DColorA:"#38bdf8",domino3DColorB:"#f472b6",domino3DLoopDelay:',
+  'domino3DColorMode:"SOLID",domino3DColorA:"#f4eee0",domino3DColorB:"#f472b6",domino3DLoopDelay:',
+  'default classic ivory color'
+);
+beReplaceOnce(
+  'domino3DFollowZoom:.52,domino3DFollowFrameAll:!1',
+  'domino3DFollowZoom:.52,domino3DManualZoom:1,domino3DFollowFrameAll:!1',
+  'manual zoom default'
+);
+const beDominoMaterialGeometry=[
+  'function beDominoRealMaterial(t){',
+  'const a=t.THREE,c=typeof document!=="undefined"?document.createElement("canvas"):new OffscreenCanvas(256,512);',
+  'c.width=256;c.height=512;',
+  'const x=c.getContext("2d");',
+  'x.fillStyle="#fff9ed";x.fillRect(0,0,256,512);',
+  'const shade=x.createLinearGradient(0,0,256,0);',
+  'shade.addColorStop(0,"rgba(68,53,34,.13)");shade.addColorStop(.12,"rgba(255,255,255,.08)");',
+  'shade.addColorStop(.85,"rgba(255,255,255,.02)");shade.addColorStop(1,"rgba(68,53,34,.14)");',
+  'x.fillStyle=shade;x.fillRect(0,0,256,512);',
+  'x.lineWidth=7;x.strokeStyle="#d7ccba";x.strokeRect(11,11,234,490);',
+  'x.lineWidth=8;x.strokeStyle="#242220";x.beginPath();x.moveTo(24,256);x.lineTo(232,256);x.stroke();',
+  'for(const p of [[63,75],[193,75],[63,187],[193,187],[64,322],[128,380],[192,438]]){',
+  'x.fillStyle="#211f1c";x.beginPath();x.arc(p[0],p[1],19,0,Math.PI*2);x.fill();',
+  'x.fillStyle="rgba(255,255,255,.22)";x.beginPath();x.arc(p[0]-5,p[1]-5,5,0,Math.PI*2);x.fill();',
+  '}',
+  'const map=new a.CanvasTexture(c);',
+  'if(a.SRGBColorSpace)map.colorSpace=a.SRGBColorSpace;',
+  'map.anisotropy=4;map.needsUpdate=!0;',
+  'const mat=t.makeStandardMaterial({vertexColors:!0,identity:!0});',
+  'mat.map=map;mat.metalness=.035;mat.roughness=.34;mat.needsUpdate=!0;',
+  'return mat',
+  '}',
+  'function beDominoRoundedGeometry(a){',
+  'const g=new a.BoxGeometry(1,1,1,3,3,3),p=g.attributes.position,n=g.attributes.normal,uv=g.attributes.uv,r=.065;',
+  'for(let i=0;i<p.count;i++){',
+  'if(Math.abs(n.getZ(i))<.5)uv.setXY(i,.035,.035);',
+  'const x=p.getX(i),y=p.getY(i),z=p.getZ(i),',
+  'cx=Math.max(-.5+r,Math.min(.5-r,x)),',
+  'cy=Math.max(-.5+r,Math.min(.5-r,y)),',
+  'cz=Math.max(-.5+r,Math.min(.5-r,z)),',
+  'dx=x-cx,dy=y-cy,dz=z-cz,len=Math.hypot(dx,dy,dz)||1;',
+  'p.setXYZ(i,cx+r*dx/len,cy+r*dy/len,cz+r*dz/len)',
+  '}',
+  'p.needsUpdate=!0;uv.needsUpdate=!0;g.computeVertexNormals();',
+  'g.translate(0,.5,-.5);return g',
+  '}'
+].join('');
+beReplaceOnce('class $Na{constructor()',beDominoMaterialGeometry+'class $Na{constructor()','renderer-only realistic mesh helpers');
+beReplaceOnce(
+  'this.material||(this.material=t.makeStandardMaterial({vertexColors:!0,identity:!0})),!this.mesh||this.mesh.count!==r',
+  'this.material||(this.material=beDominoRealMaterial(t)),!this.mesh||this.mesh.count!==r',
+  'renderer ceramic material'
+);
+beReplaceOnce(
+  'const o=new a.BoxGeometry(1,1,1);o.translate(0,.5,-.5),this.mesh=new a.InstancedMesh(o,this.material,Math.max(1,r))',
+  'const o=beDominoRoundedGeometry(a);this.mesh=new a.InstancedMesh(o,this.material,Math.max(1,r))',
+  'renderer beveled tile geometry'
+);
+beReplaceOnce(
+  'h.distanceScale=1+(m-1)*u,t.setCameraHint(h)',
+  'h.distanceScale=Math.max(.2,Math.min(3,(1+(m-1)*u)*(n.domino3DManualZoom??1))),t.setCameraHint(h)',
+  'native camera zoom'
+);
+beReplaceOnce(
+  '(a=this.material)==null||a.dispose(),this.mesh=null,this.mat=null,this.ground=null,this.material=null,this.simKey=""',
+  'this.material&&this.material.map&&this.material.map.dispose(),(a=this.material)==null||a.dispose(),this.mesh=null,this.mat=null,this.ground=null,this.material=null,this.simKey=""',
+  'texture cleanup'
+);
+const beDominoLookAnchor='s.jsxs(Ut,{label:"Look",darkMode:e.darkMode,children:[s.jsx(Ee,{label:"Color mode"';
+const beDominoCameraUi=[
+ 's.jsxs(Ut,{label:"Camera",darkMode:e.darkMode,children:[',
+ 'M("Zoom","domino3DManualZoom",.3,2.2,.05,1),',
+ 's.jsxs("div",{className:"flex items-center gap-2 mt-2",children:[',
+ 's.jsx("button",{type:"button",title:"Zoom in",className:"btn btn-sm border border-white/10 px-3",',
+ 'onClick:()=>c({domino3DManualZoom:Math.max(.3,Math.round(((e.domino3DManualZoom??1)-.15)*100)/100)}),children:"+"}),',
+ 's.jsx("button",{type:"button",title:"Zoom out",className:"btn btn-sm border border-white/10 px-3",',
+ 'onClick:()=>c({domino3DManualZoom:Math.min(2.2,Math.round(((e.domino3DManualZoom??1)+.15)*100)/100)}),children:"−"}),',
+ 's.jsx("button",{type:"button",title:"Reset camera zoom",className:"btn btn-sm border border-white/10 px-3",',
+ 'onClick:()=>c({domino3DManualZoom:1}),children:"Reset zoom"})',
+ ']})]}),'
+].join('');
+beReplaceOnce(beDominoLookAnchor,beDominoCameraUi+beDominoLookAnchor,'existing settings camera UI');
+console.log('Domino 3D: native ceramic pips, rounded tiles and responsive camera zoom enabled.');
+
 fs.writeFileSync(originalBundle,capturedApp,'utf8');
 
 
