@@ -396,6 +396,45 @@ if(capturedApp.split(missingDefault).length!==2)
 capturedApp=capturedApp.replace(missingDefault,'phonkDropFace:"grinface",phonkDropFaceScale:.45');
 console.log('Phonk Drop native randomization and image-safe illustrated default enabled.');
 
+// Keep the ORIGINAL Flood, Drum and Slice 3D engines and controls. These
+// modes can become unresponsive in software GL because their fresh scenes
+// start with thousands of bodies. Reduce only NEW scene defaults and the
+// curated Randomize load; existing saved-project values and slider maxima
+// remain untouched.
+const native3dLoadAdjustments=[
+  ['floodFillBallCount:4e3,floodFillSpawnRate:420','floodFillBallCount:2200,floodFillSpawnRate:300'],
+  ['floodFillCounterMilestone:4e3','floodFillCounterMilestone:2200'],
+  ['floodFillBallCount:{kind:"int",min:2200,max:6e3}','floodFillBallCount:{kind:"int",min:1200,max:3e3}'],
+  ['drumSortBallCount:900,','drumSortBallCount:480,'],
+  ['drumSortBallCount:{kind:"int",min:600,max:1200}','drumSortBallCount:{kind:"int",min:360,max:760}'],
+  ['glassSliceRounds:3,','glassSliceRounds:2,']
+];
+for(const [from,to] of native3dLoadAdjustments){
+  if(capturedApp.split(from).length!==2)
+    throw new Error('Mode load adjustment anchor changed: '+from);
+  capturedApp=capturedApp.replace(from,to);
+}
+console.log('Flood / Drum / Slice 3D native new-scene and randomizer density adjusted.');
+
+// Flood 3D can remount its expensive renderer when a roll changes geometry.
+// In the captured app, the ORIGINAL randomizer saves undo history only in
+// a component useRef; a remount loses the history UI. Keep that exact native
+// history object alive across renderer remounts *in the same tab*.
+// It never uses localStorage and resets as soon as another mode is active.
+const nativeHistoryBefore='j=E.useRef({list:[],index:-1}),[F,_]=E.useState({index:-1,length:0}),N=()=>_({index:j.current.index,length:j.current.list.length})';
+const nativeHistoryAfter=[
+  'j=E.useRef(b.current.mode==="FLOOD_FILL"&&window.__beFloodRollState?window.__beFloodRollState:{list:[],index:-1}),',
+  '[F,_]=E.useState(()=>({index:j.current.index,length:j.current.list.length})),',
+  'N=()=>{if(b.current.mode==="FLOOD_FILL")window.__beFloodRollState=j.current;',
+  'else if(window.__beFloodRollState)delete window.__beFloodRollState;',
+  '_({index:j.current.index,length:j.current.list.length})}'
+].join('');
+if(capturedApp.split(nativeHistoryBefore).length!==2)
+  throw new Error('Original native randomizer history hook changed; review before patching.');
+capturedApp=capturedApp.replace(nativeHistoryBefore,nativeHistoryAfter);
+console.log('Flood 3D native roll undo/redo survives heavy renderer remounts.');
+
+
 // Experimental Domino 3D ships with 1,600 physics bodies at startup.
 // On CPU/software-GPU export runners, even two seconds of output can take
 // several minutes. Use a moderate default for NEW simulations while keeping
