@@ -45,10 +45,11 @@ const server=http.createServer((req,res)=>{
     await page.waitForFunction(()=>[...document.querySelectorAll('canvas')].some(x=>x.width>=80&&x.height>=80&&x.getClientRects().length),null,{timeout:13000});
     const canvasCount=await canvas.count();
     assert.ok(canvasCount>0,'Established mode lost visible canvas');
-    const renderer=page.locator('canvas:visible').first();
-    const a=await renderer.screenshot({timeout:10000});
+    // Use page-level snapshots: element screenshots wait for the continuously
+    // animated 3D canvas to become "stable" and falsely time out.
+    const a=await page.screenshot({timeout:24000,animations:'disabled'});
     await page.waitForTimeout(800);
-    const b=await renderer.screenshot({timeout:10000});
+    const b=await page.screenshot({timeout:24000,animations:'disabled'});
     // Frozen samples are reported for manual review; do not make frame
     // movement a hard failure when an engine starts paused or waits for input.
     const bufferChanged=!a.equals(b);
