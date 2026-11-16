@@ -308,6 +308,33 @@ capturedApp=capturedApp.replace(exportFpsBefore,exportFpsAfter);
 console.log('Software-renderer Domino MP4 adaptive frame-rate enabled; hardware 60fps unaffected.');
 console.log('Standalone local MP4 export enabled using original frame renderer; upstream ticket not requested.');
 
+// Live Studio previews draw fewer physical pixels than the user's final MP4.
+// This changes rendering resolution only (not simulation steps, geometry, effects,
+// saved export resolution, bitrate or selected FPS). The native offline exporter
+// sets MWe(...) from t.width/t.height and therefore keeps full export quality.
+// Avoid global devicePixelRatio monkey patches, which also impact the encoder.
+const previewDprBefore='function a2(e){if(typeof window>"u")return 1;if(oie!==null)return Math.max(1,oie);const t=wc()?nCt():urn();return wc()?(ZTe!==null?ZTe:.8)*t:e?.8*t*Bae:DP()?Math.min(1,A0e().dprCap)*t*Bae:t*Bae}';
+const previewDprAfter='function a2(e){if(typeof window>"u")return 1;if(oie!==null)return Math.max(1,oie);const t=wc()?nCt():urn(),r=wc()?(ZTe!==null?ZTe:.8)*t:e?.8*t*Bae:DP()?Math.min(1,A0e().dprCap)*t*Bae:t*Bae;return window.isOfflineRendering===!0?r:Math.max(.35,r*.75)}';
+if(capturedApp.split(previewDprBefore).length!==2)
+  throw new Error('Live 2D canvas DPR anchor changed; no preview-quality patch applied.');
+capturedApp=capturedApp.replace(previewDprBefore,previewDprAfter);
+
+// Native 3D scenes use an independent adaptive preview DPR controller.
+// Scale that drawing buffer too, but allow the exporter to use its own
+// explicit full-resolution override without any 0.75 multiplier.
+const preview3DBefore='const i=Math.max(o,Math.min(r,n))*nCt();return this.applied=i,i}autoActive(t){';
+const preview3DAfter='const i=Math.max(o,Math.min(r,n))*nCt()*(window.isOfflineRendering===!0?1:.75);return this.applied=i,i}autoActive(t){';
+if(capturedApp.split(preview3DBefore).length!==2)
+  throw new Error('Native 3D adaptive DPR anchor changed; no preview-quality patch applied.');
+capturedApp=capturedApp.replace(preview3DBefore,preview3DAfter);
+
+// The offline exporter must still size the encoding frame from the selected
+// output dimensions, not from the on-screen canvas's reduced resolution.
+if(!capturedApp.includes('d=Opt(t.width),u=Opt(t.height),') ||
+   !capturedApp.includes('MWe(re>1?Math.max(te,Math.min(te*re,3)):te)'))
+  throw new Error('Native MP4 export sizing changed; review preview/export isolation.');
+console.log('Live 2D and native 3D preview DPR scaled to 75%; selected offline MP4 dimensions unchanged.');
+
 // QA-gated release of native experimental simulation controls. The captured
 // engines exist already; do not promote them to live until independently
 // verifying animation, controls, and MP4 export on this exact build.
