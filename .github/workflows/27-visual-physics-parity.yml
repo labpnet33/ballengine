@@ -1,0 +1,40 @@
+name: Verify 27 modes - visual and physics-behavior evidence
+on:
+  workflow_dispatch:
+  push:
+    branches: [fix/27-modes-native-controls-preview]
+    paths:
+      - scripts/test-27-visual-physics-parity.cjs
+      - .github/workflows/27-visual-physics-parity.yml
+permissions:
+  contents: read
+jobs:
+  captured-mode-visual-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        range: ['0:3','3:6','6:9','9:12','12:15','15:18','18:21','21:24','24:27']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install browser controller and PNG pixel decoder
+        run: npm install --prefix "$RUNNER_TEMP/visual-audit" --no-save --no-audit --no-fund playwright-core@1.56.0 pngjs@7.0.0
+      - name: Build the EXISTING Studio (no new modes/pages)
+        run: node scripts/build-original-studio.cjs
+      - name: Exercise animation, native randomization, visual change and history
+        env:
+          MODE_RANGE: ${{ matrix.range }}
+          AUDIT_OUTPUT: ${{ runner.temp }}/visual-physics-audit
+          NODE_PATH: ${{ runner.temp }}/visual-audit/node_modules
+        run: CHROME_BIN="$(command -v google-chrome)" node scripts/test-27-visual-physics-parity.cjs
+      - name: Preserve per-mode screenshot evidence and machine-readable results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: visual-physics-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/visual-physics-audit/
+          retention-days: 7
+          if-no-files-found: warn
