@@ -44,6 +44,31 @@ async function canvasScreenshot(page,slug,stage){
     if(await pause.isVisible().catch(()=>false)){await pause.evaluate(x=>x.click());await page.waitForTimeout(250);}
     const before=await snapshot(page);
     result.controls=before.controls;
+    if(slug==='flood-fill'||slug==='phase-bloom'){
+      // Test a visibly different scene layout, not gravity/tempo while
+      // paused. Wait for actual 3D geometry: a loading overlay does not count.
+      const from=slug==='flood-fill'?'BOX':'ARCS',to=slug==='flood-fill'?'ROOM':'RINGS';
+      const waitScene=async()=>page.waitForFunction(()=>{
+        const canvas=[...document.querySelectorAll('canvas')].some(e=>e.getClientRects().length&&e.width>80&&e.height>80);
+        const loading=[...document.querySelectorAll('#root *')].some(e=>e.children.length===0&&e.getClientRects().length&&/Loading 3D scene|Preparing 3D scene|Loading simulation/.test(e.textContent||''));
+        return canvas&&!loading;
+      },null,{timeout:30000});
+      const layout=page.locator('#root select:visible').filter({has:page.locator('option[value="'+from+'"]')}).first();
+      if(!await layout.count())throw Error('Missing native layout select for '+slug);
+      await waitScene();
+      if(await layout.inputValue()!==from){await layout.selectOption(from);await waitScene();}
+      result.imageBefore=await canvasScreenshot(page,slug,'before');
+      await layout.selectOption(to,{timeout:10000});
+      await page.waitForTimeout(1000);
+      await waitScene();
+      await page.waitForTimeout(1000);
+      result.imageSettled=await canvasScreenshot(page,slug,'live-settled');
+      result.liveChangedWithoutRefresh=result.imageBefore.sha!==result.imageSettled.sha;
+      result.setting={from,to,actual:await layout.inputValue()};
+      if(!result.liveChangedWithoutRefresh)
+        throw Error('Scene shape did not update without refresh: '+slug);
+      if(result.setting.actual!==to)throw Error('Layout select did not retain new setting');
+    }else{
     const ranges=page.locator('#root input[type=range]:visible:not([disabled])');
     const count=await ranges.count(); if(count<2)throw Error('Not enough sliders');
     const target=ranges.last();
@@ -69,6 +94,7 @@ async function canvasScreenshot(page,slug,stage){
     await page.waitForTimeout(1500);
     const reload=await snapshot(page);result.setting.afterReload=await page.locator('#root input[type=range]:visible:not([disabled])').last().inputValue();
     result.imageReload=await canvasScreenshot(page,slug,'reload');
+    }
     result.errors=errors;
    }catch(e){result.error=String(e).slice(0,500);result.errors=errors;}
    console.log('LIVE_PREVIEW_DIAG '+JSON.stringify(result));fs.writeFileSync(path.join(out,'diag-'+slug+'.json'),JSON.stringify(result,null,2));
