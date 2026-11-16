@@ -1,0 +1,35 @@
+name: Diagnose Studio live preview refresh bug
+on:
+  workflow_dispatch:
+  push:
+    branches: [fix/27-modes-native-controls-preview]
+    paths:
+      - scripts/diagnose-live-preview-update.cjs
+      - .github/workflows/live-preview-synchronization.yml
+permissions:
+  contents: read
+jobs:
+  live-preview-diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        range: ['0:3','3:6']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: npm install --prefix "$RUNNER_TEMP/preview-diagnostics" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - run: node scripts/build-original-studio.cjs
+      - name: Check configuration and canvas without and with refresh
+        env:
+          MODE_RANGE: ${{ matrix.range }}
+          NODE_PATH: ${{ runner.temp }}/preview-diagnostics/node_modules
+        run: CHROME_BIN="$(command -v google-chrome)" node scripts/diagnose-live-preview-update.cjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: live-preview-diagnostic-${{ strategy.job-index }}
+          path: test-results/live-preview/
+          retention-days: 3
