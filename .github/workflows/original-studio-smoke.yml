@@ -1,7 +1,12 @@
 name: Smoke-test original BallEngine Studio preview
 on:
   push:
-    branches: [preview/original-studio-assets, fix/production-home-route]
+    branches: [preview/original-studio-assets, fix/production-home-route, perf/low-res-preview-full-quality-export]
+  pull_request:
+    paths:
+      - scripts/build-original-studio.cjs
+      - scripts/test-original-studio.cjs
+      - .github/workflows/original-studio-smoke.yml
   workflow_dispatch:
 permissions:
   contents: read
