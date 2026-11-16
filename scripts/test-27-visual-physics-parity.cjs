@@ -99,6 +99,34 @@ async function clickRandom(page){
   return diag;
  }
 }
+async function dismissRandomizeTutorial(page){
+ const button=page.getByRole('button',{name:/^(Got it|Okay|Understood)$/i}).first();
+ if(await button.isVisible().catch(()=>false)){
+  await button.click({timeout:5500}).catch(async()=>button.evaluate(e=>e.click()));
+  return true;
+ }
+ return false;
+}
+async function sceneLoaderState(page){
+ return page.evaluate(()=>{
+  const root=document.querySelector('#root');
+  if(!root)return {loading:false,texts:[]};
+  const texts=[...root.querySelectorAll('*')]
+    .filter(e=>e.children.length===0&&e.getClientRects().length&&/Loading 3D scene|Loading simulation|Preparing 3D scene/i.test(e.textContent||''))
+    .map(e=>e.textContent.trim().slice(0,120)).slice(0,5);
+  return {loading:texts.length>0,texts};
+ });
+}
+async function awaitScene(page,ms){
+ const begin=Date.now();
+ await page.waitForFunction(()=>{
+  const root=document.querySelector('#root');
+  if(!root)return false;
+  return ![...root.querySelectorAll('*')].some(e=>e.children.length===0&&e.getClientRects().length&&/Loading 3D scene|Loading simulation|Preparing 3D scene/i.test(e.textContent||''));
+ },null,{timeout:ms}).catch(()=>{});
+ const info=await sceneLoaderState(page);
+ return {...info,elapsedMs:Date.now()-begin};
+}
 async function screenshot(page,slug,label){
  const candidates=page.locator('canvas:visible');
  let best=null,area=0;
@@ -155,6 +183,9 @@ const records=[];
     const titleEl=page.locator('button[title="Change mode"]').first();
     await titleEl.waitFor({state:'visible',timeout:28000});
     assert.equal((await titleEl.innerText()).trim(),title,'Incorrect simulation selected');
+    const initialLoad=await awaitScene(page,17000);
+    result.checks.initialSceneLoad=initialLoad;
+    if(initialLoad.loading)result.warnings.push('Visible scene loading overlay remains after 17 seconds');
     await setPlaying(page);
     await page.waitForFunction(()=>[...document.querySelectorAll('canvas')].some(c=>c.width>=80&&c.height>=80&&c.getClientRects().length),null,{timeout:18000}).catch(()=>{});
     await page.waitForTimeout(350);
@@ -172,14 +203,23 @@ const records=[];
     await page.waitForTimeout(250);
     const stable0=await screenshot(page,slug,'paused');
     const conf0=await state(page);
+    await dismissRandomizeTutorial(page);
     const firstClick=await clickRandom(page);
+    const tutorial1=await dismissRandomizeTutorial(page);
     if(firstClick.blocked)result.warnings.push('Randomize blocked by overlay: clicked original handler for behavior-only test');
+    const load1=await awaitScene(page,11000);
+    result.checks.randomSceneLoad1=load1;
+    if(load1.loading)result.warnings.push('Scene remains loading after Randomize #1 (11s)');
     await page.waitForTimeout(450);
     const conf1=await state(page);
     const roll1=await screenshot(page,slug,'random-1');
     const delta1=Object.keys({...conf0,...conf1}).filter(k=>conf0[k]!==conf1[k]);
     const secondClick=await clickRandom(page);
+    const tutorial2=await dismissRandomizeTutorial(page);
     if(secondClick.blocked)result.warnings.push('Second Randomize blocked by overlay');
+    const load2=await awaitScene(page,11000);
+    result.checks.randomSceneLoad2=load2;
+    if(load2.loading)result.warnings.push('Scene remains loading after Randomize #2 (11s)');
     await page.waitForTimeout(450);
     const conf2=await state(page);
     const roll2=await screenshot(page,slug,'random-2');
@@ -213,7 +253,11 @@ const records=[];
     result.checks.redoMatch=redoMatch;
     if(undoMatch===false)result.warnings.push('Previous Roll did not restore exact visible settings');
     if(redoMatch===false)result.warnings.push('Next Roll did not restore exact visible settings');
+    await dismissRandomizeTutorial(page);
     await setPlaying(page);
+    const afterHistoryReady=await awaitScene(page,9000);
+    result.checks.afterHistoryReady=afterHistoryReady;
+    if(afterHistoryReady.loading)result.warnings.push('Scene remains loading after undo/redo sequence');
     await page.waitForTimeout(750);
     const finalFrame=await screenshot(page,slug,'post-roll-play');
     result.checks.postRollMotion=frameDiff(roll2.buf,finalFrame.buf);
