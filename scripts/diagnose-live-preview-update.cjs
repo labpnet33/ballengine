@@ -52,7 +52,9 @@ async function canvasScreenshot(page,slug,stage){
     const desired=old===String(max)?Math.max(min,max-step*10):Math.min(max,Number(old)+step*10);
     result.setting={old,desired,step,label:before.controls.slice(-1)[0]?.text};
     result.imageBefore=await canvasScreenshot(page,slug,'before');
-    await target.evaluate((e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));},desired);
+    // React tracks the input value; use the native setter so onChange is
+    // actually fired. Plain e.value=... would suppress React's change handler.
+    await target.evaluate((e,v)=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(e,String(v));e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));},desired);
     await page.waitForTimeout(900);
     const after=await snapshot(page); result.setting.actual=after.controls.map(x=>x.value).slice(-1)[0];
     result.imageLive=await canvasScreenshot(page,slug,'live');
