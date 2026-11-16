@@ -5,6 +5,7 @@ on:
     branches: [fix/27-modes-native-controls-preview]
     paths:
       - scripts/diagnose-live-preview-update.cjs
+      - scripts/build-original-studio.cjs
       - .github/workflows/live-preview-synchronization.yml
 permissions:
   contents: read
