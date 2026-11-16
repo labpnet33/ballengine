@@ -17,7 +17,7 @@ const snapshot=async page=>page.evaluate(()=>{
  return {controls:[...root.querySelectorAll('input[type=range],select,input[type=checkbox],input[type=number]')].filter(vis).map((e,i)=>{
  const parent=e.closest('label')||e.parentElement?.parentElement||e.parentElement;
  return {i,type:e.type,value:e.type==='checkbox'?e.checked:e.value,min:e.min,max:e.max,step:e.step,title:e.title,aria:e.getAttribute('aria-label'),name:e.name,text:(parent?.innerText||'').replace(/\s+/g,' ').slice(0,140),options:e.tagName==='SELECT'?[...e.options].map(o=>o.textContent.trim()).slice(0,16):undefined}
- }),playing:!!root.querySelector('button[title="Pause (Space)"]'),loading:root.innerText.match(/Loading (?:3D )?scene[^\n]*/gi)?.slice(0,4),mode:root.querySelector('button[title="Change mode"]')?.innerText}};
+ }),playing:!!root.querySelector('button[title="Pause (Space)"]'),loading:root.innerText.match(/Loading (?:3D )?scene[^\n]*/gi)?.slice(0,4),mode:root.querySelector('button[title="Change mode"]')?.innerText};});
 async function canvasScreenshot(page,slug,stage){
  const canvases=page.locator('canvas:visible');let best=null,max=0;
  for(let i=0;i<await canvases.count();i++){let b=await canvases.nth(i).boundingBox();if(b&&b.width*b.height>max&&b.width>=90&&b.height>=90){best=b;max=b.width*b.height;}}
