@@ -41,6 +41,30 @@ const server=http.createServer((req,res)=>{
       };
     });
     const valuesBeforeRoll=await controlSnapshot();
+    // Stable mode-control snapshot, excluding Publish reminders, social
+    // account checkboxes, aspect-ratio selection and the shared speed control.
+    // It catches randomizers that change only global Studio settings.
+    const engineControlSnapshot=()=>page.evaluate(()=>{
+      const visible=e=>!!e.getClientRects().length&&!e.disabled;
+      const root=document.querySelector('#root');
+      const selects=[...root.querySelectorAll('select')].filter(visible).filter(e=>{
+        const labels=[...e.options].map(o=>o.textContent.trim()).join('|');
+        return !(/Once\\|Daily\\|Weekly/.test(labels) || /15s\\|30s\\|59s/.test(labels) || labels.includes('Instagram Reels'));
+      });
+      const ranges=[...root.querySelectorAll('input[type="range"]')].filter(visible).slice(1);
+      const result={};
+      const counts=new Map();
+      for(const e of selects){
+        const choices=[...e.options].map(o=>o.value).join('|');
+        const base='select:'+choices;
+        const ordinal=counts.get(base)||0;
+        counts.set(base,ordinal+1);
+        result[base+':'+ordinal]=e.value;
+      }
+      for(let i=0;i<ranges.length;i++)result['range:'+i]=ranges[i].value;
+      return result;
+    });
+    const engineBeforeRoll=await engineControlSnapshot();
     // First test native Randomize/history on an untouched initial mode.
     // Manual setting changes may intentionally clear roll history.
     const random=page.getByRole('button',{name:'Randomize',exact:true}).first();
@@ -94,6 +118,12 @@ const server=http.createServer((req,res)=>{
       },null,{timeout:9000}).catch(()=>{});
     }
     assert.ok(await back.isEnabled(),'Randomize history unavailable even after two rolls');
+    const engineAfterRoll=await engineControlSnapshot();
+    const engineChanges=[...new Set([...Object.keys(engineBeforeRoll),...Object.keys(engineAfterRoll)])]
+      .filter(k=>engineBeforeRoll[k]!==engineAfterRoll[k])
+      .map(k=>({key:k,before:engineBeforeRoll[k]??null,after:engineAfterRoll[k]??null}));
+    console.log('MODE_RANDOMIZE_ENGINE_CHANGES '+JSON.stringify({slug,count:engineChanges.length,changes:engineChanges.slice(0,24)}));
+    assert.ok(engineChanges.length>0,'Randomize did not change any mode-specific controls (only shared settings may have changed)');
     const valuesAfterRoll=await controlSnapshot();
     const changedControls=valuesAfterRoll.controls.filter((c,i)=>valuesBeforeRoll.controls[i]?.value!==c.value).map(c=>({label:c.label,kind:c.kind,before:valuesBeforeRoll.controls[c.index]?.value,after:c.value}));
     console.log('MODE_RANDOMIZE_BEHAVIOR_DIAGNOSTIC '+JSON.stringify({slug,changedCount:changedControls.length,changes:changedControls.slice(0,24),initialHeadings:valuesBeforeRoll.headings,modeHeading:valuesBeforeRoll.modeHeading,firstControls:valuesBeforeRoll.controls.slice(0,28)}));
@@ -109,6 +139,9 @@ const server=http.createServer((req,res)=>{
       const alternative=choices.find(o=>o.value!==before);
       if(!alternative)continue;
       const titleText=await sel.evaluate(el=>el.closest('label')?.innerText?.slice(0,110)||el.parentElement?.parentElement?.innerText?.slice(0,110));
+      const labelOptions=await sel.evaluate(el=>[...el.options].map(o=>o.textContent.trim()).join('|'));
+      // Never pass a simulation-control test by changing Publish or shared UI.
+      if(/Once\\|Daily\\|Weekly|15s\\|30s\\|59s|Instagram Reels/.test(labelOptions))continue;
       // The original React UI can replace <option> nodes between inspection
       // and input (notably GPU-heavy 3D scenes). Select the currently valid
       // index rather than asking Playwright to wait for an obsolete value.
@@ -121,7 +154,25 @@ const server=http.createServer((req,res)=>{
       await page.waitForTimeout(100);
       after=await sel.inputValue();changed=after!==before;editedLabel=titleText;if(changed)break;
     }
-    assert.ok(changed,'No editable dropdown value changed');
+    if(!changed){
+      // Some modes (Colors, Spin, Plinko 3D) are intentionally controlled
+      // by numeric sliders rather than a mode-specific dropdown.
+      const sliders=page.locator('#root input[type="range"]:visible:not([disabled])');
+      const count=await sliders.count();
+      if(count>1){
+        const slider=sliders.last(),initial=await slider.inputValue();
+        const max=Number(await slider.getAttribute('max'));
+        const direction=Number(initial)<max?'ArrowRight':'ArrowLeft';
+        await slider.focus();
+        await slider.press(direction,{timeout:9000});
+        await page.waitForTimeout(180);
+        after=await slider.inputValue();
+        before=initial;
+        changed=after!==before;
+        editedLabel='Mode-specific slider';
+      }
+    }
+    assert.ok(changed,'No native mode-specific option changed (publishing controls excluded)');
     const recording=page.locator('button[title="Instantly record a clean clip (C)"]').first();
     assert.ok(await recording.isVisible().catch(()=>false),'Record button disappeared');
     assert.equal((await title.innerText()).trim(),priorMode,'Randomize moved to another mode unexpectedly');
