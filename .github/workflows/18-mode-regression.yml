@@ -1,0 +1,31 @@
+name: Protect the 18 established BallEngine modes
+on:
+  workflow_dispatch:
+  push:
+    branches: [fix/27-modes-native-controls-preview]
+    paths:
+      - scripts/test-18-original-mode-regression.cjs
+      - .github/workflows/18-mode-regression.yml
+permissions:
+  contents: read
+jobs:
+  regression-18:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        range: ['0:6','6:12','12:18']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install Playwright
+        run: npm install --prefix "$RUNNER_TEMP/18-mode-audit" --no-save --no-audit --no-fund playwright-core@1.56.0
+      - name: Rebuild the original Studio
+        run: node scripts/build-original-studio.cjs
+      - name: Verify established mode selection, canvas, settings, Randomize, Record and guest access
+        env:
+          MODE_RANGE: ${{ matrix.range }}
+          NODE_PATH: ${{ runner.temp }}/18-mode-audit/node_modules
+        run: CHROME_BIN="$(command -v google-chrome)" node scripts/test-18-original-mode-regression.cjs
