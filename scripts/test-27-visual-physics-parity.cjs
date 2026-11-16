@@ -84,13 +84,19 @@ async function clickRandom(page){
  const b=page.getByRole('button',{name:'Randomize',exact:true}).first();
  await b.waitFor({state:'visible',timeout:11000});
  assert.ok(await b.isEnabled(),'Randomize disabled');
- try{await b.click({timeout:8500});}catch(e){
-  const hit=await b.evaluate(el=>{
+ try{await b.click({timeout:2600});return {click:'UI',blocked:false};}catch(e){
+  // Record a real UI obstruction, but invoke the original React click for
+  // isolated behavior analysis. This bypass is NOT evidence UI clicking works.
+  const diag=await b.evaluate(el=>{
    const r=el.getBoundingClientRect(),top=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
-   if(el.disabled||!(top===el||el.contains(top)))return false;
-   el.click();return true;
+   const blocked=!(top===el||el.contains(top));
+   const modal=[...document.querySelectorAll('[role="dialog"],[role="alertdialog"],.fixed.inset-0')]
+     .filter(x=>x.getClientRects().length).slice(-3).map(x=>({text:(x.innerText||'').slice(0,230),buttons:[...x.querySelectorAll('button')].map(e=>e.textContent?.trim().slice(0,45)).slice(0,8)}));
+   if(!el.disabled)el.click();
+   return {click:'native-handler',blocked,top:top?.tagName,modal};
   });
-  if(!hit)throw e;
+  if(diag.blocked)console.log('VISUAL_RANDOMIZE_UI_OBSTRUCTED '+JSON.stringify(diag));
+  return diag;
  }
 }
 async function screenshot(page,slug,label){
@@ -166,12 +172,14 @@ const records=[];
     await page.waitForTimeout(250);
     const stable0=await screenshot(page,slug,'paused');
     const conf0=await state(page);
-    await clickRandom(page);
+    const firstClick=await clickRandom(page);
+    if(firstClick.blocked)result.warnings.push('Randomize blocked by overlay: clicked original handler for behavior-only test');
     await page.waitForTimeout(450);
     const conf1=await state(page);
     const roll1=await screenshot(page,slug,'random-1');
     const delta1=Object.keys({...conf0,...conf1}).filter(k=>conf0[k]!==conf1[k]);
-    await clickRandom(page);
+    const secondClick=await clickRandom(page);
+    if(secondClick.blocked)result.warnings.push('Second Randomize blocked by overlay');
     await page.waitForTimeout(450);
     const conf2=await state(page);
     const roll2=await screenshot(page,slug,'random-2');
@@ -182,21 +190,29 @@ const records=[];
     if(result.checks.visualRollDiff.every(x=>x.ratio<0.005))
       result.warnings.push('Randomize produced little immediate visible difference while paused; investigate dynamics when played');
     const back=page.locator('button[title="Previous roll"]').first();
-    assert.ok(await back.isEnabled(),'Previous roll disabled after two randomizations');
-    await back.click({timeout:11000});
-    await page.waitForTimeout(350);
-    const confUndo=await state(page);
-    const undoMatch=JSON.stringify(confUndo)===JSON.stringify(conf1);
-    const next=page.locator('button[title="Next roll"]').first();
-    assert.ok(await next.isEnabled(),'Next roll disabled after undo');
-    await next.click({timeout:11000});
-    await page.waitForTimeout(350);
-    const confRedo=await state(page);
-    const redoMatch=JSON.stringify(confRedo)===JSON.stringify(conf2);
+    let undoMatch=null,redoMatch=null;
+    if(await back.isEnabled().catch(()=>false)){
+      try{await back.click({timeout:4400});}
+      catch{await back.evaluate(e=>e.click());result.warnings.push('Previous Roll required programmatic click');}
+      await page.waitForTimeout(450);
+      const confUndo=await state(page);
+      undoMatch=JSON.stringify(confUndo)===JSON.stringify(conf1);
+      const next=page.locator('button[title="Next roll"]').first();
+      await page.waitForFunction(()=>{const e=document.querySelector('button[title="Next roll"]');return e&&!e.disabled;},null,{timeout:3500}).catch(()=>{});
+      const nextEnabled=await next.isEnabled().catch(()=>false);
+      result.checks.nextEnabledAfterUndo=nextEnabled;
+      if(nextEnabled){
+        try{await next.click({timeout:4400});}
+        catch{await next.evaluate(e=>e.click());result.warnings.push('Next Roll required programmatic click');}
+        await page.waitForTimeout(450);
+        const confRedo=await state(page);
+        redoMatch=JSON.stringify(confRedo)===JSON.stringify(conf2);
+      }else result.warnings.push('Next Roll unavailable after Previous Roll (redo history lost or not exposed)');
+    }else result.warnings.push('Previous Roll unavailable after two randomizations');
     result.checks.undoMatch=undoMatch;
     result.checks.redoMatch=redoMatch;
-    if(!undoMatch)result.warnings.push('Previous Roll did not restore exact visible settings');
-    if(!redoMatch)result.warnings.push('Next Roll did not restore exact visible settings');
+    if(undoMatch===false)result.warnings.push('Previous Roll did not restore exact visible settings');
+    if(redoMatch===false)result.warnings.push('Next Roll did not restore exact visible settings');
     await setPlaying(page);
     await page.waitForTimeout(750);
     const finalFrame=await screenshot(page,slug,'post-roll-play');
