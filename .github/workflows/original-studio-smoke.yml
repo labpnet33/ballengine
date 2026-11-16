@@ -1,7 +1,7 @@
 name: Smoke-test original BallEngine Studio preview
 on:
   push:
-    branches: [preview/original-studio-assets, fix/production-home-route, perf/low-res-preview-full-quality-export]
+    branches: [preview/original-studio-assets, fix/production-home-route, perf/low-res-preview-full-quality-export, fix/27-modes-native-controls-preview]
   pull_request:
     paths:
       - scripts/build-original-studio.cjs
