@@ -1,18 +1,19 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path');
-const f=path.resolve(__dirname,'..','extra/wget/ballengine.app/assets/index-3pf76ICO.js');
-const a=fs.readFileSync(f,'utf8');
-console.log('DOMINO_INSPECT_SIZE',a.length);
-const keys=[
- 'DOMINO_3D','domino3DCount','domino3DLayout','domino3DColor','domino3D',
- 'Domino 3D','DOMINO_3D:', 'CIRCUIT_ROUND','domino3DGravity',
- 'domino3DZoom','zoomIn','zoomOut','Zoom in','Zoom out','Camera zoom'
+const a=fs.readFileSync(path.resolve(__dirname,'..','extra/wget/ballengine.app/assets/index-3pf76ICO.js'),'utf8');
+const samples=[
+ ['renderer-init',9212490,3000,5400],
+ ['runtime-mode-case',9501718,1600,5300],
+ ['runtime-scene',9693792,2300,6200],
+ ['renderer-ui',3755361,900,3500],
+ ['camera-controls',1281996,500,1800],
+ ['model-function',1862621,2500,2000]
 ];
-for(const k of keys){
- const pos=[];let ix=-1;
- while((ix=a.indexOf(k,ix+1))>=0&&pos.length<60)pos.push(ix);
- console.log('DOMINO_KEY',JSON.stringify({key:k,count:a.split(k).length-1,positions:pos}));
- for(const p of pos.slice(0,k==='DOMINO_3D'?10:k==='domino3DCount'?16:k==='domino3DLayout'?12:3)){
-  console.log('DOMINO_CONTEXT',JSON.stringify({key:k,pos:p,before:a.slice(Math.max(0,p-750),p),after:a.slice(p,p+1400)}));
- }
+for(const [key,pos,before,after] of samples)console.log('DOMINO_DETAIL '+JSON.stringify({key,pos,content:a.slice(pos-before,pos+after)}));
+const terms=['domino3DFollowZoom','domino3DFollowCascade','domino3DColorMode','domino3DFollowFrameAll'];
+for(const term of terms){
+ let pos=-1,i=0;const p=[];
+ while((pos=a.indexOf(term,pos+1))>=0)p.push(pos);
+ console.log('DOMINO_TERM '+JSON.stringify({term,count:p.length,positions:p}));
+ for(const pos of p.filter(x=>x>8500000).slice(0,12))console.log('DOMINO_LIVE '+JSON.stringify({term,pos,content:a.slice(pos-1000,pos+2200)}));
 }
