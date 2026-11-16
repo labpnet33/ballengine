@@ -56,12 +56,18 @@ async function canvasScreenshot(page,slug,stage){
     // actually fired. Plain e.value=... would suppress React's change handler.
     await target.evaluate((e,v)=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(e,String(v));e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));},desired);
     await page.waitForTimeout(900);
-    const after=await snapshot(page); result.setting.actual=after.controls.map(x=>x.value).slice(-1)[0];
+    const after=await snapshot(page);
+    result.setting.actual=await target.inputValue();
     result.imageLive=await canvasScreenshot(page,slug,'live');
+    await page.waitForTimeout(4000);
+    result.imageSettled=await canvasScreenshot(page,slug,'live-settled');
+    result.liveChangedWithoutRefresh=result.imageBefore.sha!==result.imageSettled.sha;
+    if(slug==='flood-fill'&&!result.liveChangedWithoutRefresh)
+      throw Error('Regression: Flood 3D did not update live preview canvas after gravity change; only browser refresh updates scene');
     await page.reload({waitUntil:'domcontentloaded',timeout:40000});
     await page.locator('button[title="Change mode"]').first().waitFor({state:'visible',timeout:20000});
     await page.waitForTimeout(1500);
-    const reload=await snapshot(page);result.setting.afterReload=reload.controls.map(x=>x.value).slice(-1)[0];
+    const reload=await snapshot(page);result.setting.afterReload=await page.locator('#root input[type=range]:visible:not([disabled])').last().inputValue();
     result.imageReload=await canvasScreenshot(page,slug,'reload');
     result.errors=errors;
    }catch(e){result.error=String(e).slice(0,500);result.errors=errors;}
