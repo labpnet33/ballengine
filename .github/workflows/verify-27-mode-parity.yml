@@ -1,7 +1,7 @@
 name: Verify 27 simulation engine parity
 on:
   push:
-    branches: [dev/complete-27-mode-engines]
+    branches: [dev/complete-27-mode-engines, fix/27-modes-native-controls-preview]
     paths:
       - scripts/build-original-studio.cjs
       - scripts/test-mode-option-interactivity.cjs
